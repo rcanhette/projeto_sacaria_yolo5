@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iniciar Contagem</title>
+</head>
+<body>
+    <h2>Dados da Contagem</h2>
+    <form method="post">
+        Lote: <input type="text" name="lote" required><br><br>
+        
+        <h3>Escolha a Fonte de Vídeo:</h3>
+        
+        <input type="radio" id="rtsp" name="source_type" value="rtsp" checked>
+        <label for="rtsp">Câmera RTSP (Produção)</label><br>
+        
+        <input type="radio" id="local" name="source_type" value="local">
+        <label for="local">Vídeo Local (Teste/Gravação)</label><br>
+        
+        <label for="source_input">Caminho do Arquivo (Ex: C:\video.mp4):</label>
+        <input type="text" name="source_input" id="source_input" style="width: 300px;" 
+               placeholder="Deixe vazio se for RTSP" value="{{ last_source if 'rtsp' not in last_source else '' }}">
+        <br><br>
+        
+        <button type="submit">Start Contagem</button>
+    </form>
+</body>
+</html>
