@@ -28,13 +28,13 @@ class IndustrialTagDetector:
         self.next_id = 1
         
         # AJUSTE FINAL: Alta tolerância para evitar dupla contagem durante manuseio (2.0s em 30 FPS)
-        self.max_lost = 2.0
+        self.max_lost = 8
         # AJUSTE FINAL: Distância de rastreamento confirmada que resolveu a contagem múltipla
-        self.match_dist = 200 
+        self.match_dist = 130 
         
         # Filtros: ID e Confiança
         self.target_ids = [0] # ID da sacaria (Classe 0)
-        self.min_conf = 0.25 # Confiança mínima para detecção
+        self.min_conf = 0.80 # Confiança mínima para detecção
         
         # Log
         self.log_file = log_file
