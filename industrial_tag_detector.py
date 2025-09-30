@@ -27,14 +27,14 @@ class IndustrialTagDetector:
         self.tracked_objects = {}
         self.next_id = 1
         
-        # AJUSTE FINAL: Alta tolerância para evitar dupla contagem durante manuseio (2.0s em 30 FPS)
-        self.max_lost = 8
-        # AJUSTE FINAL: Distância de rastreamento confirmada que resolveu a contagem múltipla
-        self.match_dist = 130 
+        # AJUSTE DE ESTABILIDADE: Tolerância de 2 segundos de perda (24 frames)
+        self.max_lost = 8 
+        # AJUSTE DE SEPARAÇÃO: 150 pixels para SEPARAR sacarias que passam próximas.
+        self.match_dist = 100 
         
         # Filtros: ID e Confiança
-        self.target_ids = [0] # ID da sacaria (Classe 0)
-        self.min_conf = 0.80 # Confiança mínima para detecção
+        self.target_ids = [0] # ID da sacaria (Cl_90asse 0)
+        self.min_conf = 0.90 # Confiança mínima para detecção
         
         # Log
         self.log_file = log_file
@@ -67,12 +67,13 @@ class IndustrialTagDetector:
         # Definição crucial: verifica se o ROI foi definido (qualquer valor > 0)
         is_roi_active = w_roi > 0 and h_roi > 0
 
-        # 1. Desenha o ROI (caixa verde) ou a Linha de Contagem (amarela)
+        # 1. Desenha o ROI (quadro verde) ou a Linha Central
         if is_roi_active:
-            # Desenha o quadro verde
+            # Desenha o quadro verde (Zona de Contagem)
             cv2.rectangle(frame, (x_roi, y_roi), (x_final, y_final), (0, 255, 0), 2)
+            
         else:
-            # Desenha a linha amarela central (Deve ser ativado com ROI_ORIGINAL = (0, 0, 0, 0))
+            # Desenha a linha amarela central (fallback se o ROI não estiver ativo)
             crossing_line_x = int(w_frame * 0.50)
             cv2.line(frame, (crossing_line_x, 0), (crossing_line_x, h_frame), (0, 255, 255), 2)
 
@@ -109,11 +110,13 @@ class IndustrialTagDetector:
                     best_match_id = obj_id
 
             if best_match_id is not None and best_match_id not in matched_ids:
-                prev_cx = self.tracked_objects[best_match_id]['cx']
+                
+                # RESTAURADO: Rastreamento simplificado, o movimento Y não é mais rastreado explicitamente.
+                prev_cx = self.tracked_objects[best_match_id]['cx'] 
                 
                 self.tracked_objects[best_match_id].update({
                     'x1': dx1, 'y1': dy1, 'x2': dx2, 'y2': dy2,
-                    'cx': dcx, 'cy': dcy, 'prev_cx': prev_cx,
+                    'cx': dcx, 'cy': dcy, 'prev_cx': prev_cx, # RESTAURADO
                     'lost_frames': 0,
                     'conf': dconf
                 })
@@ -122,7 +125,7 @@ class IndustrialTagDetector:
             elif best_match_id is None:
                 self.tracked_objects[self.next_id] = {
                     'x1': dx1, 'y1': dy1, 'x2': dx2, 'y2': dy2,
-                    'cx': dcx, 'cy': dcy, 'prev_cx': dcx,
+                    'cx': dcx, 'cy': dcy, 'prev_cx': dcx, # RESTAURADO
                     'lost_frames': 0,
                     'counted': False,
                     'conf': dconf
@@ -136,14 +139,9 @@ class IndustrialTagDetector:
         for obj_id in list(self.tracked_objects.keys()):
             obj = self.tracked_objects[obj_id]
             
-            # === NOVA LÓGICA DE DESCARTE RÁPIDO (Se o centro sair do ROI) ===
-            x_roi, y_roi, w_roi, h_roi = self.roi
-            x_final, y_final = x_roi + w_roi, y_roi + h_roi
-            is_roi_active = w_roi > 0 and h_roi > 0
-
-            # Se o ROI estiver ativo E o centro do objeto estiver fora dele
-            if is_roi_active and (obj['cx'] < x_roi or obj['cx'] > x_final or obj['cy'] < y_roi or obj['cy'] > y_final):
-                 # Deleta o ID imediatamente para remover o quadrado azul.
+            # === MANTIDO: DESCARTE CRÍTICO POR SAÍDA DE TELA (Evita Roubo de ID) ===
+            # Deleta o ID imediatamente se o objeto sair dos limites da imagem (borda superior ou inferior)
+            if obj['y1'] < 10 or obj['y2'] > h_frame - 10:
                  del self.tracked_objects[obj_id]
                  continue
             # ==========================================================
@@ -153,11 +151,11 @@ class IndustrialTagDetector:
                 obj['lost_frames'] += 1
                 
                 if obj['lost_frames'] > self.max_lost:
-                    # Log de PERDIDO COMENTADO
                     del self.tracked_objects[obj_id]
                     continue
             else:
-                 obj['prev_cx'] = obj['cx']
+                 # RESTAURADO: Atualiza apenas a posição X anterior
+                 obj['prev_cx'] = obj['cx'] 
 
 
             # Desenha a Bounding Box e ID
@@ -166,32 +164,26 @@ class IndustrialTagDetector:
             cv2.putText(frame, f"ID: {obj_id} Conf:{obj['conf']:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
             
             # ====================================================================
-            # LÓGICA DE CONTAGEM (Entrada na Área de Contagem)
+            # LÓGICA DE CONTAGEM ORIGINAL (Contagem por Zona de Contagem)
             # ====================================================================
-            is_in_counting_area = False
             
             if not obj['counted']:
                 
-                if not is_roi_active:
-                    # Contagem sem ROI: Contar se o centro do objeto estiver na metade direita da tela
-                    crossing_line_x = int(w_frame * 0.50)
-                    
-                    # Condição: Se o centro do objeto estiver à direita ou sobre a linha central
-                    if obj['cx'] >= crossing_line_x:
-                        is_in_counting_area = True
-
-                else:
-                    # Contagem com ROI: Objeto entra na área definida (quadro verde)
-                    # NOTA: O descarte rápido acontece na lógica acima, 
-                    # mas a contagem ainda usa esta verificação para garantir que o objeto está no ROI.
+                if is_roi_active:
+                    # Contagem com ROI: Se o centro estiver dentro do quadrado (Zona de Contagem)
                     if x_roi <= obj['cx'] <= x_final and y_roi <= obj['cy'] <= y_final:
-                        is_in_counting_area = True
-
-                if is_in_counting_area:
-                    self.counter += 1
-                    obj['counted'] = True
-                    self._log(f"RECONHECIMENTO {datetime.now().strftime('%d/%m/%Y %H:%M:%S')} +1 (ID: {obj_id})")
-                    
+                        self.counter += 1
+                        obj['counted'] = True
+                        self._log(f"RECONHECIMENTO {datetime.now().strftime('%d/%m/%Y %H:%M:%S')} +1 (ID: {obj_id})")
+                
+                # Lógica de fallback para a linha central X, se o ROI não estiver ativo
+                elif not is_roi_active:
+                    crossing_line_x = int(w_frame * 0.50)
+                    if obj['cx'] >= crossing_line_x:
+                        self.counter += 1
+                        obj['counted'] = True
+                        self._log(f"RECONHECIMENTO {datetime.now().strftime('%d/%m/%Y %H:%M:%S')} +1 (ID: {obj_id})")
+                        
         return frame, self.counter
 
     def get_current_count(self):
