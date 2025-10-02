@@ -1,15 +1,16 @@
 import os
 import json
-from flask import Flask, render_template, Response, request, redirect, url_for
+from flask import Flask, render_template, Response, request, redirect, url_for, flash, jsonify
 import cv2
 from datetime import datetime
 from industrial_tag_detector import IndustrialTagDetector
 import time
+from threading import Lock
 
-# IMPORTAÇÃO CORRIGIDA: Usa a classe VideoSource que tem a solução de threading
+# IMPORTAÇÃO ASSUMIDA: A classe VideoSource que usa threading (recomendado)
 from video_source import VideoSource 
 
-# Filtro de Aviso (para ser usado com 'python -W ignore app.py')
+# Filtro de Aviso
 import warnings
 warnings.filterwarnings(
     "ignore", 
@@ -23,194 +24,250 @@ MODEL_PATH = "sacaria_yolov5n.pt"
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
 
-# Fontes de Vídeo
-RTSP_URL = "rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101"
-
-# ROI: (x_inicial, y_inicial, largura, altura)
-# ATENÇÃO: Configurado para 1920x1080 (escala de 1.5x o antigo 1280x720)
-ROI_ORIGINAL = (765, 495, 300, 375)
-# A linha abaixo foi o antigo ROI (0, 0, 0, 0) que desativa o ROI
-#ROI_ORIGINAL = (0, 0, 0, 0)
-
-camera = None 
+# Variáveis globais para rastreamento
+camera = None
 detector = None
+frame_lock = Lock()
+
+# =========================================================
+# Configurações de Câmera e ROI
+# =========================================================
+
+CONFIG_CAMERA_1 = {
+    "name": "Câmera 1 (Produção)",
+    "rtsp_url": "rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101", 
+    "roi": (765, 495, 300, 375), 
+    "model": "sacaria_yolov5n.pt"
+}
+
+CONFIG_CAMERA_2 = {
+    "name": "Câmera 2 (Teste/Nova)",
+    "rtsp_url": "rtsp://user:password@ip_da_sua_nova_camera:port/path", 
+    "roi": (100, 100, 500, 400), 
+    "model": "sacaria_yolov5n.pt" 
+}
+
+CAMERA_OPTIONS = {
+    "CAM1": CONFIG_CAMERA_1,
+    "CAM2": CONFIG_CAMERA_2,
+}
+
+# =========================================================
+# Funções de Gerenciamento de Estado
+# =========================================================
 
 def load_state():
-    if not os.path.exists(STATE_FILE):
+    try:
+        with open(STATE_FILE, 'r') as f:
+            state = json.load(f)
+            if 'camera_id' not in state:
+                state['camera_id'] = "CAM1" 
+            return state
+    except (FileNotFoundError, json.JSONDecodeError):
         return {
             "status": "STOP",
             "lote": "",
             "data": "",
             "hora_inicio": "",
             "log_file": None,
-            "source_path": RTSP_URL 
+            "source_path": None,
+            "camera_id": "CAM1",
         }
-    with open(STATE_FILE, "r", encoding="utf-8") as f:
-        state = json.load(f)
-        if "source_path" not in state:
-             state["source_path"] = RTSP_URL
-        return state
 
 def save_state(state):
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
+    with open(STATE_FILE, 'w') as f:
         json.dump(state, f)
 
 def clear_state():
-    save_state({
-        "status": "STOP",
-        "lote": "",
-        "data": "",
-        "hora_inicio": "",
-        "log_file": None,
-        "source_path": RTSP_URL 
-    })
+    state = load_state()
+    state["status"] = "STOP"
+    state["lote"] = ""
+    state["data"] = ""
+    state["hora_inicio"] = ""
+    state["log_file"] = None
+    state["source_path"] = None
+    save_state(state)
 
-def salvar_contagem(lote, data, hora_inicio, hora_fim, quantidade, log_file_path):
-    # Log completo
-    final_filename = f"log_contagem_{lote}_{data.replace('/', '-')}_{hora_inicio.replace(':', '-')}.txt"
-    linha_resumo = f"lote: {lote} | Data: {data} | Hora Início: {hora_inicio} | Hora Fim: {hora_fim} | Quantidade: {quantidade}\n"
-    
+def salvar_contagem(lote, data, hora_inicio, hora_fim, quantidade, log_file_path=None):
     try:
-        if log_file_path and os.path.exists(log_file_path):
-            with open(log_file_path, 'r', encoding='utf-8') as f:
-                conteudo_log_detalhado = f.read()
-            
-            conteudo_final = linha_resumo + conteudo_log_detalhado
-            
-            with open(log_file_path, 'w', encoding='utf-8') as f:
-                f.write(conteudo_final)
-            
-            os.rename(log_file_path, final_filename)
-        else:
-             with open(final_filename, 'w', encoding='utf-8') as f:
-                 f.write(linha_resumo)
+        if log_file_path:
+            with open(log_file_path, 'a') as f:
+                f.write(f"FIM: {hora_fim}\n")
+                f.write(f"QUANTIDADE FINAL: {quantidade}\n")
 
+        file_exists = os.path.exists("contagens_finalizadas.csv")
+        with open("contagens_finalizadas.csv", 'a') as f:
+            if not file_exists or os.path.getsize("contagens_finalizadas.csv") == 0:
+                f.write("Lote,Data,Hora_Inicio,Hora_Fim,Quantidade\n")
+            f.write(f"{lote},{data},{hora_inicio},{hora_fim},{quantidade}\n")
+            
     except Exception as e:
-        print(f"[ERRO CONSOLIDAÇÃO] Falha ao consolidar ou renomear log: {e}")
-        with open(final_filename, 'a', encoding='utf-8') as f:
-            f.write(linha_resumo)
+        print(f"[ERRO DE LOG] Falha ao salvar a contagem final: {e}")
+
+# =========================================================
+# Rotas e Lógica de Vídeo
+# =========================================================
+
+# ROTA SSE (Server-Sent Events) - SOLUÇÃO FINAL PARA O CONTADOR HTML
+@app.route('/sse_count')
+def sse_count():
+    def generate_count_events():
+        global detector
+        while True:
+            # Polling no servidor a cada 1 segundo
+            count = detector.counter if detector else 0
+            
+            # Formato SSE: data: <valor> \n\n
+            data = f"data: {count}\n\n"
+            yield data
+            
+            time.sleep(1) 
+
+    return Response(generate_count_events(), mimetype='text/event-stream')
+
+
+# ROTA DE BACKUP: Retorna a contagem atual como JSON (Para o JS se o SSE falhar)
+@app.route('/get_count')
+def get_count():
+    global detector
+    count = detector.counter if detector else 0
+    return jsonify({'count': count})
+
 
 def gen_frames():
     global camera, detector
+    
     while True:
+        # Garante que a câmera e o detector estejam prontos antes de processar
         if camera and detector:
-            ret, frame = camera.get_frame()
-            if not ret or frame is None:
-                # Se falhar, tenta pegar um frame em branco, agora em 1920x1080
-                import numpy as np 
-                frame = np.zeros((1080, 1920, 3), dtype=np.uint8) 
-                cv2.putText(frame, "ERRO: CAMERA OFFLINE OU FIM DO VIDEO", (50, 360), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
-            else:
-                frame, total_count = detector.detect_and_tag(frame)
-                
-              # ==========================================================
-                # NOVO DESTAQUE: Fundo Preto e Texto Branco
-                # ==========================================================
-                text = f"TOTAL: {total_count}"
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                font_scale = 1.5
-                thickness = 4
-                
-                # Posição de Início do Texto
-                position_x, position_y = 20, 60 
-                
-                # 1. Calcular o tamanho que o texto ocupa
-                # text_size[0] = largura, text_size[1] = altura da fonte
-                (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness)
-                
-                # 2. Desenhar o Fundo (Retângulo Preto)
-                # Ponto de início (canto superior esquerdo do retângulo)
-                rect_start = (position_x - 10, position_y - text_height - 10)
-                # Ponto final (canto inferior direito do retângulo)
-                rect_end = (position_x + text_width + 10, position_y + baseline + 10)
-                
-                # Desenha o retângulo preenchido (cor BGR: Preto = 0, 0, 0)
-                cv2.rectangle(frame, rect_start, rect_end, (0, 0, 0), -1) 
-                
-                # 3. Desenhar o Texto Principal (Branco)
-                # A cor (255, 255, 255) é BGR (Azul, Verde, Vermelho)
-                cv2.putText(frame, text, (position_x, position_y), font, font_scale, (255, 255, 255), thickness) 
-                
-                # ==========================================================
-                
-            # Redimensiona para o display do navegador (800x600)
-            display_frame = cv2.resize(frame, (800, 600)) 
             
-            ret, buffer = cv2.imencode('.jpg', display_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        else:
-            import numpy as np
-            frame = np.zeros((600, 800, 3), dtype=np.uint8)
-            cv2.putText(frame, "Contagem Parada. Clique em 'Start'", (50, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-            ret, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            time.sleep(1) 
+            ret, frame = camera.get_frame() 
+            
+            if not ret or frame is None:
+                time.sleep(0.1)
+                continue
+                
+            with frame_lock:
+                # TRATAMENTO DE ERRO ROBUSTO: Protege o stream contra falhas no detector
+                try:
+                    # 1. Processa o frame
+                    processed_frame, count = detector.detect_and_tag(frame)
+                    
+                    if processed_frame is None:
+                         time.sleep(0.1)
+                         continue
+                         
+                    h, w, _ = processed_frame.shape
+                    
+                    # 2. CÓDIGO FINAL DE DESENHO DO CONTADOR (Fundo Preto/Letra Branca)
+                    count_text = f"TOTAL: {count}"
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    
+                    # Desenha Fundo
+                    (text_w, text_h), baseline = cv2.getTextSize(count_text, font, 1.5, 3)
+                    text_x = w - 400
+                    text_y = 50 
+                    cv2.rectangle(processed_frame, 
+                                  (text_x - 10, text_y - text_h - 10), 
+                                  (text_x + text_w + 10, text_y + baseline + 10), 
+                                  (0, 0, 0), -1) # Fundo preto
+                                  
+                    # Desenha Texto
+                    cv2.putText(processed_frame, count_text, (text_x, text_y), font, 1.5, (255, 255, 255), 3)
+                    
+                    # -------------------------------------
 
-@app.route('/', methods=['GET', 'POST'])
+                    # 3. Codifica para JPEG e envia
+                    ret, buffer = cv2.imencode('.jpg', processed_frame)
+                
+                    if ret:
+                        yield (b'--frame\r\n'
+                               b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+                
+                except Exception as e:
+                    print(f"[ERRO NO PROCESSAMENTO DO FRAME] Detector falhou: {e}")
+                    time.sleep(0.5)
+        else:
+            time.sleep(0.5)
+
+
+@app.route('/')
 def index():
     state = load_state()
-    if state["status"] == "START":
-        return redirect(url_for('contagem'))
-        
-    if request.method == 'POST':
-        # 1. Obter dados do formulário
-        lote = request.form['lote']
-        source_type = request.form['source_type']
-        source_input = request.form.get('source_input', '').strip()
-        
-        # 2. Definir a fonte de vídeo
-        if source_type == 'rtsp':
-            source = RTSP_URL
-        elif source_type == 'local' and source_input:
-            source = source_input
-        else:
-             # Caso default ou erro, usa RTSP
-            source = RTSP_URL
-            
-        # 3. Inicializar Log e Detector
-        agora = datetime.now()
-        data = agora.strftime("%d/%m/%Y")
-        hora_inicio = agora.strftime("%H:%M:%S")
-        log_temp_name = f"temp_log_{lote}_{data.replace('/', '-')}_{hora_inicio.replace(':', '-')}.txt"
-        
-        global camera, detector
-        camera = VideoSource(source) 
-        detector = IndustrialTagDetector(model_path=MODEL_PATH, roi=ROI_ORIGINAL, log_file=log_temp_name)
-        
-        # 4. Salvar estado
-        state = {
-            "status": "START",
-            "lote": lote,
-            "data": data,
-            "hora_inicio": hora_inicio,
-            "log_file": log_temp_name,
-            "source_path": source 
-        }
-        save_state(state)
-        
-        return redirect(url_for('contagem'))
-        
-    return render_template('index.html', last_source=state["source_path"])
-
-@app.route('/contagem')
-def contagem():
-    state = load_state()
-    global detector
-    total_count = detector.counter if detector else 0 
+    
+    selected_camera_id = state.get("camera_id", "CAM1")
+    total_count = detector.counter if detector else 0
     
     return render_template(
-        'contagem.html',
+        'index.html',
+        status=state["status"],
         lote=state["lote"],
         data=state["data"],
         hora_inicio=state["hora_inicio"],
-        # A contagem total agora é passada uma vez, no carregamento da página
         total_count=total_count, 
-        source=state["source_path"]
+        source=state["source_path"],
+        
+        camera_options=CAMERA_OPTIONS,
+        selected_camera=selected_camera_id
     )
+
+@app.route('/start', methods=['POST'])
+def start():
+    state = load_state()
+    
+    lote = request.form['lote']
+    source_type = request.form['source_type']
+    camera_id = request.form.get('camera_id', 'CAM1') 
+    
+    config = CAMERA_OPTIONS.get(camera_id)
+    if not config:
+        flash("Configuração de câmera inválida.", "error")
+        return redirect(url_for('index'))
+
+    rtsp_url = config["rtsp_url"]
+    roi_config = config["roi"]
+    model_path = config["model"]
+
+    agora = datetime.now()
+    os.makedirs("logs", exist_ok=True)
+    log_file = os.path.join("logs", f"{lote}_{agora.strftime('%Y%m%d_%H%M%S')}.log")
+
+    source_path = rtsp_url if source_type == 'rtsp' else request.form['video_file']
+
+    state["status"] = "START"
+    state["lote"] = lote
+    state["data"] = agora.strftime("%d/%m/%Y")
+    state["hora_inicio"] = agora.strftime("%H:%M:%S")
+    state["log_file"] = log_file
+    state["source_path"] = source_path
+    state["camera_id"] = camera_id 
+    
+    save_state(state) 
+    
+    global camera, detector
+    
+    # GARANTINDO LIMPEZA DE OBJETOS ANTERIORES
+    if camera:
+        camera.release()
+        camera = None
+    detector = None
+
+    try:
+         # Inicializa a câmera e o detector
+         camera = VideoSource(source_path)
+         detector = IndustrialTagDetector(
+             model_path=model_path,
+             roi=roi_config, 
+             log_file=log_file
+         )
+         flash(f"Contagem iniciada para {config['name']} (Lote: {lote}).", "success")
+         # REDIRECT PADRÃO: Usado em conjunto com a lógica SSE para iniciar o contador
+         return redirect(url_for('index'))
+         
+    except Exception as e:
+         flash(f"Erro ao iniciar o stream ou detector: {e}", "error")
+         clear_state() 
+         return redirect(url_for('index'))
 
 @app.route('/video_feed')
 def video_feed():
@@ -233,22 +290,34 @@ def stop():
         camera.release()
         camera = None
     detector = None
+    
+    flash(f"Contagem finalizada. Total de sacos: {quantidade}", "info")
     clear_state()
     
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
+    # Lógica de RESTAURAÇÃO DE ESTADO
     state = load_state()
     if state["status"] == "START" and state.get("source_path"):
         source = state["source_path"]
         log_file = state["log_file"]
+        camera_id = state.get("camera_id", "CAM1")
+        
+        config = CAMERA_OPTIONS.get(camera_id, CONFIG_CAMERA_1)
+        roi_config = config["roi"]
+        model_path = config["model"]
         
         try:
              camera = VideoSource(source)
-             detector = IndustrialTagDetector(model_path=MODEL_PATH, roi=ROI_ORIGINAL, log_file=log_file)
+             detector = IndustrialTagDetector(
+                 model_path=model_path,
+                 roi=roi_config,
+                 log_file=log_file
+             )
+             print(f"Estado restaurado. Contagem rodando em {config['name']}.")
         except Exception as e:
-             print(f"[AVISO] Não foi possível restaurar a sessão anterior: {e}")
+             print(f"Falha ao restaurar o estado: {e}. O sistema será limpo.")
              clear_state()
-             
-    # Execução na porta 8080
-    app.run(debug=True, threaded=True, port=8080)
+    
+    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
