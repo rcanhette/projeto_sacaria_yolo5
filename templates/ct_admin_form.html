@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ 'Nova CT' if mode=='new' else 'Editar CT' }}</title>
+  <style>
+    body{font-family:Segoe UI,Roboto,Arial;margin:0;background:#f8fafc;color:#002F54}
+    .wrap{max-width:700px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    h1{margin:0 0 16px}
+    label{display:block;margin-top:12px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6B7280}
+    input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-top:6px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{margin-top:18px;display:flex;gap:12px}
+    .btn{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;font-weight:700}
+    .save{background:#22c55e;color:#062b16}
+    .back{background:#004A80;color:#fff;text-decoration:none;display:inline-flex;align-items:center}
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    <h1>{{ 'Nova CT' if mode=='new' else 'Editar CT' }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li><strong>{{ category }}:</strong> {{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <label>Nome</label>
+      <input type="text" name="name" required value="{{ ct.name if ct else '' }}">
+
+      <label>URL RTSP</label>
+      <input type="text" name="source_path" required value="{{ ct.source_path if ct else '' }}">
+
+      <div class="row">
+        <div>
+          <label>ROI (x,y,w,h)</label>
+          <input type="text" name="roi" required placeholder="765,495,300,375" value="{{ ct.roi if ct else '' }}">
+        </div>
+        <div>
+          <label>Modelo YOLO (path)</label>
+          <input type="text" name="model_path" required value="{{ ct.model_path if ct else 'sacaria_yolov5n.pt' }}">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn save" type="submit">Salvar</button>
+        <a class="btn back" href="{{ url_for('ct_admin.ct_admin_list') }}">Voltar</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

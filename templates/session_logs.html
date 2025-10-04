@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Logs da Sessão #{{ sess.id }}</title>
+  <style>
+    body{font-family:Segoe UI,Roboto,Arial;margin:0;background:#f8fafc;color:#002F54}
+    .wrap{max-width:900px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    h1{margin:0 0 16px}
+    .meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+    .box{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px}
+    .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#6B7280}
+    .value{font-weight:700;margin-top:4px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+    a.link{color:#004A80;text-decoration:none;border-bottom:1px dashed #004A80}
+    .row-actions{margin-top:10px}
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    <h1>Logs da Sessão #{{ sess.id }} — {{ sess.ct_name }}</h1>
+
+    <div class="meta">
+      <div class="box">
+        <div class="label">Lote</div>
+        <div class="value">{{ sess.lote }}</div>
+      </div>
+      <div class="box">
+        <div class="label">Início</div>
+        <div class="value">{{ sess.data_inicio.strftime('%d/%m/%Y %H:%M:%S') if sess.data_inicio else '-' }}</div>
+      </div>
+      <div class="box">
+        <div class="label">Fim</div>
+        <div class="value">{{ sess.data_fim.strftime('%d/%m/%Y %H:%M:%S') if sess.data_fim else '-' }}</div>
+      </div>
+    </div>
+
+    <div class="row-actions">
+      <a class="link" href="{{ url_for('logs.session_logs_export_xlsx', session_id=sess.id) }}">Baixar XLSX</a>
+      &nbsp;|&nbsp;
+     <!-- <a class="link" href="{{ url_for('logs.session_logs_export_txt', session_id=sess.id) }}">Baixar TXT</a> 
+      &nbsp;|&nbsp; -->
+      <a class="link" href="{{ url_for('logs.logs_panel', ct_id=sess.ct_id) }}">Voltar ao painel</a>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Evento</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in logs %}
+          <tr>
+            <td>{{ r.ts.strftime('%H:%M:%S') }}</td>
+            <td>
+              {% if r.delta == 1 %}
+                RECONHECIMENTO + 1
+              {% else %}
+                RECONHECIMENTO - 1
+              {% endif %}
+            </td>
+            <td>{{ r.total_atual }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3">Sem eventos nesta sessão.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

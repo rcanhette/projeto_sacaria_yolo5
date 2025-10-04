@@ -37,7 +37,7 @@ class VideoSource:
             fps = self.cap.get(cv2.CAP_PROP_FPS)
             
             if fps > 0:
-                self.delay = 1.0 / fps 
+                self.delay = 1 / fps 
                 print(f"[FPS] Vídeo FPS: {fps:.2f}. Delay ajustado para: {self.delay:.4f}s")
             else:
                 self.delay = 0.033 # Fallback

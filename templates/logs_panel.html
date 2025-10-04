@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Logs por CT</title>
+  <style>
+    body{font-family:Segoe UI,Roboto,Arial;margin:0;background:#f8fafc;color:#002F54}
+    .wrap{max-width:1000px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    h1{margin:0 0 16px}
+    .filters{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+    select{padding:8px 10px;border:1px solid #e5e7eb;border-radius:10px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+    a.link{color:#004A80;text-decoration:none;border-bottom:1px dashed #004A80}
+    .badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;display:inline-block}
+    .ok{background:#22c55e;color:#062b16}
+    .warn{background:#ef4444}
+    .muted{background:#9ca3af}
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    <h1>Logs por CT</h1>
+
+    <div class="filters">
+      <form method="GET" action="{{ url_for('logs.logs_panel') }}">
+        <label for="ct_id">CT:</label>
+        <select name="ct_id" id="ct_id" onchange="this.form.submit()">
+          {% for c in cts %}
+            <option value="{{ c.id }}" {% if c.id == current_ct.id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <div style="margin-left:auto;color:#6B7280">Exibindo últimas {{ sessions|length }} sessões</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Lote</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+          <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.lote }}</td>
+            <td>{{ s.data_inicio.strftime('%d/%m/%Y %H:%M:%S') if s.data_inicio else '-' }}</td>
+            <td>{{ s.data_fim.strftime('%d/%m/%Y %H:%M:%S') if s.data_fim else '-' }}</td>
+            <td>{{ s.total_sacarias }}</td>
+            <td>
+              {% if s.status == 'finalizado' %}
+                <span class="badge ok">Finalizado</span>
+              {% elif s.status == 'ativo' %}
+                <span class="badge muted">Ativo</span>
+              {% else %}
+                <span class="badge warn">{{ s.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <a class="link" href="{{ url_for('logs.session_logs_view', session_id=s.id) }}">Ver</a>
+              &nbsp;|&nbsp;
+              <a class="link" href="{{ url_for('logs.session_logs_export_xlsx', session_id=s.id) }}">XLSX</a>
+              <!--&nbsp;|&nbsp;
+              <a class="link" href="{{ url_for('logs.session_logs_export_txt', session_id=s.id) }}">TXT</a>-->
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7">Nenhuma sessão encontrada para esta CT.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

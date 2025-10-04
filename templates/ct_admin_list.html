@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>CTs - Administração</title>
+  <style>
+    body{font-family:Segoe UI,Roboto,Arial;margin:0;background:#f8fafc;color:#002F54}
+    .wrap{max-width:900px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    h1{margin:0 0 16px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    a.btn{display:inline-block;padding:10px 14px;background:#22c55e;color:#062b16;text-decoration:none;border-radius:10px;font-weight:700}
+    a.link{color:#004A80;text-decoration:none;border-bottom:1px dashed #004A80}
+    form{display:inline}
+    button.del{background:#ef4444;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    <div class="topbar">
+      <h1>Administração de CTs</h1>
+      <a class="btn" href="{{ url_for('ct_admin.ct_admin_new') }}">Nova CT</a>
+    </div>
+
+  
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Nome</th><th>RTSP</th><th>ROI</th><th>Modelo</th><th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in cts %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td><a class="link" href="{{ url_for('ct.ct_detail', ct_id=c.id) }}">{{ c.name }}</a></td>
+            <td style="max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ c.source_path }}">{{ c.source_path }}</td>
+            <td>{{ c.roi }}</td>
+            <td>{{ c.model_path }}</td>
+            <td>
+              <a class="link" href="{{ url_for('ct_admin.ct_admin_edit', ct_id=c.id) }}">Editar</a>
+              &nbsp;|&nbsp;
+              <form method="POST" action="{{ url_for('ct_admin.ct_admin_delete', ct_id=c.id) }}" onsubmit="return confirm('Remover esta CT?');">
+                <button class="del" type="submit">Excluir</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6">Nenhuma CT cadastrada.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

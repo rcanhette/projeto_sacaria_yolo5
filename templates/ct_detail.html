@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>CT {{ ct.id }} - {{ ct.name }}</title>
+  <title>{{ ct.name }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
@@ -27,21 +27,24 @@
       background: #f8fafc; /* fundo claro */
       color: var(--text);
       min-height: 100vh;
-      padding: 32px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      /* antes: display:flex; align-items:center; justify-content:center;  */
+      /* dá espaço abaixo da navbar fixa */
+      padding: 0px 0px 0px; 
     }
     .wrap {
       width: 100%;
       max-width: 880px;
+      margin: 0 auto;          /* centraliza horizontalmente */
       display:grid;
       gap:20px;
       grid-template-columns: 1fr;
     }
     header{
-      display:flex;align-items:center;justify-content:space-between;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       gap:12px;
+      margin-top: 20px;
     }
     .title{
       font-size: clamp(20px, 3vw, 28px);
@@ -155,7 +158,7 @@
       }
     }
     document.addEventListener("DOMContentLoaded", function() {
-      const evt = new EventSource("{{ url_for('sse_ct', ct_id=ct.id) }}");
+      const evt = new EventSource("{{ url_for('ct.sse_ct', ct_id=ct.id) }}");
       evt.onmessage = function(e) {
         const d = JSON.parse(e.data);
 
@@ -177,6 +180,8 @@
   </script>
 </head>
 <body>
+  {% include '_navbar.html' %}  <!-- navbar fixa no topo -->
+
   <div class="wrap">
     <header>
       <div class="title">Ponto de Captura — <span style="opacity:.9">{{ ct.name }}</span></div>
@@ -184,6 +189,7 @@
     </header>
 
     <div class="grid">
+      <!-- Coluna esquerda: contador e infos -->
       <section class="card">
         <div class="count-wrap">
           <div style="text-align:center">
@@ -207,16 +213,18 @@
           </div>
         </div>
 
-        <a id="videoLink" href="{{ url_for('ct_video', ct_id=ct.id) }}" target="_blank" class="video-link" style="display:none">
+        <a id="videoLink" href="{{ url_for('ct.ct_video', ct_id=ct.id) }}" target="_blank" class="video-link" style="display:none">
           Ver vídeo da sessão
         </a>
 
         <div class="hint">Dica: você pode deixar esta página fechada; a contagem continua em background.</div>
       </section>
 
+      <!-- Coluna direita: controles -->
       <section class="card controls">
+        <!-- START -->
         <div id="formArea">
-          <form method="POST" action="{{ url_for('ct_start', ct_id=ct.id) }}">
+          <form method="POST" action="{{ url_for('ct.ct_start', ct_id=ct.id) }}">
             <div class="row">
               <div style="flex:1">
                 <label for="lote">Lote</label>
@@ -247,7 +255,8 @@
           </form>
         </div>
 
-        <form method="POST" action="{{ url_for('ct_stop', ct_id=ct.id) }}">
+        <!-- STOP -->
+        <form method="POST" action="{{ url_for('ct.ct_stop', ct_id=ct.id) }}">
           <div class="row">
             <button type="submit" id="stopBtn" class="btn btn-stop" style="flex:1" disabled>Stop</button>
           </div>
