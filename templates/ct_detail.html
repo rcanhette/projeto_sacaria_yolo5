@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>CT {{ ct.id }} - {{ ct.name }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#002F54;           /* azul institucional fundo */
+      --card:#ffffff;         /* cartões brancos */
+      --muted:#6B7280;        /* cinza texto secundário */
+      --text:#002F54;         /* azul escuro para texto principal */
+      --accent:#22c55e;       /* verde (start) */
+      --accent-weak:#16a34a;
+      --danger:#ef4444;       /* vermelho (stop) */
+      --danger-weak:#dc2626;
+      --border:#e5e7eb;       /* borda cinza clara */
+      --badge-on:#004A80;     /* azul médio status ativo */
+      --badge-off:#9ca3af;    /* cinza status parado */
+      --pill-on:#10b981;
+      --pill-off:#9ca3af;
+    }
+    *{box-sizing:border-box}
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background: #f8fafc; /* fundo claro */
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 880px;
+      display:grid;
+      gap:20px;
+      grid-template-columns: 1fr;
+    }
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;
+    }
+    .title{
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 700;
+      letter-spacing:.3px;
+    }
+    .status-pill{
+      display:inline-flex;align-items:center;gap:10px;
+      padding:8px 14px;border-radius:999px;
+      background: var(--badge-off); border:1px solid var(--border);
+      color:#fff; font-weight:600;
+      transition: .2s ease;
+    }
+    .status-dot{
+      width:10px;height:10px;border-radius:999px;background: var(--pill-off);
+      box-shadow:0 0 0 3px rgba(255,255,255,.03) inset;
+    }
+    .status-on { background: var(--badge-on); }
+    .status-on .status-dot { background: var(--pill-on); }
+
+    .grid{
+      display:grid; gap:20px;
+      grid-template-columns: 2fr 1fr;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius:16px; padding:20px;
+      box-shadow:0 4px 16px rgba(0,0,0,.1);
+    }
+
+    /* Contador */
+    .count-wrap{
+      display:flex; align-items:center; justify-content:center;
+      min-height: 220px; border-radius:14px;
+      background: #f1f5f9;
+      border:1px dashed var(--border);
+    }
+    .count-label{ text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-weight:700; font-size:12px; }
+    .count-num{
+      font-size: clamp(64px, 11vw, 108px);
+      font-weight: 800;
+      line-height: .9;
+      margin-top: 8px;
+      color: var(--text);
+    }
+
+    /* Info list */
+    .info{
+      display:grid; gap:10px; margin-top:16px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 640px){ .info{ grid-template-columns: 1fr; } }
+    .info .item{
+      background: #f9fafb;
+      border:1px solid var(--border);
+      border-radius:12px; padding:12px 14px;
+    }
+    .info .label{ color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .info .value{ font-weight:700; font-size:18px; margin-top:6px; }
+
+    /* Controles */
+    .controls .row{ display:flex; gap:12px; align-items:end; }
+    .controls label{ color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .controls input, .controls select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+      background:#ffffff; color:var(--text); font-size:14px; outline:none;
+    }
+    .controls input::placeholder{ color:#9ca3af; }
+    .btn{
+      padding:12px 18px; border-radius:12px; border:1px solid transparent;
+      font-weight:800; letter-spacing:.02em; cursor:pointer; transition:.15s ease;
+    }
+    .btn:disabled{ opacity:.45; cursor:not-allowed; }
+    .btn-start{ background: var(--accent); color:#062b16; }
+    .btn-start:hover{ background: var(--accent-weak); }
+    .btn-stop{ background: var(--danger); color:#2a0b0b; }
+    .btn-stop:hover{ background: var(--danger-weak); }
+    .video-link{
+      display:inline-block;margin-top:14px;text-decoration:none;font-weight:700;
+      color:#004A80; border-bottom:1px dashed #004A80; padding-bottom:2px;
+    }
+
+    .hint{
+      margin-top:10px; color:var(--muted); font-size:13px;
+    }
+  </style>
+  <script>
+    function toggleFileInput() {
+      const select = document.getElementById("source_type");
+      const row = document.getElementById("fileInputRow");
+      row.style.display = (select.value === "file") ? "block" : "none";
+    }
+    function setFormVisible(visible) {
+      const formArea = document.getElementById("formArea");
+      formArea.style.display = visible ? "block" : "none";
+    }
+    function setStatus(active){
+      const pill = document.getElementById("statusPill");
+      const text = document.getElementById("statusText");
+      if(active){
+        pill.classList.add("status-on");
+        text.textContent = "Contando";
+      }else{
+        pill.classList.remove("status-on");
+        text.textContent = "Parado";
+      }
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      const evt = new EventSource("{{ url_for('sse_ct', ct_id=ct.id) }}");
+      evt.onmessage = function(e) {
+        const d = JSON.parse(e.data);
+
+        setStatus(!!d.session_active);
+        document.getElementById("lote_val").textContent = d.lote || "-";
+        document.getElementById("data").textContent = d.data || "-";
+        document.getElementById("hora").textContent = d.hora_inicio || "-";
+        document.getElementById("count").textContent = d.count ?? 0;
+
+        document.getElementById("startBtn").disabled = d.session_active;
+        document.getElementById("stopBtn").disabled = !d.session_active;
+        document.getElementById("videoLink").style.display = d.session_active ? "inline-block" : "none";
+
+        setFormVisible(!d.session_active);
+      };
+
+      toggleFileInput();
+    });
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">Ponto de Captura — <span style="opacity:.9">{{ ct.name }}</span></div>
+      <div id="statusPill" class="status-pill"><span class="status-dot"></span><span id="statusText">Parado</span></div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="count-wrap">
+          <div style="text-align:center">
+            <div class="count-label">Contagem</div>
+            <div id="count" class="count-num">0</div>
+          </div>
+        </div>
+
+        <div class="info">
+          <div class="item">
+            <div class="label">Lote</div>
+            <div id="lote_val" class="value">-</div>
+          </div>
+          <div class="item">
+            <div class="label">Data</div>
+            <div id="data" class="value">-</div>
+          </div>
+          <div class="item">
+            <div class="label">Hora Início</div>
+            <div id="hora" class="value">-</div>
+          </div>
+        </div>
+
+        <a id="videoLink" href="{{ url_for('ct_video', ct_id=ct.id) }}" target="_blank" class="video-link" style="display:none">
+          Ver vídeo da sessão
+        </a>
+
+        <div class="hint">Dica: você pode deixar esta página fechada; a contagem continua em background.</div>
+      </section>
+
+      <section class="card controls">
+        <div id="formArea">
+          <form method="POST" action="{{ url_for('ct_start', ct_id=ct.id) }}">
+            <div class="row">
+              <div style="flex:1">
+                <label for="lote">Lote</label>
+                <input type="text" id="lote" name="lote" placeholder="Ex.: 2025-10-04-L01" required>
+              </div>
+            </div>
+
+            <div class="row">
+              <div style="flex:1">
+                <label for="source_type">Fonte</label>
+                <select name="source_type" id="source_type" onchange="toggleFileInput()">
+                  <option value="rtsp">RTSP</option>
+                  <option value="file">Arquivo Local</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row" id="fileInputRow" style="display:none">
+              <div style="flex:1">
+                <label for="file_path">Arquivo</label>
+                <input type="text" id="file_path" name="file_path" placeholder="C:/videos/teste.mp4">
+              </div>
+            </div>
+
+            <div class="row">
+              <button type="submit" id="startBtn" class="btn btn-start" style="flex:1">Start</button>
+            </div>
+          </form>
+        </div>
+
+        <form method="POST" action="{{ url_for('ct_stop', ct_id=ct.id) }}">
+          <div class="row">
+            <button type="submit" id="stopBtn" class="btn btn-stop" style="flex:1" disabled>Stop</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

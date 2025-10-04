@@ -28,11 +28,11 @@ class IndustrialTagDetector:
         self.next_id = 1
         
         # AJUSTES CRÍTICOS DE ESTABILIDADE
-        self.max_lost = 8   # Aumentado para 60 frames (2.0s em 30 FPS)
+        self.max_lost = 5   # Aumentado para 60 frames (2.0s em 30 FPS)
         self.match_dist = 200 # Aumentado para 180 pixels para sacos colados
         
         # MARGEM DE TOLERÂNCIA (Histerese): 20 pixels para prevenir reset por jitter.
-        self.reset_margin = 20 
+        self.reset_margin = 18 
         
         # Linhas de Portão (Duplo Cruzamento)
         x_roi, y_roi, w_roi, h_roi = roi
@@ -45,7 +45,7 @@ class IndustrialTagDetector:
         
         # Filtros: ID e Confiança
         self.target_ids = [0] 
-        self.min_conf = 0.80 
+        self.min_conf = 0.90 
         
         # Log
         self.log_file = log_file
