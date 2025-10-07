@@ -1,3 +1,4 @@
+# services/session_repository.py
 from typing import Optional, List, Dict
 from services.db import execute_returning, execute, query_all, query_one
 
@@ -24,9 +25,12 @@ def insert_log(session_id: int, ct_id: int, delta: int, total_atual: int) -> Non
 # -----------------------------------------------------------------------------
 def finish_session(session_id: int, total_final: int, status: str = "finalizado") -> None:
     """
-    Finaliza a sessão: grava data_fim, total_final e status com base no ID da sessão.
-    Se nada for atualizado (0 linhas), tenta finalizar a sessão ATIVA mais recente da CT
-    à qual essa sessão pertence (fallback de segurança).
+    Finaliza a sessão pelo ID:
+      - Define data_fim = NOW(), total_final e status.
+      - Se não atualizar nenhuma linha (sessão não encontrada, p.ex.),
+        faz um fallback: finaliza a sessão ATIVA mais recente da mesma CT.
+      - IMPORTANTE: o fallback usa subconsulta no WHERE para evitar
+        o erro de ORDER BY em UPDATE no PostgreSQL.
     """
     # 1) tenta finalizar pela PK
     updated = execute(
@@ -40,23 +44,58 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
         [total_final, status, session_id],
     )
 
-    if getattr(updated, "rowcount", None) in (0, None):
-        # 2) fallback: descobrir a CT da sessão informada e finalizar a ativa mais recente
+    # Se o execute() não retorna contagem, tentamos descobrir pela CT do ID dado
+    # e fazemos o fallback de forma segura com subconsulta.
+    try:
+        rowcount = getattr(updated, "rowcount", None)
+    except Exception:
+        rowcount = None
+
+    if rowcount in (0, None):
+        # Descobre a CT dessa sessão
         s = query_one("SELECT ct_id FROM session WHERE id = %s", [session_id])
-        if s and "ct_id" in s:
+        if s and "ct_id" in s and s["ct_id"] is not None:
+            # 2) fallback: finaliza a sessão ativa mais recente da CT via subconsulta
             execute(
                 """
                 UPDATE session
                    SET data_fim   = NOW(),
                        total_final = %s,
                        status      = %s
-                 WHERE ct_id = %s
-                   AND status = 'ativo'
-                 ORDER BY data_inicio DESC
-                 LIMIT 1
+                 WHERE id = (
+                     SELECT id
+                       FROM session
+                      WHERE ct_id = %s
+                        AND status = 'ativo'
+                      ORDER BY data_inicio DESC
+                      LIMIT 1
+                 )
                 """,
                 [total_final, status, s["ct_id"]],
             )
+
+def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "finalizado") -> None:
+    """
+    Finaliza diretamente a sessão ATIVA mais recente de uma CT.
+    Útil quando você só tem o ct_id.
+    """
+    execute(
+        """
+        UPDATE session
+           SET data_fim   = NOW(),
+               total_final = %s,
+               status      = %s
+         WHERE id = (
+             SELECT id
+               FROM session
+              WHERE ct_id = %s
+                AND status = 'ativo'
+              ORDER BY data_inicio DESC
+              LIMIT 1
+         )
+        """,
+        [total_final, status, ct_id],
+    )
 
 # -----------------------------------------------------------------------------
 # Consultas auxiliares
