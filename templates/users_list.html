@@ -3,7 +3,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <title>Pontos de Operação</title>
+  <title>Usuários</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
@@ -16,8 +16,7 @@
     h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
     .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
     .toolbar{ display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px; }
-    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px;
-          background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800; }
+    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800;}
     .btn:hover{ border-color:#94a3b8; }
     .btn-primary{ background:var(--primary); color:#fff; border-color:transparent; }
     .btn-primary:hover{ background:var(--primary-weak); }
@@ -27,23 +26,19 @@
     table{ width:100%; border-collapse:separate; border-spacing:0; }
     th, td{ padding:12px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
     thead th{ background:#f5f7fb; font-weight:700; }
+    .muted{ color:var(--muted); }
     .row-actions{ display:flex; gap:8px; justify-content:flex-end; }
     .inline-form{ display:inline-block; margin:0; }
-    .muted{ color:var(--muted); }
-    .nowrap{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; display:inline-block; }
-    /* link do nome como ação primária, sem parecer botão */
-    .name-link{ color:#0b1220; text-decoration:none; font-weight:800; }
-    .name-link:hover{ text-decoration:underline; }
   </style>
 </head>
 <body>
   <div class="wrap">
     {% include '_flash.html' %}
-    <h1>Pontos de Operação</h1>
+    <h1>Usuários</h1>
 
     <div class="card">
       <div class="toolbar">
-        <a class="btn btn-primary" href="{{ url_for('ct_admin.ct_admin_new') }}">+ Novo ponto de operação</a>
+        <a class="btn btn-primary" href="{{ url_for('user_admin.users_new') }}">+ Novo usuário</a>
       </div>
 
       <div class="table-wrap">
@@ -51,28 +46,24 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Nome (clique para abrir)</th>
-              <th>Fonte (URL/Dispositivo)</th>
-              <th>Modelo</th>
+              <th>Usuário</th>
+              <th>Papel</th>
+              <th>Status</th>
               <th style="text-align:right;">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {% for ct in cts %}
+            {% for u in users %}
             <tr>
-              <td>{{ ct.id }}</td>
-              <td>
-                <a class="name-link" href="{{ url_for('ct.ct_detail', ct_id=ct.id) }}">
-                  {{ ct.name }}
-                </a>
-              </td>
-              <td><span class="nowrap" title="{{ ct.source_path }}">{{ ct.source_path }}</span></td>
-              <td><span class="nowrap" title="{{ ct.model_path }}">{{ ct.model_path }}</span></td>
+              <td>{{ u.id }}</td>
+              <td>{{ u.username }}</td>
+              <td>{{ u.role }}</td>
+              <td class="muted">{{ 'Ativo' if u.active else 'Inativo' }}</td>
               <td>
                 <div class="row-actions">
-                  <a class="btn" href="{{ url_for('ct_admin.ct_admin_edit', ct_id=ct.id) }}">Editar</a>
-                  <form class="inline-form" method="post" action="{{ url_for('ct_admin.ct_admin_delete', ct_id=ct.id) }}"
-                        onsubmit="return confirm('Excluir Ponto de Operação {{ ct.name }}? Esta ação é irreversível.')">
+                  <a class="btn" href="{{ url_for('user_admin.users_edit', user_id=u.id) }}">Editar</a>
+                  <form class="inline-form" method="post" action="{{ url_for('user_admin.users_delete', user_id=u.id) }}"
+                        onsubmit="return confirm('Excluir usuário {{ u.username }}? Esta ação é irreversível.')">
                     <button class="btn btn-danger" type="submit">Excluir</button>
                   </form>
                 </div>
@@ -80,7 +71,7 @@
             </tr>
             {% else %}
             <tr>
-              <td colspan="5" style="padding:16px;text-align:center;color:var(--muted);">Nenhum ponto de operação cadastrado.</td>
+              <td colspan="5" style="padding:16px;text-align:center;color:var(--muted);">Nenhum usuário cadastrado.</td>
             </tr>
             {% endfor %}
           </tbody>

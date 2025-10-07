@@ -1,208 +1,268 @@
 # routes/logs.py
-from flask import send_file
+from flask import Blueprint, render_template, request, abort, Response, send_file
 from io import BytesIO
+import re
+
+# Auth/session
+from routes.auth import login_required, current_user
+from services.auth_repository import user_can_view_ct
+
+# DB helpers
+from services.db import query_all, query_one
+from services.ct_repository import list_cts
+
+# Excel
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
-from flask import Blueprint, render_template, request, redirect, url_for, Response, flash
-from services.ct_repository import list_cts, get_ct
-from services.session_repository import list_sessions_by_ct, get_session, get_session_logs
 
-logs_bp = Blueprint("logs", __name__)
 
-def _first_ct_id():
-    cts = list_cts()
-    return cts[0]["id"] if cts else None
+logs_bp = Blueprint("logs", __name__, url_prefix="")
 
-@logs_bp.route("/logs")
+# ----------------------------------------------------------------------
+# Helpers
+# ----------------------------------------------------------------------
+def _permitted_cts():
+    u = current_user()
+    if not u:
+        abort(401)
+    all_cts = list_cts()
+    permitted = [c for c in all_cts if user_can_view_ct(u, c["id"])]
+    return u, permitted
+
+
+def _get_session_or_404(session_id: int):
+    s = query_one(
+        """
+        SELECT s.id, s.ct_id, s.lote, s.data_inicio, s.data_fim, s.status,
+               COALESCE(s.total_final, 0) AS total_final,
+               c.name AS ct_name
+          FROM session s
+          JOIN ct c ON c.id = s.ct_id
+         WHERE s.id = %s
+        """,
+        [session_id],
+    )
+    if not s:
+        abort(404)
+    _, permitted_cts = _permitted_cts()
+    permitted_ids = {c["id"] for c in permitted_cts}
+    if s["ct_id"] not in permitted_ids:
+        abort(403)
+    return s
+
+
+def _get_session_logs(session_id: int):
+    return query_all(
+        """
+        SELECT id, ts, delta, total_atual
+          FROM session_log
+         WHERE session_id = %s
+         ORDER BY ts ASC
+        """,
+        [session_id],
+    )
+
+
+# Excel sheet titles cannot contain: : \ / ? * [ ]
+# and must be <= 31 chars
+def _safe_sheet_title(name: str) -> str:
+    if not name:
+        return "Planilha"
+    bad = r'[:\\/*?\[\]/]'   # inclui a barra /
+    cleaned = re.sub(bad, " ", str(name))
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return (cleaned or "Planilha")[:31]
+
+
+def _safe_filename_piece(text: str) -> str:
+    if not text:
+        return ""
+    piece = re.sub(r'[^0-9A-Za-z_\-]+', '_', text.strip())
+    piece = re.sub(r'_+', '_', piece).strip('_')
+    return piece
+
+
+# ----------------------------------------------------------------------
+# LISTA DE SESSÕES (com filtro por CT)
+# ----------------------------------------------------------------------
+@logs_bp.get("/logs")
+@login_required
 def logs_panel():
-    # ct_id por querystring; se não vier, usa a primeira CT disponível
-    try:
-        ct_id = int(request.args.get("ct_id") or 0)
-    except Exception:
-        ct_id = 0
+    """
+    Mostra as sessões das CTs às quais o usuário tem acesso.
+    Filtro opcional: ?ct_id=<id> ou ?ct_id=all
+    """
+    _, permitted_cts = _permitted_cts()
+    if not permitted_cts:
+        return render_template("logs_panel.html", cts=[], current_ct_id="all", sessions=[])
 
-    if not ct_id:
-        ct_id = _first_ct_id()
-        if not ct_id:
-            flash("Nenhuma CT cadastrada. Cadastre uma em /ct-admin.", "error")
-            return redirect(url_for("ct_admin.ct_admin_list"))
+    ct_id_arg = request.args.get("ct_id", "all")
+    permitted_ids = [c["id"] for c in permitted_cts]
 
-    ct_row = get_ct(ct_id)
-    if not ct_row:
-        flash("CT não encontrada.", "error")
-        return redirect(url_for("ct_admin.ct_admin_list"))
+    if ct_id_arg == "all":
+        ct_ids = permitted_ids
+        current_ct_id = "all"
+    else:
+        try:
+            wanted = int(ct_id_arg)
+        except ValueError:
+            abort(400)
+        if wanted not in permitted_ids:
+            abort(403)
+        ct_ids = [wanted]
+        current_ct_id = str(wanted)
 
-    cts = list_cts()
-    sessions = list_sessions_by_ct(ct_id, limit=200)
+    placeholders = ",".join(["%s"] * len(ct_ids))
+    sql = f"""
+        SELECT
+            s.id,
+            s.ct_id,
+            c.name     AS ct_name,
+            s.lote,
+            s.data_inicio,
+            s.data_fim,
+            s.status,
+            COALESCE(s.total_final, 0) AS total_final
+        FROM session s
+        JOIN ct c ON c.id = s.ct_id
+        WHERE s.ct_id IN ({placeholders})
+        ORDER BY s.data_inicio DESC
+        LIMIT 2000
+    """
+    sessions = query_all(sql, ct_ids)
 
-    return render_template("logs_panel.html", cts=cts, current_ct=ct_row, sessions=sessions)
+    return render_template(
+        "logs_panel.html",
+        cts=permitted_cts,
+        current_ct_id=current_ct_id,
+        sessions=sessions,
+    )
 
-@logs_bp.route("/logs/session/<int:session_id>")
-def session_logs_view(session_id):
-    sess = get_session(session_id)
-    if not sess:
-        flash("Sessão não encontrada.", "error")
-        return redirect(url_for("logs.logs_panel"))
 
-    logs = get_session_logs(session_id)
-    return render_template("session_logs.html", sess=sess, logs=logs)
+# ----------------------------------------------------------------------
+# DETALHE DA SESSÃO (logs)
+# ----------------------------------------------------------------------
+@logs_bp.get("/logs/session/<int:session_id>")
+@login_required
+def session_logs(session_id: int):
+    s = _get_session_or_404(session_id)
+    logs = _get_session_logs(session_id)
+    return render_template("session_log.html", sess=s, logs=logs)
 
-@logs_bp.route("/logs/session/<int:session_id>/export.xlsx")
-def session_logs_export_xlsx(session_id):
-    from datetime import datetime
 
-    sess = get_session(session_id)
-    if not sess:
-        return ("Sessão não encontrada", 404)
+# ----------------------------------------------------------------------
+# EXPORT XLSX — layout igual ao do seu exemplo
+# ----------------------------------------------------------------------
+@logs_bp.get("/logs/session/<int:session_id>/export.xlsx")
+@login_required
+def session_logs_export_xlsx(session_id: int):
+    sess = _get_session_or_404(session_id)
+    rows = _get_session_logs(session_id) or []
 
-    logs = get_session_logs(session_id) or []
-
-    # calcula total (se não houver em session, usa último total_atual)
-    total_final = sess.get("total_sacarias")
-    if total_final is None:
-        total_final = logs[-1]["total_atual"] if logs else 0
+    total_final = sess.get("total_final", 0) or (rows[-1]["total_atual"] if rows else 0)
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Log da Sessão"
+    sheet_title = _safe_sheet_title(sess.get("ct_name") or f"CT {sess['ct_id']}")
+    ws.title = sheet_title
 
-    # ===== Estilos =====
+    # Estilos
     bold = Font(bold=True)
     title_font = Font(bold=True, size=12)
-    header_fill = PatternFill("solid", fgColor="004A80")   # azul coonagro
+    header_fill = PatternFill("solid", fgColor="004A80")
     header_font = Font(bold=True, color="FFFFFF")
     center = Alignment(horizontal="center", vertical="center")
     left = Alignment(horizontal="left", vertical="center")
     thin = Side(style="thin", color="D1D5DB")
     border = Border(left=thin, right=thin, top=thin, bottom=thin)
 
-    # ===== Cabeçalho superior (como sua imagem) =====
-    # Linha 1: CT | <nome>
-    ws["A1"] = "CT";                ws["A1"].font = title_font
-    ws["B1"] = sess.get("ct_name", "")
-    # Linha 2: DATA INICIO | dd/mm/yyyy hh:mm
-    ws["A2"] = "DATA INICIO";       ws["A2"].font = bold
+    # Cabeçalho superior
+    ws["A1"] = "CT";             ws["A1"].font = title_font
+    ws["B1"] = sess.get("ct_name") or f"CT {sess['ct_id']}"
+    ws["A2"] = "DATA INICIO";    ws["A2"].font = bold
     ws["B2"] = sess["data_inicio"].strftime("%d/%m/%Y %H:%M") if sess.get("data_inicio") else "-"
-    # Linha 3: DATA FIM | dd/mm/yyyy hh:mm
-    ws["A3"] = "DATA FIM";          ws["A3"].font = bold
+    ws["A3"] = "DATA FIM";       ws["A3"].font = bold
     ws["B3"] = sess["data_fim"].strftime("%d/%m/%Y %H:%M") if sess.get("data_fim") else "-"
-    # Linha 4: TOTAL SACARIA | <n>
-    ws["A4"] = "TOTAL";     ws["A4"].font = bold
+    ws["A4"] = "TOTAL";          ws["A4"].font = bold
     ws["B4"] = total_final
 
-    # Linha 5: vazia
-    ws.append([])
+    ws.append([])  # linha vazia
 
-    # ===== Tabela =====
+    # Tabela
     start_row = 6
     headers = ["Status", "Hora", "Delta (+1/-1)", "Total Atual"]
     ws.append(headers)
-    for col_idx, _ in enumerate(headers, start=1):
+    for col_idx in range(1, len(headers) + 1):
         cell = ws.cell(row=start_row, column=col_idx)
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = center
         cell.border = border
 
-    # Linhas da tabela
-    row = start_row + 1
-    for r in logs:
+    r = start_row + 1
+    for item in rows:
         status_txt = "RECONHECIMENTO"
-        hora_txt = r["ts"].strftime("%H:%M:%S") if r.get("ts") else ""
-        ws.cell(row=row, column=1, value=status_txt).alignment = left
-        ws.cell(row=row, column=2, value=hora_txt).alignment = center
-        ws.cell(row=row, column=3, value=r.get("delta", 0)).alignment = center
-        ws.cell(row=row, column=4, value=r.get("total_atual", 0)).alignment = center
-        # bordas
+        hora_txt = item["ts"].strftime("%H:%M:%S") if item.get("ts") else ""
+        delta_val = item.get("delta", 0)
+        total_val = item.get("total_atual", 0)
+
+        ws.cell(row=r, column=1, value=status_txt).alignment = left
+        ws.cell(row=r, column=2, value=hora_txt).alignment = center
+        ws.cell(row=r, column=3, value=delta_val).alignment = center
+        ws.cell(row=r, column=4, value=total_val).alignment = center
+
         for c in range(1, 5):
-            ws.cell(row=row, column=c).border = border
-        row += 1
+            ws.cell(row=r, column=c).border = border
+        r += 1
 
-    # ===== Ajuste de larguras =====
-    widths = {
-        1: 18,   # Status
-        2: 14,   # Hora
-        3: 16,   # Delta (+1/-1)
-        4: 14,   # Total Atual
-    }
-    # Colunas A/B do cabeçalho
-    ws.column_dimensions[get_column_letter(1)].width = max(widths[1], 16)
-    ws.column_dimensions[get_column_letter(2)].width = max(widths[2], 24)
-    # Se quiser uma coluna C/D no topo melhor dimensionada:
-    ws.column_dimensions[get_column_letter(3)].width = widths[3]
-    ws.column_dimensions[get_column_letter(4)].width = widths[4]
+    # larguras de coluna
+    widths = {1: 18, 2: 14, 3: 16, 4: 14}
+    for col_idx, w in widths.items():
+        ws.column_dimensions[get_column_letter(col_idx)].width = w
+    for rr in (1, 2, 3, 4):
+        ws[f"A{rr}"].alignment = left
+        ws[f"B{rr}"].alignment = left
+    ws.column_dimensions["A"].width = max(16, ws.column_dimensions["A"].width or 0)
+    ws.column_dimensions["B"].width = max(24, ws.column_dimensions["B"].width or 0)
 
-    # destaque leve nos rótulos do topo
-    for r in (1,2,3,4):
-        ws[f"A{r}"].alignment = left
-        ws[f"B{r}"].alignment = left
+    # Nome do arquivo: session_ct<CTID>_<LOTE>.xlsx (sanitizado)
+    ct_id = sess["ct_id"]
+    lote = _safe_filename_piece(sess.get("lote") or "")
+    filename = f"session_ct{ct_id}" + (f"_{lote}" if lote else "") + ".xlsx"
 
-    # ===== Retorno do arquivo =====
     output = BytesIO()
     wb.save(output)
     output.seek(0)
-
-    filename = f"session_{sess['id']}_ct{sess['ct_id']}_{sess.get('lote','')}.xlsx".replace(" ", "_")
     return send_file(
         output,
         as_attachment=True,
         download_name=filename,
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
 
-@logs_bp.route("/logs/session/<int:session_id>/export.csv")
-def session_logs_export_csv(session_id):
-    sess = get_session(session_id)
-    if not sess:
-        return "Sessão não encontrada", 404
-
-    logs = get_session_logs(session_id)
+# ----------------------------------------------------------------------
+# Export CSV simples (opcional)
+# ----------------------------------------------------------------------
+@logs_bp.get("/logs/session/<int:session_id>/export.csv")
+@login_required
+def session_logs_export_csv(session_id: int):
+    sess = _get_session_or_404(session_id)
+    rows = _get_session_logs(session_id)
 
     def gen_csv():
-        # cabeçalho
         yield "session_id,ct_id,ct_name,lote,ts,delta,total_atual\n"
-        for r in logs:
-            # formata timestamp ISO; Excel abre bem .csv
-            ts_str = r["ts"].strftime("%Y-%m-%d %H:%M:%S")
-            yield f"{sess['id']},{sess['ct_id']},{sess['ct_name']},{sess['lote']},{ts_str},{r['delta']},{r['total_atual']}\n"
+        for r in rows:
+            ts_str = r["ts"].strftime("%Y-%m-%d %H:%M:%S") if r.get("ts") else ""
+            ct_name = (sess.get("ct_name") or "").replace(",", " ")
+            lote = (sess.get("lote") or "").replace(",", " ")
+            yield f"{sess['id']},{sess['ct_id']},{ct_name},{lote},{ts_str},{r.get('delta',0)},{r.get('total_atual',0)}\n"
 
-    filename = f"session_{sess['id']}_ct{sess['ct_id']}_{sess['lote']}.csv".replace(" ", "_")
+    lote_piece = _safe_filename_piece(sess.get("lote") or "")
+    filename = f"session_ct{sess['ct_id']}" + (f"_{lote_piece}" if lote_piece else "") + ".csv"
     headers = {
         "Content-Disposition": f'attachment; filename="{filename}"',
-        "Content-Type": "text/csv; charset=utf-8"
+        "Content-Type": "text/csv; charset=utf-8",
     }
     return Response(gen_csv(), headers=headers)
-
-# (Opcional) exportar texto no formato do .txt antigo
-@logs_bp.route("/logs/session/<int:session_id>/export.txt")
-def session_logs_export_txt(session_id):
-    sess = get_session(session_id)
-    if not sess:
-        return "Sessão não encontrada", 404
-
-    logs = get_session_logs(session_id)
-
-    def gen_txt():
-        # Cabeçalho similar ao que você usava
-        yield f"LOTE: {sess['lote']}\n"
-        data_ini = sess['data_inicio'].strftime('%d/%m/%Y %H:%M:%S')
-        yield f"DATA INICIO: {data_ini}\n"
-        if sess['data_fim']:
-            yield f"DATA FIM: {sess['data_fim'].strftime('%d/%m/%Y %H:%M:%S')}\n"
-        yield "\n"
-        # Linhas de reconhecimento
-        for r in logs:
-            hhmmss = r["ts"].strftime("%H:%M:%S")
-            if r["delta"] == 1:
-                yield f"RECONHECIMENTO + 1 HORA: {hhmmss} TOTAL: {r['total_atual']}\n"
-            else:
-                yield f"RECONHECIMENTO - 1 HORA: {hhmmss} TOTAL: {r['total_atual']}\n"
-
-    filename = f"session_{sess['id']}_ct{sess['ct_id']}_{sess['lote']}.txt".replace(" ", "_")
-    headers = {
-        "Content-Disposition": f'attachment; filename="{filename}"',
-        "Content-Type": "text/plain; charset=utf-8"
-    }
-    return Response(gen_txt(), headers=headers)

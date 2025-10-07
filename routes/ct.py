@@ -1,4 +1,3 @@
-# routes/ct.py
 import time
 import json
 import cv2
@@ -6,6 +5,8 @@ from flask import Blueprint, render_template, Response, request, redirect, url_f
 from services.capture_point import CapturePoint
 from services.ct_repository import get_ct
 from services.runtime import ct_runtime
+from routes.auth import current_user, login_required
+from services.auth_repository import user_can_view_ct, user_can_control_ct
 
 ct_bp = Blueprint("ct", __name__)
 
@@ -34,20 +35,32 @@ def _ensure_cp(ct_row):
     return cp
 
 @ct_bp.route("/ct/<int:ct_id>")
+@login_required
 def ct_detail(ct_id):
+    # Somente admin pode abrir a tela individual
+    u = current_user()
+    if u["role"] != "admin":
+        flash("Acesso negado à tela individual.", "error")
+        return redirect(url_for("index"))
     ct_row = get_ct(ct_id)
     if not ct_row:
         flash("CT não encontrada.", "error")
-        return redirect(url_for("ct_admin.ct_admin_list"))
+        return redirect(url_for("index"))
     cp = _ensure_cp(ct_row)
     return render_template("ct_detail.html", ct=ct_row, cp=cp)
 
 @ct_bp.route("/ct/<int:ct_id>/start", methods=["POST"])
+@login_required
 def ct_start(ct_id):
+    u = current_user()
+    if not user_can_control_ct(u, ct_id):
+        flash("Você não tem permissão para iniciar esta CT.", "error")
+        return redirect(url_for("index"))
+
     ct_row = get_ct(ct_id)
     if not ct_row:
         flash("CT não encontrada.", "error")
-        return redirect(url_for("ct_admin.ct_admin_list"))
+        return redirect(url_for("index"))
 
     lote = request.form.get("lote")
     source_type = request.form.get("source_type", "rtsp")
@@ -55,31 +68,50 @@ def ct_start(ct_id):
 
     if not lote:
         flash("Lote é obrigatório.", "error")
-        return redirect(url_for("ct.ct_detail", ct_id=ct_id))
+        return redirect(url_for("index"))
 
     cp = _ensure_cp(ct_row)
     cp.set_source(source_type, file_path)
     cp.start_session(lote)
 
+    if request.headers.get("X-Requested-With") == "fetch":
+        return ("", 204)
     flash(f"{ct_row['name']} iniciada com lote {lote}.", "success")
-    return redirect(url_for("ct.ct_detail", ct_id=ct_id))
+    return redirect(url_for("index"))
 
 @ct_bp.route("/ct/<int:ct_id>/stop", methods=["POST"])
+@login_required
 def ct_stop(ct_id):
+    u = current_user()
+    if not user_can_control_ct(u, ct_id):
+        flash("Você não tem permissão para parar esta CT.", "error")
+        return redirect(url_for("index"))
+
     cp = ct_runtime.get(ct_id)
     if not cp:
         flash("CT não encontrada.", "error")
-        return redirect(url_for("ct_admin.ct_admin_list"))
+        return redirect(url_for("index"))
 
     cp.stop_session()
+
+    if request.headers.get("X-Requested-With") == "fetch":
+        return ("", 204)
     flash(f"{cp.ct['name']} parada.", "info")
-    return redirect(url_for("ct.ct_detail", ct_id=ct_id))
+    return redirect(url_for("index"))
 
 @ct_bp.route("/sse/ct/<int:ct_id>")
+@login_required
 def sse_ct(ct_id):
+    u = current_user()
+    if not user_can_view_ct(u, ct_id):
+        return "forbidden", 403
+
     cp = ct_runtime.get(ct_id)
     if not cp:
-        return "CT não encontrada", 404
+        ct_row = get_ct(ct_id)
+        if not ct_row:
+            return "CT não encontrada", 404
+        cp = _ensure_cp(ct_row)
 
     def stream():
         while True:
@@ -97,7 +129,13 @@ def sse_ct(ct_id):
     return Response(stream(), mimetype="text/event-stream")
 
 @ct_bp.route("/ct/<int:ct_id>/video")
+@login_required
 def ct_video(ct_id):
+    # Apenas admin pode abrir vídeo individual
+    u = current_user()
+    if u["role"] != "admin":
+        return "forbidden", 403
+
     cp = ct_runtime.get(ct_id)
     if not cp or not cp.session_active:
         return "Nenhuma sessão ativa para esta CT.", 404

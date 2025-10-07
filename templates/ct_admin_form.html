@@ -1,59 +1,92 @@
+{% include '_navbar.html' %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>{{ 'Nova CT' if mode=='new' else 'Editar CT' }}</title>
+  <meta charset="utf-8" />
+  <title>Ponto de Operação</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{font-family:Segoe UI,Roboto,Arial;margin:0;background:#f8fafc;color:#002F54}
-    .wrap{max-width:700px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-    h1{margin:0 0 16px}
-    label{display:block;margin-top:12px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6B7280}
-    input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-top:6px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .actions{margin-top:18px;display:flex;gap:12px}
-    .btn{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;font-weight:700}
-    .save{background:#22c55e;color:#062b16}
-    .back{background:#004A80;color:#fff;text-decoration:none;display:inline-flex;align-items:center}
+    :root{
+      --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff;
+      --primary:#002F54; --primary-weak:#0f3d68; --danger:#ef4444; --danger-weak:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui; }
+    .wrap{ padding:16px; max-width:1100px; margin:0 auto; }
+    h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .toolbar{ display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px; }
+    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px;
+          background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800; }
+    .btn:hover{ border-color:#94a3b8; }
+    .btn-primary{ background:var(--primary); color:#fff; border-color:transparent; }
+    .btn-primary:hover{ background:var(--primary-weak); }
+    .btn-danger{ background:var(--danger); color:#fff; border-color:transparent; }
+    .btn-danger:hover{ background:var(--danger-weak); }
+    .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; }
+    th, td{ padding:12px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+    thead th{ background:#f5f7fb; font-weight:700; }
+    .row-actions{ display:flex; gap:8px; justify-content:flex-end; }
+    .inline-form{ display:inline-block; margin:0; }
+    .muted{ color:var(--muted); }
+    .nowrap{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; display:inline-block; }
+    /* link do nome como ação primária, sem parecer botão */
+    .name-link{ color:#0b1220; text-decoration:none; font-weight:800; }
+    .name-link:hover{ text-decoration:underline; }
   </style>
 </head>
 <body>
-  {% include '_navbar.html' %}
   <div class="wrap">
-    <h1>{{ 'Nova CT' if mode=='new' else 'Editar CT' }}</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li><strong>{{ category }}:</strong> {{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
-    <form method="POST">
-      <label>Nome</label>
-      <input type="text" name="name" required value="{{ ct.name if ct else '' }}">
-
-      <label>URL RTSP</label>
-      <input type="text" name="source_path" required value="{{ ct.source_path if ct else '' }}">
-
-      <div class="row">
-        <div>
-          <label>ROI (x,y,w,h)</label>
-          <input type="text" name="roi" required placeholder="765,495,300,375" value="{{ ct.roi if ct else '' }}">
-        </div>
-        <div>
-          <label>Modelo YOLO (path)</label>
-          <input type="text" name="model_path" required value="{{ ct.model_path if ct else 'sacaria_yolov5n.pt' }}">
-        </div>
+    {% include '_flash.html' %}
+    <h1>Pontos de Operações</h1>
+    <div class="card">
+      <div class="toolbar">
+        <a class="btn btn-primary" href="{{ url_for('ct_admin.ct_admin_new') }}">+ Novo ponto de operação</a>
       </div>
 
-      <div class="actions">
-        <button class="btn save" type="submit">Salvar</button>
-        <a class="btn back" href="{{ url_for('ct_admin.ct_admin_list') }}">Voltar</a>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome (clique para abrir)</th>
+              <th>Fonte (URL/Dispositivo)</th>
+              <th>Modelo</th>
+              <th style="text-align:right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ct in cts %}
+            <tr>
+              <td>{{ ct.id }}</td>
+              <td>
+                <a class="name-link" href="{{ url_for('ct.ct_video', ct_id=ct.id) }}">
+                  {{ ct.name }}
+                </a>
+              </td>
+              <td><span class="nowrap" title="{{ ct.source_path }}">{{ ct.source_path }}</span></td>
+              <td><span class="nowrap" title="{{ ct.model_path }}">{{ ct.model_path }}</span></td>
+              <td>
+                <div class="row-actions">
+                  <a class="btn" href="{{ url_for('ct_admin.ct_admin_edit', ct_id=ct.id) }}">Editar</a>
+                  <form class="inline-form" method="post" action="{{ url_for('ct_admin.ct_admin_delete', ct_id=ct.id) }}"
+                        onsubmit="return confirm('Excluir Ponto de Operação {{ ct.name }}? Esta ação é irreversível.')">
+                    <button class="btn btn-danger" type="submit">Excluir</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" style="padding:16px;text-align:center;color:var(--muted);">Nenhum ponto de operação cadastrado.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-    </form>
+    </div>
+
   </div>
 </body>
 </html>

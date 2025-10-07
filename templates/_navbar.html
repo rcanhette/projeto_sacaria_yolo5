@@ -1,37 +1,21 @@
-<!-- templates/_navbar.html -->
-<style>
-  .topnav {
-    position: sticky; top: 0; z-index: 1000;
-    background: #004A80; color: #fff;
-    padding: 10px 16px;
-    display: flex; align-items: center; gap: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.1);
-  }
-  .topnav .brand { font-weight: 800; letter-spacing:.02em; }
-  .topnav a {
-    color: #fff; text-decoration: none; padding: 8px 10px; border-radius: 8px;
-  }
-  .topnav a:hover { background: rgba(255,255,255,.12); }
-  .topnav .spacer { flex: 1; }
-  .topnav .btn {
-    background: #22c55e; color: #062b16; font-weight: 800;
-  }
-</style>
+{% set _u = current_user() %}
+<nav style="background:#002F54; color:#fff; padding:10px 16px; display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+  <a href="{{ url_for('acompanhamento') }}" style="color:#fff; text-decoration:none; font-weight:800; padding:6px 10px;">Acompanhamento</a>
+  <span style="flex:1"></span>
 
-<nav class="topnav">
-  <div class="brand">COONAGRO · Sacaria</div>
+  {% if _u %}
+    <a href="{{ url_for('logs.logs_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Logs</a>
 
-  {# Acompanhamento: se houver ct no contexto, usa ct.id; senão vai para "/" (que redireciona para a 1ª CT) #}
-  {% if ct and ct.id %}
-    <a href="{{ url_for('ct.ct_detail', ct_id=ct.id) }}">Acompanhamento</a>
-    <a href="{{ url_for('logs.logs_panel') ~ '?ct_id=' ~ ct.id }}">Logs (Sessões)</a>
+    {% if _u.role == 'admin' %}
+      <a href="{{ url_for('user_admin.user_access_by_ct_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acessos</a>
+      <a href="{{ url_for('user_admin.users_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Usuários</a>
+      <a href="{{ url_for('ct_admin.ct_admin_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Ponto de Operação</a>
+    {% endif %}
+
+    <span style="opacity:.8;">|</span>
+    <span style="opacity:.8;">{{ _u.username }} ({{ _u.role }})</span>
+    <a href="{{ url_for('auth.logout') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Sair</a>
   {% else %}
-    <a href="{{ url_for('ct.ct_detail', ct_id=1) }}">Acompanhamento</a>
-    <a href="{{ url_for('logs.logs_panel') }}">Logs (Sessões)</a>
+    <a href="{{ url_for('auth.login') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Entrar</a>
   {% endif %}
-
-  <a href="{{ url_for('ct_admin.ct_admin_list') }}">CTs</a>
-
-  <div class="spacer"></div>
-
 </nav>

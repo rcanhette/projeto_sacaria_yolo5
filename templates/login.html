@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --bg:#f8fafc; --card:#fff; --border:#e5e7eb; --muted:#6B7280; --accent:#22c55e; --accent-weak:#16a34a; --text:#002F54; }
+    body{ margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;
+      display:flex; align-items:center; justify-content:center; }
+    .card{ background:#fff; border:1px solid var(--border); border-radius:16px; padding:24px; width:100%; max-width:400px; box-shadow:0 4px 16px rgba(0,0,0,.08); }
+    h1{ margin:0 0 12px; font-size:20px; font-weight:800; }
+    .muted{ color:var(--muted); font-size:12px; margin-bottom:16px; }
+    .input{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; margin:6px 0 12px; }
+    .btn{ width:100%; padding:10px 14px; border:none; border-radius:10px; background:var(--accent); color:#062b16; font-weight:800; cursor:pointer; }
+    .btn:hover{ background:var(--accent-weak); }
+    .alert{ background:#fee2e2; color:#991b1b; padding:8px 10px; border-radius:8px; margin-bottom:10px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <form class="card" method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+    <h1>Entrar</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          {% if cat in ['error'] %}<div class="alert">{{ msg }}</div>{% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="muted">Faça login para acessar o monitoramento.</div>
+    <label>Usuário</label>
+    <input class="input" name="username" autocomplete="username" required />
+    <label>Senha</label>
+    <input class="input" name="password" type="password" autocomplete="current-password" required />
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</body>
+</html>
