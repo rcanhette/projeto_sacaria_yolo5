@@ -144,6 +144,9 @@ def ct_video(ct_id):
         frame = None
         raw = None
         while True:
+            # Encerra imediatamente o streaming quando a sessão parar
+            if not cp.session_active:
+                break
             try:
                 frame = cp.last_vis_frame
                 if frame is None and cp.camera is not None:
@@ -174,5 +177,8 @@ def ct_video(ct_id):
                         yield (b'--frame\r\n'
                                b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
                 time.sleep(0.1)
+            
+        # Sai do generator encerrando a resposta
+        return
 
     return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')

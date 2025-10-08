@@ -1,11 +1,18 @@
 import cv2
 import threading
 import time 
+import os
 
 class VideoSource:
     def __init__(self, source_path):
         """Inicializa a fonte de vídeo (câmera ou arquivo) e o threading."""
         self.source_path = source_path
+        self.cap = None
+        self.frame = None
+        self.ret = False
+        self.lock = threading.Lock()
+        self.stop_event = threading.Event()
+        self.thread = None
         
         # === CORREÇÕES PARA RTSP E BUFFER ===
         self.is_file = not source_path.lower().startswith("rtsp")
@@ -15,7 +22,12 @@ class VideoSource:
             self.cap = cv2.VideoCapture(source_path, cv2.CAP_FFMPEG) 
             
             # Reduz o buffer para pegar o frame mais recente e evitar atrasos/travamentos
-            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 3) 
+            try:
+                buf_env = os.getenv('VIDEO_RTSP_BUFFER_SIZE')
+                buffer_size = int(buf_env) if buf_env is not None else 3
+            except Exception:
+                buffer_size = 3
+            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, buffer_size)
         else:
             self.cap = cv2.VideoCapture(source_path)
         # ======================================
@@ -25,25 +37,34 @@ class VideoSource:
             # Se não abrir, definimos como None para o loop não travar
             self.cap = None 
             return 
-        
-        self.frame = None
-        self.ret = False
-        self.lock = threading.Lock()
-        
+
         # === LÓGICA DE SINCRONIZAÇÃO FPS ===
         self.delay = 0 
         
         if self.is_file:
             fps = self.cap.get(cv2.CAP_PROP_FPS)
             
-            if fps > 0:
-                self.delay = 0.9 / fps 
+            # Configuração por ambiente: fator ou delay fixo em ms
+            delay_ms_env = os.getenv('VIDEO_FILE_DELAY_MS')
+            delay_factor_env = os.getenv('VIDEO_FILE_DELAY_FACTOR')
+
+            if delay_ms_env is not None:
+                try:
+                    self.delay = max(0.0, float(delay_ms_env) / 1000.0)
+                except Exception:
+                    self.delay = 0.033
+            elif fps > 0:
+                try:
+                    factor = float(delay_factor_env) if delay_factor_env is not None else 0.9
+                except Exception:
+                    factor = 0.9
+                self.delay = max(0.0, factor / fps)
                 print(f"[FPS] Vídeo FPS: {fps:.2f}. Delay ajustado para: {self.delay:.4f}s")
             else:
-                self.delay = 0.033 # Fallback
+                # Fallback quando FPS não está disponível
+                self.delay = 0.033
         # ==================================
         
-        self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
 
@@ -56,7 +77,17 @@ class VideoSource:
         while not self.stop_event.is_set():
             
             # Tenta ler o frame
-            ret, frame = self.cap.read()
+            try:
+                ret, frame = self.cap.read()
+            except Exception as e:
+                # Proteção contra race condition: cap pode ser liberado durante read()
+                # ou backend lançar exceção C++ (cv2.error). Encerra a thread com segurança.
+                try:
+                    # registra uma mensagem simples (evita quebrar se logger não existir)
+                    print(f"[VideoSource] Exceção no read(): {e}. Encerrando thread de captura.")
+                except Exception:
+                    pass
+                break
             
             with self.lock:
                 self.ret = ret
@@ -90,8 +121,19 @@ class VideoSource:
 
     def release(self):
         """Para a thread e libera a captura do OpenCV."""
-        self.stop_event.set()
-        if self.cap:
-             self.cap.release()
-        if self.thread.is_alive():
-             self.thread.join()
+        # Ordem importa para evitar race com self.cap.read():
+        # 1) sinaliza parada, 2) aguarda thread sair do loop, 3) libera cap
+        try:
+            self.stop_event.set()
+        except Exception:
+            pass
+        try:
+            if self.thread and self.thread.is_alive():
+                self.thread.join(timeout=1.0)
+        except Exception:
+            pass
+        try:
+            if self.cap:
+                self.cap.release()
+        except Exception:
+            pass

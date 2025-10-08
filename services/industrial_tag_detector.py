@@ -3,6 +3,7 @@ import torch
 from datetime import datetime
 import os
 import numpy as np
+import sys
 
 # Supressão de avisos do PyTorch/YOLO
 import warnings
@@ -11,14 +12,25 @@ warnings.filterwarnings('ignore')
 class IndustrialTagDetector:
     def __init__(self, model_path='sacaria_yolov5n.pt', roi=(0, 0, 0, 0), log_file=None, match_dist=100):
         
-        # 1. Configurações do Modelo e Ambiente
+        # 1. Configurações do Modelo e Ambiente (uso local do YOLOv5)
         try:
-            # Assumimos que 'ultralytics/yolov5' é o repositório correto.
-            self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, force_reload=True)
+            # Evita qualquer tentativa de auto-instalação de dependências pelo YOLOv5
+            os.environ.setdefault('YOLOV5_NO_AUTOINSTALL', '1')
+
+            # Caminho local para o repositório YOLOv5 dentro do projeto
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            yolo_dir = os.path.join(project_root, 'third_party', 'yolov5')
+
+            if not os.path.isdir(yolo_dir):
+                raise FileNotFoundError(f"Diretório YOLOv5 não encontrado: {yolo_dir}")
+
+            # Carrega o modelo a partir do repositório local
+            # Requer que exista um 'hubconf.py' em yolo_dir (já presente no repo oficial)
+            self.model = torch.hub.load(yolo_dir, 'custom', path=model_path, source='local', force_reload=False)
             self.model.eval()
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         except Exception as e:
-            print(f"[ERRO] Falha ao carregar o modelo YOLOv5: {e}")
+            print(f"[ERRO] Falha ao carregar o modelo YOLOv5 local: {e}")
             self.model = None
 
         # 2. Configurações do Rastreador (Tracking)
@@ -28,8 +40,8 @@ class IndustrialTagDetector:
         self.next_id = 1
         
         # AJUSTES CRÍTICOS DE ESTABILIDADE
-        self.max_lost = 5  # Aumentado para 60 frames (2.0s em 30 FPS)
-        self.match_dist = 150 # Aumentado para 180 pixels para sacos colados
+        self.max_lost = 10  # Aumentado para 60 frames (2.0s em 30 FPS)
+        self.match_dist = 200 # Aumentado para 180 pixels para sacos colados
         
         # MARGEM DE TOLERÂNCIA (Histerese): 20 pixels para prevenir reset por jitter.
         self.reset_margin = 20 
@@ -38,10 +50,10 @@ class IndustrialTagDetector:
         x_roi, y_roi, w_roi, h_roi = roi
         
         # Linha Vermelha (Portão SUPERIOR - Y menor): A 1/3 da altura do ROI
-        self.line_red_y = y_roi + int(h_roi / 3) if h_roi > 0 else 0
+        self.line_red_y = y_roi + int(h_roi / 3) +10 if h_roi > 0 else 0
         
         # Linha Azul (Portão INFERIOR - Y maior): A 2/3 da altura do ROI
-        self.line_blue_y = y_roi + int(2 * h_roi / 3) +20 if h_roi > 0 else 0
+        self.line_blue_y = y_roi + int(2 * h_roi / 3) -10 if h_roi > 0 else 0
         
         # Filtros: ID e Confiança
         self.target_ids = [0] 

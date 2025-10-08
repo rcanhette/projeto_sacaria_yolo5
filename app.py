@@ -7,6 +7,8 @@ from routes.auth import auth_bp, current_user
 from routes.user_admin import user_admin_bp
 from routes.ct_admin import ct_admin_bp
 from services.ct_repository import list_cts
+from services.runtime import ct_runtime
+import atexit
 from services.db import ensure_schema
 from services.auth_repository import list_user_ct_ids, user_can_control_ct
 
@@ -81,6 +83,18 @@ def create_app():
 
 
 if __name__ == "__main__":
+    # Shutdown limpo: libera todas as CTs na saída do processo
+    @atexit.register
+    def _shutdown_release_all():
+        try:
+            for cp in list(ct_runtime.values()):
+                try:
+                    cp.release()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
     app = create_app()
     app.logger.info("Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)")
     app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)

@@ -85,6 +85,8 @@ class CapturePoint:
                     print(f"[CT{self.ct['id']}] loop error: {e}")
                     time.sleep(0.05)
 
+        # Garante que o evento de parada esteja limpo antes de iniciar uma nova thread
+        self.stop_event.clear()
         self.thread = threading.Thread(target=loop, daemon=True)
         self.thread.start()
 
@@ -150,29 +152,53 @@ class CapturePoint:
             print(f"[ERRO LOG DB] CT{self.ct['id']} delta: {e}")
 
     def stop_session(self):
-        if not self.session_active:
-            return
+        # Mesmo que não haja sessão ativa, atender STOP deve encerrar captura
 
         agora = datetime.now()
-        self.session_hora_fim = agora.strftime("%H:%M:%S")
-        quantidade = int(self.current_session_count)
-
         try:
-            if self.session_db_id is not None:
-                finish_session(self.session_db_id, quantidade, status='finalizado')
-        except Exception as e:
-            print(f"[LOG DB] erro ao finalizar sessão: {e}")
+            if self.session_active:
+                self.session_hora_fim = agora.strftime("%H:%M:%S")
+                quantidade = int(self.current_session_count)
+                try:
+                    if self.session_db_id is not None:
+                        finish_session(self.session_db_id, quantidade, status='finalizado')
+                except Exception as e:
+                    print(f"[LOG DB] erro ao finalizar sessão: {e}")
+        finally:
+            # limpa estado de sessão
+            self.session_active = False
+            self.session_lote = None
+            self.session_data = None
+            self.session_hora_inicio = None
+            self.session_hora_fim = None
+            self.session_db_id = None
+            self.current_session_count = 0
+            self._last_session_logged_total = None
+            self._base_counter_snapshot = 0
 
-        # limpa estado (thread fica viva p/ reuso)
-        self.session_active = False
-        self.session_lote = None
-        self.session_data = None
-        self.session_hora_inicio = None
-        self.session_hora_fim = None
-        self.session_db_id = None
-        self.current_session_count = 0
-        self._last_session_logged_total = None
-        self._base_counter_snapshot = 0
+        # IMPORTANTE: encerrar de fato a thread de captura e conexões (RTSP/Arquivo)
+        try:
+            self.stop_event.set()
+            if self.thread and self.thread.is_alive():
+                self.thread.join(timeout=1.5)
+        except Exception:
+            pass
+        finally:
+            self.thread = None
+
+        # Encerra a fonte de vídeo (isso para a thread interna do VideoSource)
+        if self.camera:
+            try:
+                self.camera.release()
+            except Exception:
+                pass
+        self.camera = None
+
+        # Solta o detector para liberar memória GPU/CPU
+        self.detector = None
+
+        # Prepara um novo evento para próxima sessão (senão a thread sairia imediatamente)
+        self.stop_event = threading.Event()
 
     # ---------- fonte ----------
     def set_source(self, source_type: str, source_path: str | None):
@@ -183,7 +209,9 @@ class CapturePoint:
         else:
             self.source_type = "rtsp"
             self.source_path = self.default_source_path
-        self._open_sources()
+        # Reabre a fonte apenas se já houver thread ativa; caso contrário, será aberta ao iniciar
+        if self.thread and self.thread.is_alive():
+            self._open_sources()
 
     # ---------- cleanup ----------
     def release(self):
