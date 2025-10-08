@@ -27,3 +27,6 @@ openpyxl>=3.1
 torch
 torchvision
 
+# Servidor WSGI e Serviço Windows
+waitress>=2.1
+pywin32>=306; platform_system == "Windows"
