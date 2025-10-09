@@ -95,6 +95,16 @@
   <script>
     const cts = {{ cts|tojson }};
 
+    // Ajusta o rótulo visual de "Sessão ativa" para "Sessão operando"
+    // sem depender do texto original no HTML (robusto a encoding).
+    try {
+      cts.forEach(ct => {
+        const row = document.getElementById(`ativa-${ct.id}`)?.parentElement;
+        const label = row?.querySelector('.label');
+        if (label) label.textContent = 'Sessão operando';
+      });
+    } catch (_) {}
+
     function setVisibility(ctId, active){
       const card = document.getElementById("ct-card-" + ctId);
       const canControl = card?.dataset?.canControl === "1";
