@@ -195,3 +195,71 @@ def ensure_schema() -> None:
         END$$;
         """
     )
+    
+    # ---------- migração: adotar status 'operando' no lugar de 'ativo' ----------
+    # Ajusta constraint, default, atualiza registros e recria índice único parcial
+    execute(
+        """
+        DO $$
+        DECLARE
+            cname text;
+        BEGIN
+            -- Drop CHECK constraint existente (qualquer nome)
+            SELECT conname INTO cname
+              FROM pg_constraint
+             WHERE conrelid = 'session'::regclass
+               AND contype = 'c'
+               AND pg_get_constraintdef(oid) ILIKE '%%status%%IN%%';
+            IF cname IS NOT NULL THEN
+                EXECUTE format('ALTER TABLE session DROP CONSTRAINT %%I', cname);
+            END IF;
+
+            -- Cria CHECK permitindo 'operando' (mantém 'cancelado' e 'finalizado')
+            BEGIN
+                ALTER TABLE session
+                  ADD CONSTRAINT chk_session_status
+                  CHECK (status IN ('operando','finalizado','cancelado'));
+            EXCEPTION WHEN duplicate_object THEN
+                -- já existe
+            END;
+
+            -- Default passa a ser 'operando'
+            BEGIN
+                ALTER TABLE session ALTER COLUMN status SET DEFAULT 'operando';
+            EXCEPTION WHEN others THEN
+                -- ignora
+            END;
+        END$$;
+        """
+    )
+
+    # Converte valores antigos
+    execute("UPDATE session SET status='operando' WHERE status='ativo';")
+
+    # Garante unicidade por CT para sessões 'operando'
+    execute(
+        """
+        DO $$
+        BEGIN
+            -- Remove índice antigo (se existir)
+            IF EXISTS (
+                SELECT 1 FROM pg_indexes
+                 WHERE schemaname = 'public'
+                   AND indexname = 'uq_session_one_active_per_ct'
+            ) THEN
+                EXECUTE 'DROP INDEX IF EXISTS uq_session_one_active_per_ct';
+            END IF;
+
+            -- Cria novo índice condicional em 'operando'
+            IF NOT EXISTS (
+                SELECT 1 FROM pg_indexes
+                 WHERE schemaname = 'public'
+                   AND indexname = 'uq_session_one_operando_per_ct'
+            ) THEN
+                CREATE UNIQUE INDEX uq_session_one_operando_per_ct
+                    ON session (ct_id)
+                    WHERE (status = 'operando');
+            END IF;
+        END$$;
+        """
+    )

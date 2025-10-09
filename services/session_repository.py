@@ -14,7 +14,7 @@ def create_session(ct_id: int, lote: str) -> int:
         """
         SELECT id
           FROM session
-         WHERE ct_id = %s AND status = 'ativo'
+         WHERE ct_id = %s AND status IN ('operando','ativo')
          ORDER BY data_inicio DESC
          LIMIT 1
         """,
@@ -26,7 +26,7 @@ def create_session(ct_id: int, lote: str) -> int:
     # 2) Cria nova sessão ativa
     sql = """
         INSERT INTO session (ct_id, lote, data_inicio, status)
-        VALUES (%s, %s, NOW(), 'ativo')
+        VALUES (%s, %s, NOW(), 'operando')
         RETURNING id
     """
     return execute_returning(sql, [ct_id, lote])
@@ -84,7 +84,7 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
                      SELECT id
                        FROM session
                       WHERE ct_id = %s
-                        AND status = 'ativo'
+                        AND status IN ('operando','ativo')
                       ORDER BY data_inicio DESC
                       LIMIT 1
                  )
@@ -107,7 +107,7 @@ def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "fina
              SELECT id
                FROM session
               WHERE ct_id = %s
-                AND status = 'ativo'
+                AND status IN ('operando','ativo')
               ORDER BY data_inicio DESC
               LIMIT 1
          )
@@ -151,8 +151,45 @@ def get_active_session_by_ct(ct_id: int) -> Optional[Dict]:
     sql = """
         SELECT id, ct_id, lote, data_inicio, status, total_final
           FROM session
-         WHERE ct_id = %s AND status = 'ativo'
+         WHERE ct_id = %s AND status IN ('operando','ativo')
          ORDER BY data_inicio DESC
          LIMIT 1
     """
     return query_one(sql, [ct_id])
+
+# -----------------------------------------------------------------------------
+# Inicialização: finalizar sessões ativas remanescentes (queda do processo)
+# -----------------------------------------------------------------------------
+def close_all_active_sessions_on_boot(final_status: str = "finalizado") -> int:
+    """
+    Finaliza todas as sessões que ficaram com status 'ativo' (ex.: queda do app).
+    - Define data_fim = NOW()
+    - Define total_final com o último total_atual do session_log (quando existir)
+    - Altera status para `final_status` (padrão: 'finalizado')
+
+    Retorna a quantidade de linhas afetadas.
+    """
+    sql = """
+        WITH upd AS (
+            UPDATE session s
+               SET data_fim = NOW(),
+                   total_final = COALESCE(
+                       (
+                           SELECT sl.total_atual
+                             FROM session_log sl
+                            WHERE sl.session_id = s.id
+                            ORDER BY sl.ts DESC
+                            LIMIT 1
+                       ), s.total_final
+                   ),
+                   status = %s
+             WHERE s.status IN ('operando','ativo')
+         RETURNING 1
+        )
+        SELECT COUNT(*) AS affected FROM upd
+    """
+    row = query_one(sql, [final_status])
+    try:
+        return int(row["affected"]) if row and "affected" in row else 0
+    except Exception:
+        return 0

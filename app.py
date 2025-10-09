@@ -10,6 +10,7 @@ from services.ct_repository import list_cts
 from services.runtime import ct_runtime
 import atexit
 from services.db import ensure_schema
+from services.session_repository import close_all_active_sessions_on_boot
 from services.auth_repository import list_user_ct_ids, user_can_control_ct
 
 def create_app():
@@ -27,6 +28,14 @@ def create_app():
     # Apenas garante o schema (nenhum seed automático)
     log.info("Garantindo schema...")
     ensure_schema()
+
+    # Ao iniciar, finalize sessões que ficaram 'ativas' no banco (queda do processo)
+    try:
+        affected = close_all_active_sessions_on_boot(final_status="finalizado")
+        if affected:
+            log.info(f"Sessões ativas remanescentes finalizadas no boot: {affected}")
+    except Exception as e:
+        log.warning(f"Falha ao finalizar sessões remanescentes no boot: {e}")
 
     # Blueprints
     app.register_blueprint(auth_bp)        # /login, /logout
@@ -89,6 +98,12 @@ if __name__ == "__main__":
         try:
             for cp in list(ct_runtime.values()):
                 try:
+                    # Finaliza sessão ativa para marcar data_fim no banco
+                    if getattr(cp, "session_active", False) or getattr(cp, "session_db_id", None) is not None:
+                        try:
+                            cp.stop_session()
+                        except Exception:
+                            pass
                     cp.release()
                 except Exception:
                     pass

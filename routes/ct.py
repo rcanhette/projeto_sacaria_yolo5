@@ -85,7 +85,7 @@ def ct_start(ct_id):
         active = get_active_session_by_ct(ct_id)
     except Exception:
         active = None
-    if active and active.get("status") == "ativo":
+    if active and active.get("status") in ("operando", "ativo"):
         if request.headers.get("X-Requested-With") == "fetch":
             return ("", 204)
         flash("Já existe uma sessão ativa registrada no banco para esta CT.", "info")
