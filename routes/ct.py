@@ -4,6 +4,7 @@ import cv2
 from flask import Blueprint, render_template, Response, request, redirect, url_for, flash
 from services.capture_point import CapturePoint
 from services.ct_repository import get_ct
+from services.session_repository import get_active_session_by_ct
 from services.runtime import ct_runtime
 from routes.auth import current_user, login_required
 from services.auth_repository import user_can_view_ct, user_can_control_ct
@@ -71,6 +72,25 @@ def ct_start(ct_id):
         return redirect(url_for("index"))
 
     cp = _ensure_cp(ct_row)
+
+    # Proteção extra: se já houver sessão ativa no app/DB, não duplique
+    if cp.session_active or cp.session_db_id is not None:
+        if request.headers.get("X-Requested-With") == "fetch":
+            return ("", 204)
+        flash("Já existe uma sessão ativa para esta CT.", "info")
+        return redirect(url_for("index"))
+
+    active = None
+    try:
+        active = get_active_session_by_ct(ct_id)
+    except Exception:
+        active = None
+    if active and active.get("status") == "ativo":
+        if request.headers.get("X-Requested-With") == "fetch":
+            return ("", 204)
+        flash("Já existe uma sessão ativa registrada no banco para esta CT.", "info")
+        return redirect(url_for("index"))
+
     cp.set_source(source_type, file_path)
     cp.start_session(lote)
 

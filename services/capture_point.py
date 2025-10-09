@@ -24,6 +24,7 @@ class CapturePoint:
 
         self.thread = None
         self.stop_event = threading.Event()
+        self.session_lock = threading.Lock()
 
         # estado de sessão
         self.session_active = False
@@ -92,26 +93,31 @@ class CapturePoint:
 
     # ---------- sessão ----------
     def start_session(self, lote: str):
-        self._ensure_thread()
+        # Evita corrida de START duplo (duplo clique ou chamadas concorrentes)
+        with self.session_lock:
+            if self.session_active or self.session_db_id is not None:
+                return
 
-        agora = datetime.now()
-        try:
-            base = int(getattr(self.detector, "counter", 0))
-        except Exception:
-            base = 0
+            self._ensure_thread()
 
-        # cria registro no banco e guarda o id
-        self.session_db_id = create_session(self.ct["id"], lote)
+            agora = datetime.now()
+            try:
+                base = int(getattr(self.detector, "counter", 0))
+            except Exception:
+                base = 0
 
-        self.session_active = True
-        self.session_lote = lote
-        self.session_data = agora.strftime("%d/%m/%Y")
-        self.session_hora_inicio = agora.strftime("%H:%M:%S")
-        self.session_hora_fim = None
+            # cria registro no banco e guarda o id
+            self.session_db_id = create_session(self.ct["id"], lote)
 
-        self._base_counter_snapshot = base
-        self.current_session_count = 0
-        self._last_session_logged_total = 0
+            self.session_active = True
+            self.session_lote = lote
+            self.session_data = agora.strftime("%d/%m/%Y")
+            self.session_hora_inicio = agora.strftime("%H:%M:%S")
+            self.session_hora_fim = None
+
+            self._base_counter_snapshot = base
+            self.current_session_count = 0
+            self._last_session_logged_total = 0
 
         # (não há mais cabeçalho em .txt — virou a linha da tabela `session`)
 
