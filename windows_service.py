@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import subprocess
+import configparser
 
 import win32event
 import win32service
@@ -30,14 +31,29 @@ class AppServerService(win32serviceutil.ServiceFramework):
         except Exception:
             pass
 
+    def _load_config(self, root: str) -> configparser.ConfigParser:
+        cfg = configparser.ConfigParser()
+        # Nome padrão do arquivo de configuração
+        ini_path = os.path.join(root, "windows_service.ini")
+        if os.path.isfile(ini_path):
+            try:
+                cfg.read(ini_path, encoding="utf-8")
+            except Exception:
+                pass
+        return cfg
+
     def _build_command(self):
         root = os.path.dirname(os.path.abspath(__file__))
-        logs_dir = os.path.join(root, "logs")
+        cfg = self._load_config(root)
+
+        # Diretório de logs: pode vir do INI (paths.logs_dir) ou padrão 'logs'
+        logs_dir_cfg = cfg.get("paths", "logs_dir", fallback="logs")
+        logs_dir = logs_dir_cfg if os.path.isabs(logs_dir_cfg) else os.path.join(root, logs_dir_cfg)
         os.makedirs(logs_dir, exist_ok=True)
 
-        # Configs via ambiente
-        host = os.getenv("APP_HOST", "0.0.0.0")
-        port = os.getenv("APP_PORT", "8080")
+        # Configs: prioridade INI > ambiente > padrão
+        host = cfg.get("server", "host", fallback=os.getenv("APP_HOST", "0.0.0.0"))
+        port = cfg.get("server", "port", fallback=os.getenv("APP_PORT", "8080"))
         # Evita qualquer tentativa do YOLO de instalar deps
         os.environ.setdefault("YOLOV5_NO_AUTOINSTALL", "1")
         # Garante PYTHONPATH com a raiz do projeto
@@ -45,7 +61,7 @@ class AppServerService(win32serviceutil.ServiceFramework):
 
         # Caminhos prováveis do waitress-serve
         venv_waitress = os.path.join(root, "venv", "Scripts", "waitress-serve.exe")
-        alt_waitress = os.getenv("WAITRESS_EXE")  # opção de override
+        alt_waitress = cfg.get("paths", "waitress_exe", fallback=os.getenv("WAITRESS_EXE", ""))
 
         if alt_waitress and os.path.isfile(alt_waitress):
             cmd = [alt_waitress]
@@ -53,7 +69,7 @@ class AppServerService(win32serviceutil.ServiceFramework):
             cmd = [venv_waitress]
         else:
             # Fallback: python -m waitress
-            python = os.getenv("PYTHON_EXE") or sys.executable
+            python = cfg.get("paths", "python_exe", fallback=os.getenv("PYTHON_EXE", sys.executable))
             cmd = [python, "-m", "waitress"]
 
         # Argumentos para servir o app via callable app:create_app
@@ -62,6 +78,12 @@ class AppServerService(win32serviceutil.ServiceFramework):
             "--port", str(port),
             "--call", "app:create_app",
         ]
+
+        # Carrega variáveis adicionais da seção [env]
+        if cfg.has_section("env"):
+            for k, v in cfg.items("env"):
+                # Não sobrescreve se já definido no ambiente
+                os.environ.setdefault(k, v)
 
         return cmd + args, root, logs_dir
 
@@ -137,4 +159,3 @@ class AppServerService(win32serviceutil.ServiceFramework):
 if __name__ == "__main__":
     # Permite: install/start/stop/remove
     win32serviceutil.HandleCommandLine(AppServerService)
-
