@@ -88,6 +88,12 @@ class AppServerService(win32serviceutil.ServiceFramework):
         return cmd + args, root, logs_dir
 
     def SvcDoRun(self):
+        # Reporta estado inicial ao SCM para evitar timeout
+        try:
+            self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
+        except Exception:
+            pass
+
         self.log("Inicializando serviço...")
 
         try:
@@ -112,6 +118,12 @@ class AppServerService(win32serviceutil.ServiceFramework):
 
             self.log(f"Processo iniciado PID={self.process.pid}: {' '.join(cmd)}")
 
+            # Sinaliza ao SCM que o serviço está em execução
+            try:
+                self.ReportServiceStatus(win32service.SERVICE_RUNNING)
+            except Exception:
+                pass
+
             # Aguarda até receber stop, checando o processo periodicamente
             while True:
                 rc = win32event.WaitForSingleObject(self.stop_event, 1000)
@@ -125,6 +137,11 @@ class AppServerService(win32serviceutil.ServiceFramework):
             self.log(f"Erro ao iniciar: {e}")
 
         # Finalização
+        try:
+            # Reporta ao SCM que estamos parando
+            self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
+        except Exception:
+            pass
         try:
             if self.process and self.process.poll() is None:
                 self.log("Solicitando término do processo...")
@@ -147,13 +164,15 @@ class AppServerService(win32serviceutil.ServiceFramework):
         finally:
             self.process = None
             self.log("Serviço finalizado.")
+            try:
+                self.ReportServiceStatus(win32service.SERVICE_STOPPED)
+            except Exception:
+                pass
 
     def SvcStop(self):
-        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         # Sinaliza o loop principal
         win32event.SetEvent(self.stop_event)
         self.log("Recebido STOP.")
-        self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
 
 if __name__ == "__main__":
