@@ -64,6 +64,16 @@ def tc_start(tc_id):
         return redirect(url_for("index"))
 
     lote = request.form.get("lote")
+    contagem_alvo_raw = request.form.get("contagem_alvo")
+    contagem_alvo = None
+    if contagem_alvo_raw is not None and contagem_alvo_raw.strip() != "":
+        try:
+            contagem_alvo = int(contagem_alvo_raw)
+            if contagem_alvo <= 0:
+                raise ValueError
+        except Exception:
+            flash("Contagem alvo deve ser um número inteiro positivo.", "error")
+            return redirect(url_for("index"))
     source_type = request.form.get("source_type", "rtsp")
     file_path = (request.form.get("file_path") or "").strip() or None
 
@@ -92,7 +102,7 @@ def tc_start(tc_id):
         return redirect(url_for("index"))
 
     cp.set_source(source_type, file_path)
-    cp.start_session(lote)
+    cp.start_session(lote, contagem_alvo)
 
     if request.headers.get("X-Requested-With") == "fetch":
         return ("", 204)
@@ -112,7 +122,20 @@ def tc_stop(tc_id):
         flash("TC não encontrada.", "error")
         return redirect(url_for("index"))
 
-    cp.stop_session()
+    # valida observação conforme regra contagem
+    observacao = request.form.get("observacao")
+    try:
+        alvo = cp.session_contagem_alvo
+    except Exception:
+        alvo = None
+    qtd = int(cp.current_session_count)
+    if alvo is not None and qtd != int(alvo) and not (observacao and observacao.strip()):
+        if request.headers.get("X-Requested-With") == "fetch":
+            return ("Observação é obrigatória quando total != contagem alvo.", 400)
+        flash("Observação é obrigatória quando total != contagem alvo.", "error")
+        return redirect(url_for("index"))
+
+    cp.stop_session(observacao=observacao)
 
     if request.headers.get("X-Requested-With") == "fetch":
         return ("", 204)
@@ -142,6 +165,7 @@ def sse_tc(tc_id):
                 "hora_inicio": cp.session_hora_inicio,
                 "count": int(cp.current_session_count),
                 "fonte": cp.source_type,
+                "contagem_alvo": cp.session_contagem_alvo,
             }
             yield f"data: {json.dumps(payload)}\n\n"
             time.sleep(1)

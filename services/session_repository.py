@@ -5,7 +5,7 @@ from services.db import execute_returning, execute, query_all, query_one
 # -----------------------------------------------------------------------------
 # Criação e logs
 # -----------------------------------------------------------------------------
-def create_session(ct_id: int, lote: str) -> int:
+def create_session(ct_id: int, lote: str, contagem_alvo: int | None = None) -> int:
     """Cria sessão ativa para a CT, mas é idempotente: se já existir uma sessão
     'ativo' para a mesma CT, retorna o id existente ao invés de criar outra.
     """
@@ -25,11 +25,11 @@ def create_session(ct_id: int, lote: str) -> int:
 
     # 2) Cria nova sessão ativa
     sql = """
-        INSERT INTO session (ct_id, lote, data_inicio, status)
-        VALUES (%s, %s, NOW(), 'operando')
+        INSERT INTO session (ct_id, lote, data_inicio, status, contagem_alvo)
+        VALUES (%s, %s, NOW(), 'operando', %s)
         RETURNING id
     """
-    return execute_returning(sql, [ct_id, lote])
+    return execute_returning(sql, [ct_id, lote, contagem_alvo])
 
 def insert_log(session_id: int, ct_id: int, delta: int, total_atual: int) -> None:
     sql = """
@@ -41,7 +41,7 @@ def insert_log(session_id: int, ct_id: int, delta: int, total_atual: int) -> Non
 # -----------------------------------------------------------------------------
 # Finalização
 # -----------------------------------------------------------------------------
-def finish_session(session_id: int, total_final: int, status: str = "finalizado") -> None:
+def finish_session(session_id: int, total_final: int, status: str = "finalizado", observacao: str | None = None) -> None:
     """
     Finaliza a sessão pelo ID:
       - Define data_fim = NOW(), total_final e status.
@@ -56,10 +56,11 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
         UPDATE session
            SET data_fim   = NOW(),
                total_final = %s,
-               status      = %s
+               status      = %s,
+               observacao  = COALESCE(%s, observacao)
          WHERE id = %s
         """,
-        [total_final, status, session_id],
+        [total_final, status, observacao, session_id],
     )
 
     # Se o execute() não retorna contagem, tentamos descobrir pela CT do ID dado
@@ -79,7 +80,8 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
                 UPDATE session
                    SET data_fim   = NOW(),
                        total_final = %s,
-                       status      = %s
+                       status      = %s,
+                       observacao  = COALESCE(%s, observacao)
                  WHERE id = (
                      SELECT id
                        FROM session
@@ -89,10 +91,10 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
                       LIMIT 1
                  )
                 """,
-                [total_final, status, s["ct_id"]],
+                [total_final, status, observacao, s["ct_id"]],
             )
 
-def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "finalizado") -> None:
+def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "finalizado", observacao: str | None = None) -> None:
     """
     Finaliza diretamente a sessão ATIVA mais recente de uma CT.
     Útil quando você só tem o ct_id.
@@ -102,7 +104,8 @@ def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "fina
         UPDATE session
            SET data_fim   = NOW(),
                total_final = %s,
-               status      = %s
+               status      = %s,
+               observacao  = COALESCE(%s, observacao)
          WHERE id = (
              SELECT id
                FROM session
@@ -112,7 +115,7 @@ def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "fina
               LIMIT 1
          )
         """,
-        [total_final, status, ct_id],
+        [total_final, status, observacao, ct_id],
     )
 
 # -----------------------------------------------------------------------------
@@ -131,9 +134,10 @@ def list_sessions_by_ct(ct_id: int, limit: int = 200) -> List[Dict]:
 def get_session(session_id: int) -> Optional[Dict]:
     sql = """
         SELECT s.id, s.ct_id, s.lote, s.data_inicio, s.data_fim, s.total_final, s.status,
+               s.contagem_alvo, s.observacao,
                c.name AS ct_name
           FROM session s
-          JOIN ct c ON c.id = s.ct_id
+          JOIN tc c ON c.id = s.ct_id
          WHERE s.id = %s
     """
     return query_one(sql, [session_id])
@@ -149,7 +153,7 @@ def get_session_logs(session_id: int) -> List[Dict]:
 
 def get_active_session_by_ct(ct_id: int) -> Optional[Dict]:
     sql = """
-        SELECT id, ct_id, lote, data_inicio, status, total_final
+        SELECT id, ct_id, lote, data_inicio, status, total_final, contagem_alvo, observacao
           FROM session
          WHERE ct_id = %s AND status IN ('operando','ativo')
          ORDER BY data_inicio DESC

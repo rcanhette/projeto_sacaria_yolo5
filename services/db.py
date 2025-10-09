@@ -152,13 +152,19 @@ def ensure_schema() -> None:
       data_inicio TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
       data_fim TIMESTAMP WITHOUT TIME ZONE,
       status TEXT NOT NULL DEFAULT 'ativo' CHECK (status IN ('ativo','finalizado','cancelado')),
-      total_final INTEGER
+      total_final INTEGER,
+      contagem_alvo INTEGER,
+      observacao TEXT
     );
     """)
     # índices úteis
     execute("CREATE INDEX IF NOT EXISTS idx_session_ct ON session(ct_id);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_status ON session(status);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_ct_inicio ON session(ct_id, data_inicio DESC);")
+
+    -- adicionar colunas em esquemas antigos
+    execute("ALTER TABLE session ADD COLUMN IF NOT EXISTS contagem_alvo INTEGER;")
+    execute("ALTER TABLE session ADD COLUMN IF NOT EXISTS observacao TEXT;")
 
     # ---------- session_log ----------
     execute("""

@@ -38,7 +38,7 @@ def _get_session_or_404(session_id: int):
                COALESCE(s.total_final, 0) AS total_final,
                c.name AS ct_name
           FROM session s
-          JOIN ct c ON c.id = s.ct_id
+          JOIN tc c ON c.id = s.ct_id
          WHERE s.id = %s
         """,
         [session_id],
@@ -98,6 +98,10 @@ def logs_panel():
         return render_template("logs_panel.html", cts=[], current_ct_id="all", sessions=[])
 
     ct_id_arg = request.args.get("ct_id", "all")
+    status_arg = request.args.get("status", "operando").strip().lower()
+    lote_arg = (request.args.get("lote") or "").strip()
+    ini_de = (request.args.get("ini_de") or "").strip()
+    ini_ate = (request.args.get("ini_ate") or "").strip()
     permitted_ids = [c["id"] for c in permitted_cts]
 
     if ct_id_arg == "all":
@@ -114,6 +118,21 @@ def logs_panel():
         current_ct_id = str(wanted)
 
     placeholders = ",".join(["%s"] * len(ct_ids))
+    where = [f"s.ct_id IN ({placeholders})"]
+    params = list(ct_ids)
+    if status_arg and status_arg != "all":
+        where.append("s.status = %s")
+        params.append(status_arg)
+    if lote_arg:
+        where.append("s.lote ILIKE %s")
+        params.append(f"%{lote_arg}%")
+    if ini_de:
+        where.append("s.data_inicio::date >= %s")
+        params.append(ini_de)
+    if ini_ate:
+        where.append("s.data_inicio::date <= %s")
+        params.append(ini_ate)
+    where_sql = " AND ".join(where)
     sql = f"""
         SELECT
             s.id,
@@ -126,17 +145,21 @@ def logs_panel():
             COALESCE(s.total_final, 0) AS total_final
         FROM session s
           JOIN tc c ON c.id = s.ct_id
-        WHERE s.ct_id IN ({placeholders})
+        WHERE {where_sql}
         ORDER BY s.data_inicio DESC
         LIMIT 2000
     """
-    sessions = query_all(sql, ct_ids)
+    sessions = query_all(sql, params)
 
     return render_template(
         "logs_panel.html",
         cts=permitted_cts,
         current_ct_id=current_ct_id,
         sessions=sessions,
+        current_status=status_arg,
+        current_lote=lote_arg,
+        current_ini_de=ini_de,
+        current_ini_ate=ini_ate,
     )
 
 

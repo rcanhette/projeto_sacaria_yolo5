@@ -33,6 +33,7 @@ class CapturePoint:
         self.session_hora_inicio = None
         self.session_hora_fim = None
         self.session_db_id = None   # <<< ID na tabela session
+        self.session_contagem_alvo = None
 
         # contadores
         self.current_session_count = 0
@@ -92,7 +93,7 @@ class CapturePoint:
         self.thread.start()
 
     # ---------- sessão ----------
-    def start_session(self, lote: str):
+    def start_session(self, lote: str, contagem_alvo: int | None = None):
         # Evita corrida de START duplo (duplo clique ou chamadas concorrentes)
         with self.session_lock:
             if self.session_active or self.session_db_id is not None:
@@ -107,13 +108,14 @@ class CapturePoint:
                 base = 0
 
             # cria registro no banco e guarda o id
-            self.session_db_id = create_session(self.ct["id"], lote)
+            self.session_db_id = create_session(self.ct["id"], lote, contagem_alvo)
 
             self.session_active = True
             self.session_lote = lote
             self.session_data = agora.strftime("%d/%m/%Y")
             self.session_hora_inicio = agora.strftime("%H:%M:%S")
             self.session_hora_fim = None
+            self.session_contagem_alvo = int(contagem_alvo) if contagem_alvo is not None else None
 
             self._base_counter_snapshot = base
             self.current_session_count = 0
@@ -157,7 +159,7 @@ class CapturePoint:
         except Exception as e:
             print(f"[ERRO LOG DB] CT{self.ct['id']} delta: {e}")
 
-    def stop_session(self):
+    def stop_session(self, observacao: str | None = None):
         # Mesmo que não haja sessão ativa, atender STOP deve encerrar captura
 
         agora = datetime.now()
@@ -167,7 +169,7 @@ class CapturePoint:
                 quantidade = int(self.current_session_count)
                 try:
                     if self.session_db_id is not None:
-                        finish_session(self.session_db_id, quantidade, status='finalizado')
+                        finish_session(self.session_db_id, quantidade, status='finalizado', observacao=observacao)
                 except Exception as e:
                     print(f"[LOG DB] erro ao finalizar sessão: {e}")
         finally:
@@ -178,6 +180,7 @@ class CapturePoint:
             self.session_hora_inicio = None
             self.session_hora_fim = None
             self.session_db_id = None
+            self.session_contagem_alvo = None
             self.current_session_count = 0
             self._last_session_logged_total = None
             self._base_counter_snapshot = 0

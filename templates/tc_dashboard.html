@@ -64,6 +64,7 @@
           <aside class="side">
             <div class="row"><div class="label">Total da sessão</div><div class="kpi" id="count-{{ ct.id }}">0</div></div>
             <div class="row"><div class="label">Lote</div><div id="lote-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Contagem alvo</div><div id="alvo-{{ ct.id }}" class="pill off">-</div></div>
             <div class="row"><div class="label">Hora início</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
             <div class="row"><div class="label">Sessão ativa</div><div id="ativa-{{ ct.id }}" class="pill off">não</div></div>
           </aside>
@@ -75,6 +76,8 @@
                   <input type="hidden" name="source_type" value="rtsp" />
                   <label class="muted" for="lote-ipt-{{ ct.id }}">Digite o LOTE:</label>
                   <input id="lote-ipt-{{ ct.id }}" class="input" type="text" name="lote" placeholder="Ex.: LOTE-12345" required />
+                  <label class="muted" for="alvo-ipt-{{ ct.id }}">Contagem alvo:</label>
+                  <input id="alvo-ipt-{{ ct.id }}" class="input" type="number" min="1" step="1" name="contagem_alvo" placeholder="Ex.: 1000" required />
                   <button id="btn-start-{{ ct.id }}" class="btn btn-primary" type="submit">Iniciar contagem</button>
                 </form>
                 <!-- STOP (aparece só quando ativo) -->
@@ -121,6 +124,7 @@
       const elCount = get("count"); if(elCount) elCount.textContent = data.count ?? 0;
       const elLote = get("lote"); if(elLote){ elLote.textContent = data.lote || "-"; elLote.className="pill "+(data.lote&&data.lote!=="-"?"on":"off");}
       const elInicio = get("inicio"); if(elInicio){ elInicio.textContent = data.hora_inicio || "-"; elInicio.className="pill "+(data.hora_inicio&&data.hora_inicio!=="-"?"on":"off");}
+      const elAlvo = get("alvo"); if(elAlvo){ const alvo = (data.contagem_alvo ?? '-'); elAlvo.textContent = alvo; elAlvo.className="pill "+(alvo&&alvo!=='-'?"on":"off");}
       const elAtiva = get("ativa"); if(elAtiva){ elAtiva.textContent = active?"sim":"não"; elAtiva.className="pill "+(active?"on":"off");}
       const pill=document.getElementById("status-"+ctId), pillText=document.getElementById("status-text-"+ctId);
       if(pill&&pillText){ pill.className="status-pill "+(active?"status-on":"status-off"); pillText.textContent=active?"Operando":"Parada";}
@@ -146,7 +150,17 @@
         e.preventDefault();
         btn.disabled = true;
         try{
-          await fetch(form.action, { method:"POST", headers:{ "X-Requested-With":"fetch" }});
+          const alvoEl = document.getElementById("alvo-"+ctId);
+          const countEl = document.getElementById("count-"+ctId);
+          const alvo = parseInt(alvoEl?.textContent||'0');
+          const tot = parseInt(countEl?.textContent||'0');
+          let body;
+          if (Number.isFinite(alvo) && alvo>0 && tot !== alvo){
+            const obs = prompt('Informe uma observação (total diferente do alvo):');
+            if (!obs || !obs.trim()) { btn.disabled=false; return; }
+            body = new URLSearchParams(); body.set('observacao', obs.trim());
+          }
+          await fetch(form.action, { method:"POST", headers:{ "X-Requested-With":"fetch", "Content-Type": body?"application/x-www-form-urlencoded":"text/plain" }, body: body? String(body): undefined });
         }catch(_){}
         finally{ btn.disabled = false; }
       });

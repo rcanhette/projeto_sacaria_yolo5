@@ -33,13 +33,31 @@
 
     <div class="card">
       <form class="row" method="get" action="{{ url_for('logs.logs_panel') }}">
-        <label for="ct_id">CT:</label>
+        <label for="ct_id">TC:</label>
         <select name="ct_id" id="ct_id">
           <option value="all" {{ 'selected' if current_ct_id=='all' else '' }}>Todas</option>
           {% for c in cts %}
-            <option value="{{ c.id }}" {{ 'selected' if current_ct_id==c.id|string else '' }}>CT {{ c.id }} — {{ c.name }}</option>
+            <option value="{{ c.id }}" {{ 'selected' if current_ct_id==c.id|string else '' }}>TC {{ c.id }} – {{ c.name }}</option>
           {% endfor %}
         </select>
+
+        <label for="status">Status:</label>
+        <select name="status" id="status">
+          {% set st = (current_status or 'operando') %}
+          <option value="all" {{ 'selected' if st=='all' else '' }}>Todos</option>
+          <option value="operando" {{ 'selected' if st=='operando' else '' }}>Operando</option>
+          <option value="finalizado" {{ 'selected' if st=='finalizado' else '' }}>Finalizado</option>
+          <option value="cancelado" {{ 'selected' if st=='cancelado' else '' }}>Cancelado</option>
+        </select>
+
+        <label for="lote">Lote:</label>
+        <input type="text" id="lote" name="lote" value="{{ current_lote or '' }}" placeholder="Pesquisar lote" />
+
+        <label for="ini_de">Início de:</label>
+        <input type="date" id="ini_de" name="ini_de" value="{{ current_ini_de or '' }}" />
+        <label for="ini_ate">até:</label>
+        <input type="date" id="ini_ate" name="ini_ate" value="{{ current_ini_ate or '' }}" />
+
         <button class="btn" type="submit">Filtrar</button>
       </form>
 
@@ -48,7 +66,7 @@
           <thead>
             <tr>
               <th>Sessão</th>
-              <th>CT</th>
+              <th>TC</th>
               <th>Lote</th>
               <th>Início</th>
               <th>Fim</th>
@@ -61,7 +79,7 @@
             {% for s in sessions %}
               <tr>
                 <td>#{{ s.id }}</td>
-                <td>CT {{ s.ct_id }} — {{ s.ct_name }}</td>
+                <td>TC {{ s.ct_id }} – {{ s.ct_name }}</td>
                 <td>{{ s.lote or '-' }}</td>
                 <td>{{ s.data_inicio.strftime('%d/%m/%Y %H:%M:%S') if s.data_inicio else '-' }}</td>
                 <td>{{ s.data_fim.strftime('%d/%m/%Y %H:%M:%S') if s.data_fim else '-' }}</td>

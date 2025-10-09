@@ -85,11 +85,23 @@
         document.getElementById("data").textContent = d.data || "-";
         document.getElementById("hora").textContent = d.hora_inicio || "-";
         document.getElementById("count").textContent = d.count ?? 0;
+        const alvoEl = document.getElementById('alvo_val'); if (alvoEl) alvoEl.textContent = (d.contagem_alvo ?? '-');
         document.getElementById("startBtn").disabled = d.session_active;
         document.getElementById("stopBtn").disabled = !d.session_active;
         document.getElementById("videoLink").style.display = d.session_active ? "inline-block" : "none";
         setFormVisible(!d.session_active);
       };
+      // Observação obrigatória se total != alvo (adiciona campo oculto)
+      const stopForm = document.getElementById('stopForm');
+      stopForm?.addEventListener('submit', function(ev){
+        const alvo = parseInt(document.getElementById('alvo_val')?.textContent||'0');
+        const tot = parseInt(document.getElementById('count')?.textContent||'0');
+        if (Number.isFinite(alvo) && alvo>0 && tot !== alvo){
+          const obs = prompt('Informe uma observação (total diferente do alvo):');
+          if (!obs || !obs.trim()) { ev.preventDefault(); return; }
+          const hidden = document.createElement('input'); hidden.type='hidden'; hidden.name='observacao'; hidden.value=obs.trim(); this.appendChild(hidden);
+        }
+      });
       toggleFileInput();
     });
   </script>
@@ -99,6 +111,10 @@
   <div class="wrap">
     <header>
       <div class="title">Ponto de Captura – <span style="opacity:.9">{{ ct.name }}</span></div>
+ <div class=\item\>
+ <div class=\label\>Contagem alvo</div>
+ <div id=\alvo_val\ class=\value\>-</div>
+ </div>
       <div id="statusPill" class="status-pill"><span class="status-dot"></span><span id="statusText">Parado</span></div>
     </header>
     <div class="grid">
@@ -137,6 +153,12 @@
             </div>
             <div class="row">
               <div style="flex:1">
+                <label for="contagem_alvo">Contagem alvo</label>
+                <input type="number" min="1" step="1" id="contagem_alvo" name="contagem_alvo" placeholder="Ex.: 1000" required>
+              </div>
+            </div>
+            <div class="row">
+              <div style="flex:1">
                 <label for="source_type">Fonte</label>
                 <select name="source_type" id="source_type" onchange="toggleFileInput()">
                   <option value="rtsp">RTSP</option>
@@ -155,7 +177,7 @@
             </div>
           </form>
         </div>
-        <form method="POST" action="{{ url_for('tc.tc_stop', ct_id=ct.id) }}">
+        <form id="stopForm" method="POST" action="{{ url_for('tc.tc_stop', ct_id=ct.id) }}">
           <div class="row">
             <button type="submit" id="stopBtn" class="btn btn-stop" style="flex:1" disabled>Stop</button>
           </div>
