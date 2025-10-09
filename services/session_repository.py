@@ -6,6 +6,24 @@ from services.db import execute_returning, execute, query_all, query_one
 # Criação e logs
 # -----------------------------------------------------------------------------
 def create_session(ct_id: int, lote: str) -> int:
+    """Cria sessão ativa para a CT, mas é idempotente: se já existir uma sessão
+    'ativo' para a mesma CT, retorna o id existente ao invés de criar outra.
+    """
+    # 1) Se já existe sessão ativa dessa CT, retorna o id para evitar duplicidade
+    existing = query_one(
+        """
+        SELECT id
+          FROM session
+         WHERE ct_id = %s AND status = 'ativo'
+         ORDER BY data_inicio DESC
+         LIMIT 1
+        """,
+        [ct_id],
+    )
+    if existing and existing.get("id"):
+        return int(existing["id"])
+
+    # 2) Cria nova sessão ativa
     sql = """
         INSERT INTO session (ct_id, lote, data_inicio, status)
         VALUES (%s, %s, NOW(), 'ativo')
