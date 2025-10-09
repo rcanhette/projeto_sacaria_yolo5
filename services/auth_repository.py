@@ -67,7 +67,7 @@ def delete_user(user_id: int) -> None:
     Exclui usuário sob demanda. Remove vínculos em user_ct antes.
     Nenhuma exclusão automática é feita; só quando você chamar esta função.
     """
-    execute("DELETE FROM user_ct WHERE user_id=%s", [user_id])
+    execute("DELETE FROM user_tc WHERE user_id=%s", [user_id])
     execute("DELETE FROM users WHERE id=%s", [user_id])
 
 def verify_password(user_or_username: Union[Dict, Mapping, str], raw_password: str) -> Optional[Dict]:
@@ -98,18 +98,18 @@ def verify_password(user_or_username: Union[Dict, Mapping, str], raw_password: s
     }
 
 # -----------------------------
-# CT ACCESS (vínculos)
+# TC ACCESS (vínculos)
 # -----------------------------
-def list_user_ct_ids(user_id: int) -> List[int]:
-    rows = query_all("SELECT ct_id FROM user_ct WHERE user_id=%s ORDER BY ct_id", [user_id])
-    return [r["ct_id"] for r in rows]
+def list_user_tc_ids(user_id: int) -> List[int]:
+    rows = query_all("SELECT tc_id FROM user_tc WHERE user_id=%s ORDER BY tc_id", [user_id])
+    return [r["tc_id"] for r in rows]
 
-def set_user_cts(user_id: int, ct_ids: Iterable[int]) -> None:
-    execute("DELETE FROM user_ct WHERE user_id=%s", [user_id])
-    for cid in ct_ids:
+def set_user_tcs(user_id: int, tc_ids: Iterable[int]) -> None:
+    execute("DELETE FROM user_tc WHERE user_id=%s", [user_id])
+    for tid in tc_ids:
         execute(
-            "INSERT INTO user_ct (user_id, ct_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-            [user_id, cid],
+            "INSERT INTO user_tc (user_id, tc_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+            [user_id, tid],
         )
 
 def list_users_by_role(roles: Iterable[str]) -> List[Dict]:
@@ -120,29 +120,29 @@ def list_users_by_role(roles: Iterable[str]) -> List[Dict]:
     sql = f"SELECT id, username, role, active FROM users WHERE role IN ({placeholders}) ORDER BY username"
     return query_all(sql, roles)
 
-def list_user_ids_for_ct(ct_id: int) -> List[int]:
-    rows = query_all("SELECT user_id FROM user_ct WHERE ct_id=%s ORDER BY user_id", [ct_id])
+def list_user_ids_for_tc(tc_id: int) -> List[int]:
+    rows = query_all("SELECT user_id FROM user_tc WHERE tc_id=%s ORDER BY user_id", [tc_id])
     return [r["user_id"] for r in rows]
 
-def set_ct_users(ct_id: int, user_ids: Iterable[int]) -> None:
-    execute("DELETE FROM user_ct WHERE ct_id=%s", [ct_id])
+def set_tc_users(tc_id: int, user_ids: Iterable[int]) -> None:
+    execute("DELETE FROM user_tc WHERE tc_id=%s", [tc_id])
     for uid in user_ids:
         execute(
-            "INSERT INTO user_ct (ct_id, user_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-            [ct_id, uid],
+            "INSERT INTO user_tc (tc_id, user_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+            [tc_id, uid],
         )
 
 # -----------------------------
 # AUTHZ HELPERS (permissões)
 # -----------------------------
-def user_can_view_ct(user: Dict, ct_id: int) -> bool:
+def user_can_view_tc(user: Dict, tc_id: int) -> bool:
     if not user or not user.get("active", True):
         return False
     if user["role"] in ("admin", "supervisor"):
         return True
-    return ct_id in set(list_user_ct_ids(user["id"]))
+    return tc_id in set(list_user_tc_ids(user["id"]))
 
-def user_can_control_ct(user: Dict, ct_id: int) -> bool:
-    if not user_can_view_ct(user, ct_id):
+def user_can_control_tc(user: Dict, tc_id: int) -> bool:
+    if not user_can_view_tc(user, tc_id):
         return False
     return user["role"] in ("admin", "supervisor", "operator")

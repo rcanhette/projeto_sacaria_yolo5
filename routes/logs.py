@@ -5,11 +5,11 @@ import re
 
 # Auth/session
 from routes.auth import login_required, current_user
-from services.auth_repository import user_can_view_ct
+from services.auth_repository import user_can_view_tc
 
 # DB helpers
 from services.db import query_all, query_one
-from services.ct_repository import list_cts
+from services.tc_repository import list_tcs
 
 # Excel
 from openpyxl import Workbook
@@ -26,8 +26,8 @@ def _permitted_cts():
     u = current_user()
     if not u:
         abort(401)
-    all_cts = list_cts()
-    permitted = [c for c in all_cts if user_can_view_ct(u, c["id"])]
+    all_tcs = list_tcs()
+    permitted = [c for c in all_tcs if user_can_view_tc(u, c["id"])]
     return u, permitted
 
 
@@ -125,7 +125,7 @@ def logs_panel():
             s.status,
             COALESCE(s.total_final, 0) AS total_final
         FROM session s
-        JOIN ct c ON c.id = s.ct_id
+          JOIN tc c ON c.id = s.ct_id
         WHERE s.ct_id IN ({placeholders})
         ORDER BY s.data_inicio DESC
         LIMIT 2000
@@ -164,7 +164,7 @@ def session_logs_export_xlsx(session_id: int):
 
     wb = Workbook()
     ws = wb.active
-    sheet_title = _safe_sheet_title(sess.get("ct_name") or f"CT {sess['ct_id']}")
+    sheet_title = _safe_sheet_title(sess.get("ct_name") or f"TC {sess['ct_id']}")
     ws.title = sheet_title
 
     # Estilos
@@ -178,8 +178,8 @@ def session_logs_export_xlsx(session_id: int):
     border = Border(left=thin, right=thin, top=thin, bottom=thin)
 
     # Cabeçalho superior
-    ws["A1"] = "CT";             ws["A1"].font = title_font
-    ws["B1"] = sess.get("ct_name") or f"CT {sess['ct_id']}"
+    ws["A1"] = "TC";             ws["A1"].font = title_font
+    ws["B1"] = sess.get("ct_name") or f"TC {sess['ct_id']}"
     ws["A2"] = "DATA INICIO";    ws["A2"].font = bold
     ws["B2"] = sess["data_inicio"].strftime("%d/%m/%Y %H:%M") if sess.get("data_inicio") else "-"
     ws["A3"] = "DATA FIM";       ws["A3"].font = bold
@@ -229,7 +229,7 @@ def session_logs_export_xlsx(session_id: int):
     # Nome do arquivo: session_ct<CTID>_<LOTE>.xlsx (sanitizado)
     ct_id = sess["ct_id"]
     lote = _safe_filename_piece(sess.get("lote") or "")
-    filename = f"session_ct{ct_id}" + (f"_{lote}" if lote else "") + ".xlsx"
+    filename = f"session_tc{ct_id}" + (f"_{lote}" if lote else "") + ".xlsx"
 
     output = BytesIO()
     wb.save(output)
@@ -260,7 +260,7 @@ def session_logs_export_csv(session_id: int):
             yield f"{sess['id']},{sess['ct_id']},{ct_name},{lote},{ts_str},{r.get('delta',0)},{r.get('total_atual',0)}\n"
 
     lote_piece = _safe_filename_piece(sess.get("lote") or "")
-    filename = f"session_ct{sess['ct_id']}" + (f"_{lote_piece}" if lote_piece else "") + ".csv"
+    filename = f"session_tc{sess['ct_id']}" + (f"_{lote_piece}" if lote_piece else "") + ".csv"
     headers = {
         "Content-Disposition": f'attachment; filename="{filename}"',
         "Content-Type": "text/csv; charset=utf-8",

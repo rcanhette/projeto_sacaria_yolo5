@@ -1,0 +1,68 @@
+{% include '_navbar.html' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ 'Nova CT' if not ct else 'Editar Ponto de Operação' }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff;
+      --primary:#002F54; --primary-weak:#0f3d68;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui; }
+    .wrap{ padding:16px; max-width:900px; margin:0 auto; }
+    h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .grid{ display:grid; gap:12px; }
+    label{ display:block; font-weight:600; margin-bottom:6px; }
+    input[type="text"], textarea{
+      width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; background:#fff;
+    }
+    textarea{ min-height:100px; resize:vertical; }
+    .actions{ display:flex; gap:8px; justify-content:flex-end; }
+    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px;
+          background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800;}
+    .btn:hover{ border-color:#94a3b8; }
+    .btn-primary{ background:#002F54; color:#fff; border-color:transparent; }
+    .btn-primary:hover{ background:#0f3d68; }
+    .muted{ color:#6B7280; font-size:.9em; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <h1>{{ 'Novo ponto de operação' if not ct else 'Editar ponto de operação' }}</h1>
+
+    <form method="post" class="card grid">
+      <div>
+        <label>Nome</label>
+        <input type="text" name="name" value="{{ '' if not ct else ct.name }}" required />
+      </div>
+
+      <div>
+        <label>Fonte (URL/Dispositivo)</label>
+        <input type="text" name="source_path" value="{{ '' if not ct else ct.source_path }}" placeholder="ex.: rtsp://..., 0 (webcam), caminho de arquivo" required />
+        <div class="muted" style="margin-top:4px;">A URL pode ser longa; tudo bem, será truncada na listagem.</div>
+      </div>
+
+      <div>
+        <label>Modelo (arquivo .pt ou alias)</label>
+        <input type="text" name="model_path" value="{{ '' if not ct else ct.model_path }}" placeholder="ex.: sacaria_yolov5n.pt" required />
+      </div>
+
+      <div>
+        <label>ROI (JSON opcional)</label>
+        <textarea name="roi" placeholder='Ex.: {"x":100,"y":50,"w":800,"h":400}'>{{ '' if not ct else (ct.roi or '') }}</textarea>
+        <div class="muted" style="margin-top:4px;">Deixe vazio para não recortar a imagem.</div>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="{{ url_for('ct_admin.ct_admin_list') }}">Cancelar</a>
+        <button class="btn btn-primary" type="submit">{{ 'Criar' if not ct else 'Salvar' }}</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

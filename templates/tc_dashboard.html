@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Painel de Monitoramento - CTs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#002F54; --card:#ffffff; --muted:#6B7280; --text:#002F54;
+      --accent:#22c55e; --accent-weak:#16a34a; --border:#e5e7eb;
+      --pill-on:#10b981; --pill-off:#9ca3af; --danger:#ef4444; --danger-weak:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background:#f8fafc; color:var(--text); min-height:100vh; }
+    .wrap{ padding:16px; max-width:1400px; margin:0 auto; }
+    .title-page{ font-weight:800; font-size:20px; letter-spacing:.02em; margin:10px 4px 16px; }
+    .grid{ display:grid; gap:16px; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    @media (max-width:1100px){ .grid{ grid-template-columns:1fr; } }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 4px 16px rgba(0,0,0,.08);
+      overflow:hidden; display:flex; flex-direction:column; min-height: 240px; }
+    .card header{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); }
+    .h-title{ font-weight:800; letter-spacing:.02em; }
+    .status-pill{ display:inline-flex; align-items:center; gap:8px; background:#f3f4f6; color:#111827; padding:6px 10px; border-radius:999px; border:1px solid var(--border);
+      font-size:12px; font-weight:700; letter-spacing:.02em; }
+    .status-dot{ width:10px; height:10px; border-radius:999px; background:var(--pill-off); }
+    .status-on{ background:#e6f2fb; border-color:#dbeafe; color:#0b3d66; }
+    .status-on .status-dot{ background:var(--pill-on); }
+    .status-off .status-dot{ background:var(--pill-off); }
+    .body{ display:flex; flex-direction:row; }
+    @media (max-width:900px){ .body{ flex-direction:column; } }
+    .side{ flex:1; padding:16px; display:flex; flex-direction:column; gap:12px; background:#fafafa; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .label{ color:var(--muted); font-size:12px; }
+    .kpi{ font-size:28px; font-weight:800; letter-spacing:.02em; }
+    .pill{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:#fff; color:#111827; display:inline-flex; align-items:center; min-height:22px; }
+    .pill.on{ background:#e6f9f3; border-color:#bbf7d0; color:#064e3b; } .pill.off{ background:#f3f4f6; color:#374151; }
+    .content{ flex:1; padding:16px; display:flex; align-items:center; justify-content:center; }
+    .form{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; }
+    .input{ flex:1 1 240px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); outline:none; font-size:14px; }
+    .btn{ appearance:none; border:1px solid var(--border); background:#fff; color:#111827; padding:10px 14px; border-radius:10px; cursor:pointer; text-decoration:none; font-weight:700; transition:.15s ease; }
+    .btn:hover{ border-color:#94a3b8; } .btn-primary{ background:var(--accent); color:#062b16; border-color:transparent; } .btn-primary:hover{ background:var(--accent-weak); }
+    .btn-danger{ background:var(--danger); color:#fff; border-color:transparent; } .btn-danger:hover{ background:var(--danger-weak); }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+    .muted{ color:var(--muted); font-size:12px; } .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; }
+    .hide{ display:none !important; }
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <div class="title-page">Monitoramento</div>
+    <div class="grid">
+      {% for ct in cts %}
+      <section class="card" id="ct-card-{{ ct.id }}" data-can-control="{{ '1' if ct.can_control else '0' }}">
+        <header>
+          <div class="h-title">{{ ct.name }}</div>
+          <div id="status-{{ ct.id }}" class="status-pill status-off">
+            <span class="status-dot"></span><span id="status-text-{{ ct.id }}">Parada</span>
+          </div>
+        </header>
+        <div class="body">
+          <aside class="side">
+            <div class="row"><div class="label">Total da sessão</div><div class="kpi" id="count-{{ ct.id }}">0</div></div>
+            <div class="row"><div class="label">Lote</div><div id="lote-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Hora início</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Sessão ativa</div><div id="ativa-{{ ct.id }}" class="pill off">não</div></div>
+          </aside>
+          <div class="content">
+            {% if ct.can_control %}
+              <div class="form" onsubmit="return true;">
+                <!-- START (some quando ativo) -->
+                <form id="start-wrap-{{ ct.id }}" class="actions" method="post" action="{{ url_for('tc.tc_start', ct_id=ct.id) }}">
+                  <input type="hidden" name="source_type" value="rtsp" />
+                  <label class="muted" for="lote-ipt-{{ ct.id }}">Digite o LOTE:</label>
+                  <input id="lote-ipt-{{ ct.id }}" class="input" type="text" name="lote" placeholder="Ex.: LOTE-12345" required />
+                  <button id="btn-start-{{ ct.id }}" class="btn btn-primary" type="submit">Iniciar contagem</button>
+                </form>
+                <!-- STOP (aparece só quando ativo) -->
+                <form id="stop-wrap-{{ ct.id }}" class="actions hide" method="post" action="{{ url_for('tc.tc_stop', ct_id=ct.id) }}">
+                  <button id="btn-stop-{{ ct.id }}" class="btn btn-danger" type="submit">Parar contagem</button>
+                </form>
+              </div>
+            {% else %}
+              <div class="muted">Visualização apenas (sem controles).</div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    const cts = {{ cts|tojson }};
+
+    // Ajusta o rótulo visual de "Sessão ativa" para "Sessão operando"
+    // sem depender do texto original no HTML (robusto a encoding).
+    try {
+      cts.forEach(ct => {
+        const row = document.getElementById(`ativa-${ct.id}`)?.parentElement;
+        const label = row?.querySelector('.label');
+        if (label) label.textContent = 'Sessão operando';
+      });
+    } catch (_) {}
+
+    function setVisibility(ctId, active){
+      const card = document.getElementById("ct-card-" + ctId);
+      const canControl = card?.dataset?.canControl === "1";
+      if (!canControl) return;
+      const startWrap = document.getElementById("start-wrap-" + ctId);
+      const stopWrap  = document.getElementById("stop-wrap-" + ctId);
+      if (startWrap) startWrap.classList.toggle("hide", !!active);
+      if (stopWrap)  stopWrap.classList.toggle("hide",  !active);
+    }
+
+    function apply(ctId, data){
+      const get = (id)=>document.getElementById(id + "-" + ctId);
+      const active = !!data.session_active;
+      const elCount = get("count"); if(elCount) elCount.textContent = data.count ?? 0;
+      const elLote = get("lote"); if(elLote){ elLote.textContent = data.lote || "-"; elLote.className="pill "+(data.lote&&data.lote!=="-"?"on":"off");}
+      const elInicio = get("inicio"); if(elInicio){ elInicio.textContent = data.hora_inicio || "-"; elInicio.className="pill "+(data.hora_inicio&&data.hora_inicio!=="-"?"on":"off");}
+      const elAtiva = get("ativa"); if(elAtiva){ elAtiva.textContent = active?"sim":"não"; elAtiva.className="pill "+(active?"on":"off");}
+      const pill=document.getElementById("status-"+ctId), pillText=document.getElementById("status-text-"+ctId);
+      if(pill&&pillText){ pill.className="status-pill "+(active?"status-on":"status-off"); pillText.textContent=active?"Operando":"Parada";}
+      setVisibility(ctId, active);
+    }
+
+    function connectSSE(ctId){
+      const es=new EventSource(`/sse/tc/${ctId}`);
+      es.onmessage=(evt)=>{try{apply(ctId,JSON.parse(evt.data));}catch(e){}};
+      es.onerror=()=>{setTimeout(()=>{es.close();connectSSE(ctId);},2000);};
+      return es;
+    }
+
+    // STOP via AJAX (não sai do dashboard)
+    function bindStopAjax(ctId){
+      const card = document.getElementById("ct-card-" + ctId);
+      const canControl = card?.dataset?.canControl === "1";
+      if (!canControl) return;
+      const form = document.getElementById("stop-wrap-" + ctId);
+      const btn  = document.getElementById("btn-stop-" + ctId);
+      if(!form || !btn) return;
+      form.addEventListener("submit", async (e)=>{
+        e.preventDefault();
+        btn.disabled = true;
+        try{
+          await fetch(form.action, { method:"POST", headers:{ "X-Requested-With":"fetch" }});
+        }catch(_){}
+        finally{ btn.disabled = false; }
+      });
+    }
+
+    cts.forEach(ct => {
+      bindStopAjax(ct.id);
+      connectSSE(ct.id);
+    });
+  </script>
+</body>
+</html>

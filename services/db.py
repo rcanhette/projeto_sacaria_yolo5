@@ -101,9 +101,24 @@ def ensure_schema() -> None:
     execute("CREATE INDEX IF NOT EXISTS idx_users_role   ON users(role);")
     execute("CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);")
 
-    # ---------- ct ----------
+    # ---------- Migração: renomear ct -> tc (idempotente) ----------
+    execute(
+        """
+        DO $$
+        BEGIN
+            IF to_regclass('public.tc') IS NULL AND to_regclass('public.ct') IS NOT NULL THEN
+                EXECUTE 'ALTER TABLE ct RENAME TO tc';
+            END IF;
+            IF to_regclass('public.user_tc') IS NULL AND to_regclass('public.user_ct') IS NOT NULL THEN
+                EXECUTE 'ALTER TABLE user_ct RENAME TO user_tc';
+            END IF;
+        END$$;
+        """
+    )
+
+    # ---------- tc ----------
     execute("""
-    CREATE TABLE IF NOT EXISTS ct (
+    CREATE TABLE IF NOT EXISTS tc (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       source_path TEXT NOT NULL,
@@ -112,27 +127,27 @@ def ensure_schema() -> None:
     );
     """)
     # colunas que podem faltar em esquemas antigos
-    execute("ALTER TABLE ct ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;")
-    execute("ALTER TABLE ct ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW();")
-    execute("CREATE INDEX IF NOT EXISTS idx_ct_active ON ct(active);")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW();")
+    execute("CREATE INDEX IF NOT EXISTS idx_tc_active ON tc(active);")
 
-    # ---------- user_ct (vínculo N:N) ----------
+    # ---------- user_tc (vínculo N:N) ----------
     execute("""
-    CREATE TABLE IF NOT EXISTS user_ct (
+    CREATE TABLE IF NOT EXISTS user_tc (
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      ct_id   INTEGER NOT NULL REFERENCES ct(id)    ON DELETE CASCADE,
-      PRIMARY KEY (user_id, ct_id)
+      tc_id   INTEGER NOT NULL REFERENCES tc(id)    ON DELETE CASCADE,
+      PRIMARY KEY (user_id, tc_id)
     );
     """)
-    execute("CREATE INDEX IF NOT EXISTS idx_user_ct_user ON user_ct(user_id);")
-    execute("CREATE INDEX IF NOT EXISTS idx_user_ct_ct   ON user_ct(ct_id);")
+    execute("CREATE INDEX IF NOT EXISTS idx_user_tc_user ON user_tc(user_id);")
+    execute("CREATE INDEX IF NOT EXISTS idx_user_tc_tc   ON user_tc(tc_id);")
 
     # ---------- session ----------
     # usada por services/session_repository.py
     execute("""
     CREATE TABLE IF NOT EXISTS session (
       id SERIAL PRIMARY KEY,
-      ct_id INTEGER NOT NULL REFERENCES ct(id) ON DELETE CASCADE,
+      ct_id INTEGER NOT NULL REFERENCES tc(id) ON DELETE CASCADE,
       lote TEXT NOT NULL,
       data_inicio TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
       data_fim TIMESTAMP WITHOUT TIME ZONE,
@@ -150,7 +165,7 @@ def ensure_schema() -> None:
     CREATE TABLE IF NOT EXISTS session_log (
       id SERIAL PRIMARY KEY,
       session_id INTEGER NOT NULL REFERENCES session(id) ON DELETE CASCADE,
-      ct_id INTEGER NOT NULL REFERENCES ct(id) ON DELETE CASCADE,
+      ct_id INTEGER NOT NULL REFERENCES tc(id) ON DELETE CASCADE,
       ts TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
       delta INTEGER NOT NULL,
       total_atual INTEGER NOT NULL

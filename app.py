@@ -1,17 +1,17 @@
 # app.py
 import logging
 from flask import Flask, redirect, url_for, render_template, request
-from routes.ct import ct_bp
+from routes.tc import tc_bp
 from routes.logs import logs_bp
 from routes.auth import auth_bp, current_user
 from routes.user_admin import user_admin_bp
-from routes.ct_admin import ct_admin_bp
-from services.ct_repository import list_cts
-from services.runtime import ct_runtime
+from routes.tc_admin import tc_admin_bp
+from services.tc_repository import list_tcs
+from services.runtime import tc_runtime
 import atexit
 from services.db import ensure_schema
 from services.session_repository import close_all_active_sessions_on_boot
-from services.auth_repository import list_user_ct_ids, user_can_control_ct
+from services.auth_repository import list_user_tc_ids, user_can_control_tc
 
 def create_app():
     # ---- LOGGING ----
@@ -39,10 +39,10 @@ def create_app():
 
     # Blueprints
     app.register_blueprint(auth_bp)        # /login, /logout
-    app.register_blueprint(ct_bp)          # /ct/<id>, start/stop/SSE etc.
+    app.register_blueprint(tc_bp)          # /tc/<id>, start/stop/SSE etc.
     app.register_blueprint(logs_bp)        # /logs
-    app.register_blueprint(user_admin_bp)  # /users, /user-access-ct
-    app.register_blueprint(ct_admin_bp)    # /ct-admin (CRUD de CTs)
+    app.register_blueprint(user_admin_bp)  # /users, /user-access-tc
+    app.register_blueprint(tc_admin_bp)    # /tc-admin (CRUD de TCs)
 
     # Disponibiliza current_user() nos templates (ex.: _navbar.html)
     @app.context_processor
@@ -67,21 +67,21 @@ def create_app():
         Também marca "can_control" por CT (start/stop liberado para admin/supervisor/operator).
         """
         u = current_user()
-        all_cts = list_cts()
+        all_cts = list_tcs()
 
         if u["role"] in ("admin", "supervisor"):
             allowed = all_cts
         else:
-            ids = set(list_user_ct_ids(u["id"]))
+            ids = set(list_user_tc_ids(u["id"]))
             allowed = [ct for ct in all_cts if ct["id"] in ids]
 
         cts_view = []
         for ct in allowed:
             row = dict(ct)
-            row["can_control"] = user_can_control_ct(u, ct["id"])
+            row["can_control"] = user_can_control_tc(u, ct["id"])
             cts_view.append(row)
 
-        return render_template("ct_dashboard.html", cts=cts_view, role=u["role"])
+        return render_template("tc_dashboard.html", cts=cts_view, role=u["role"])
 
     # Atalho de menu
     @app.route("/acompanhamento")
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     @atexit.register
     def _shutdown_release_all():
         try:
-            for cp in list(ct_runtime.values()):
+            for cp in list(tc_runtime.values()):
                 try:
                     # Finaliza sessão ativa para marcar data_fim no banco
                     if getattr(cp, "session_active", False) or getattr(cp, "session_db_id", None) is not None:
