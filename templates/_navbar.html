@@ -7,7 +7,7 @@
     <a href="{{ url_for('logs.logs_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Logs</a>
 
     {% if _u.role == 'admin' %}
-      <a href="{{ url_for('user_admin.user_access_by_ct_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acessos</a>
+      <a href="{{ url_for('user_admin.user_access_by_tc_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acessos</a>
       <a href="{{ url_for('user_admin.users_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Usuários</a>
       <a href="{{ url_for('ct_admin.ct_admin_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Ponto de Operação</a>
     {% endif %}
