@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projeto Sacaria – Arquitetura e Fluxos</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; color: #111; }
+    h1, h2, h3 { margin: 0.6em 0 0.2em; }
+    .note { background:#f6f8fa; border:1px solid #e5e7eb; padding:12px; border-radius:6px; margin: 12px 0; }
+    .mermaid { margin: 18px 0; }
+    code { background:#f6f8fa; padding:2px 4px; border-radius:4px; }
+  </style>
+  <!-- Carrega Mermaid pela CDN (necessita internet). Para uso offline, baixe mermaid.min.js
+       e substitua o src abaixo por um caminho local, por exemplo: ./vendor/mermaid.min.js -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+  <script>
+    window.addEventListener('error', function(e){
+      const m = document.getElementById('offline-msg');
+      if(m) m.style.display = 'block';
+    });
+  </script>
+  <noscript>Ative JavaScript para renderizar os diagramas.</noscript>
+  
+</head>
+<body>
+  <h1>Projeto Sacaria – Arquitetura e Fluxos</h1>
+  <div class="note" id="offline-msg" style="display:none">
+    Não foi possível carregar a biblioteca Mermaid. Verifique a internet ou use uma cópia local de <code>mermaid.min.js</code>.
+  </div>
+
+  <h2>Arquitetura (alto nível)</h2>
+  <div class="mermaid">
+graph TD
+  subgraph Clients
+    B[Browser/UI]
+  end
+
+  subgraph App[Flask App]
+    R1[/routes/ct.py/]
+    R2[/routes/logs.py/]
+    S1[[services/capture_point.py]]
+    S2[[services/video_source.py]]
+    S3[[services/industrial_tag_detector.py]]
+    DB[(services/db.py)]
+  end
+
+  subgraph External
+    P[(PostgreSQL)]
+    RTSP[[Câmeras RTSP]]
+    FILE[[Arquivos de Vídeo]]
+    YOLO[third_party/yolov5]
+  end
+
+  B -- HTTP(GET/POST), SSE, MJPEG --> R1
+  B -- HTTP(GET) --> R2
+  R1 -- start/stop/lista --> S1
+  R1 -- vídeo (/ct/<id>/video) --> S1
+  R1 -- SSE (/sse/ct/<id>) --> S1
+  R2 -- consultas --> DB
+  S1 -- get_frame() --> S2
+  S1 -- detect_and_tag() --> S3
+  S3 -- hubconf(load local) --> YOLO
+  S1 -- create/finish/log --> DB
+  DB --- P
+  S2 -- CAP_FFMPEG/BUFFERSIZE --> RTSP
+  S2 -- delay/FPS --> FILE
+  </div>
+
+  <h2>Pipeline de processamento</h2>
+  <div class="mermaid">
+flowchart LR
+  A[Frame capturado] --> B[Filtro ROI]
+  B --> C[YOLOv5 detect]
+  C --> D[Filtra classe/confiança]
+  D --> E[Associa/atualiza objetos]
+  E --> F[Máquina de estados<br/>(duplo cruzamento)]
+  F --> G[Atualiza contador]
+  G --> H[Log de deltas (DB)]
+  E --> I[Desenho BBox/linhas/labels]
+  I --> J[Frame para /video]
+  </div>
+
+  <h2>Sequência — Start de sessão</h2>
+  <div class="mermaid">
+sequenceDiagram
+  actor U as Usuário
+  participant W as Waitress/Flask
+  participant CT as CapturePoint
+  participant DB as DB (session_repository)
+
+  U->>W: POST /ct/{id}/start (lote, fonte)
+  W->>W: valida permissões
+  W->>W: checa sessão ativa (app + DB)
+  alt já existe
+    W-->>U: 200/204 Sessão já ativa
+  else criar
+    W->>CT: set_source(tipo, path)
+    W->>CT: start_session(lote) [lock]
+    CT->>DB: create_session (idempotente)
+    CT->>CT: _ensure_thread() (inicia loop)
+    W-->>U: 200/204 OK
+  end
+  </div>
+
+  <h2>Sequência — Stop de sessão</h2>
+  <div class="mermaid">
+sequenceDiagram
+  actor U as Usuário
+  participant W as Waitress/Flask
+  participant CT as CapturePoint
+  participant DB as DB
+
+  U->>W: POST /ct/{id}/stop
+  W->>CT: stop_session()
+  CT->>DB: finish_session()
+  CT->>CT: encerra thread loop
+  CT->>CT: VideoSource.release() (ordem segura)
+  W-->>U: 200/204 OK
+  </div>
+
+  <h2>Modelo de dados (ER)</h2>
+  <div class="mermaid">
+erDiagram
+  USERS ||--o{ USER_CT : GRANTS
+  CT ||--o{ USER_CT : RELATION
+  CT ||--o{ SESSION : HAS
+  SESSION ||--o{ SESSION_LOG : HAS
+
+  USERS {
+    int id PK
+    text username
+    text password
+    text role
+  }
+
+  CT {
+    int id PK
+    text name
+    text source_path
+    text roi
+    text model_path
+  }
+
+  SESSION {
+    int id PK
+    int ct_id FK
+    text lote
+    timestamp data_inicio
+    timestamp data_fim
+    text status
+    int total_final
+  }
+
+  SESSION_LOG {
+    int id PK
+    int session_id FK
+    int ct_id FK
+    timestamp ts
+    int delta
+    int total_atual
+  }
+  </div>
+
+  <hr />
+  <p>Para exportar em PDF via Edge headless, use o script PowerShell <code>scripts/export_docs.ps1</code>.</p>
+</body>
+</html>
+
