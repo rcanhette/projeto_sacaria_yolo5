@@ -158,3 +158,40 @@ def ensure_schema() -> None:
     """)
     execute("CREATE INDEX IF NOT EXISTS idx_session_log_session_ts ON session_log(session_id, ts);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_log_ct_ts ON session_log(ct_id, ts);")
+
+    # ---------- migração: garantir 1 sessão 'ativo' por CT ----------
+    # 1) limpa duplicatas antigas marcando as mais antigas como 'cancelado'
+    #    (mantém a sessão ativa mais recente de cada CT)
+    execute(
+        """
+        UPDATE session s
+           SET status = 'cancelado',
+               data_fim = COALESCE(data_fim, NOW())
+         WHERE s.status = 'ativo'
+           AND EXISTS (
+                SELECT 1
+                  FROM session s2
+                 WHERE s2.ct_id = s.ct_id
+                   AND s2.status = 'ativo'
+                   AND s2.data_inicio > s.data_inicio
+           );
+        """
+    )
+
+    # 2) índice único parcial para impedir nova duplicidade
+    execute(
+        """
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM pg_indexes
+                 WHERE schemaname = 'public'
+                   AND indexname = 'uq_session_one_active_per_ct'
+            ) THEN
+                CREATE UNIQUE INDEX uq_session_one_active_per_ct
+                    ON session (ct_id)
+                    WHERE (status = 'ativo');
+            END IF;
+        END$$;
+        """
+    )
