@@ -85,6 +85,15 @@ class AppServerService(win32serviceutil.ServiceFramework):
                 # Não sobrescreve se já definido no ambiente
                 os.environ.setdefault(k, v)
 
+        # Configura parâmetros do banco de dados a partir da seção [database]
+        if cfg.has_section("database"):
+            db = cfg["database"]
+            os.environ.setdefault("PGHOST", db.get("host", "localhost"))
+            os.environ.setdefault("PGPORT", db.get("port", "5432"))
+            os.environ.setdefault("PGDATABASE", db.get("database", "contagem_sacaria"))
+            os.environ.setdefault("PGUSER", db.get("user", "postgres"))
+            os.environ.setdefault("PGPASSWORD", db.get("password", "postgres"))
+
         return cmd + args, root, logs_dir
 
     def SvcDoRun(self):

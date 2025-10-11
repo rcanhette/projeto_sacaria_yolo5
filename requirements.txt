@@ -1,8 +1,8 @@
-# Projeto Sacaria YOLOv5 — dependências de runtime
-# Observação:
-# - O YOLOv5 é carregado do diretório local `third_party/yolov5` (sem pip do ultralytics/yolov5)
-# - O PyTorch pode requerer instruções específicas por SO/CPU. Se houver erro ao instalar,
-#   siga as instruções oficiais: https://pytorch.org/get-started/locally/
+# Projeto Sacaria YOLOv5  dependencias de runtime
+# Observacao:
+# - O YOLOv5 e carregado do diretorio local `third_party/yolov5` (sem pip do ultralytics/yolov5)
+# - O PyTorch pode requerer instrucoes especificas por SO/CPU. Se houver erro ao instalar,
+#   siga as instrucoes oficiais: https://pytorch.org/get-started/locally/
 
 # Web/API
 Flask>=2.3
@@ -10,7 +10,7 @@ Flask>=2.3
 # Banco de dados (PostgreSQL)
 psycopg2-binary>=2.9
 
-# Visão computacional / Numérico
+# Visao computacional / Numerico
 opencv-python>=4.8
 numpy>=1.26
 Pillow>=10.3
@@ -25,13 +25,13 @@ seaborn>=0.11.0
 # Excel (export de logs)
 openpyxl>=3.1
 
-# PyTorch (CPU por padrão). Ajuste conforme plataforma se necessário.
+# PyTorch (CPU por padrao). Ajuste conforme plataforma se necessario.
 torch
 torchvision
 
-# Servidor WSGI e Serviço Windows
+# Servidor WSGI e Servico Windows
 waitress>=2.1
 pywin32>=306; platform_system == "Windows"
 
-# Dependência necessária para alguns módulos do YOLOv5 recente
+# Dependencia necessaria para alguns modulos do YOLOv5 recente
 ultralytics>=8.2.64

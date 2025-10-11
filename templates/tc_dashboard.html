@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -44,6 +44,15 @@
     .btn[disabled]{ opacity:.6; cursor:not-allowed; }
     .muted{ color:var(--muted); font-size:12px; } .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; }
     .hide{ display:none !important; }
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(15,23,42,0.45); z-index:200; display:none; }
+    .modal{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 24px 56px rgba(15,23,42,0.3); width:min(90vw,420px); padding:24px; display:none; flex-direction:column; gap:16px; z-index:210; }
+    .modal.open{ display:flex; }
+    .modal-backdrop.open{ display:block; }
+    .modal-title{ font-weight:700; font-size:16px; letter-spacing:.01em; color:var(--text); }
+    .modal textarea{ min-height:120px; resize:vertical; padding:12px; border-radius:12px; border:1px solid var(--border); font-size:14px; line-height:1.4; }
+    .modal textarea:focus{ outline:2px solid #7dd3fc; outline-offset:2px; }
+    .modal-actions{ display:flex; justify-content:flex-end; gap:10px; }
+    .modal-hint{ font-size:12px; color:var(--muted); }
   </style>
 </head>
 <body>
@@ -62,17 +71,17 @@
         </header>
         <div class="body">
           <aside class="side">
-            <div class="row"><div class="label">Total da sessão</div><div class="kpi" id="count-{{ ct.id }}">0</div></div>
+            <div class="row"><div class="label">Total da contagem</div><div class="kpi" id="count-{{ ct.id }}">0</div></div>
             <div class="row"><div class="label">Lote</div><div id="lote-{{ ct.id }}" class="pill off">-</div></div>
             <div class="row"><div class="label">Contagem alvo</div><div id="alvo-{{ ct.id }}" class="pill off">-</div></div>
-            <div class="row"><div class="label">Hora início</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
-            <div class="row"><div class="label">Sessão ativa</div><div id="ativa-{{ ct.id }}" class="pill off">não</div></div>
+            <div class="row"><div class="label">Hora inÃ­cio</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">SessÃ£o ativa</div><div id="ativa-{{ ct.id }}" class="pill off">nÃ£o</div></div>
           </aside>
           <div class="content">
             {% if ct.can_control %}
               <div class="form" onsubmit="return true;">
                 <!-- START (some quando ativo) -->
-                <form id="start-wrap-{{ ct.id }}" class="actions" method="post" action="{{ url_for('tc.tc_start', ct_id=ct.id) }}">
+                <form id="start-wrap-{{ ct.id }}" class="actions" method="post" action="{{ url_for('tc.tc_start', tc_id=ct.id) }}">
                   <input type="hidden" name="source_type" value="rtsp" />
                   <label class="muted" for="lote-ipt-{{ ct.id }}">Digite o LOTE:</label>
                   <input id="lote-ipt-{{ ct.id }}" class="input" type="text" name="lote" placeholder="Ex.: LOTE-12345" required />
@@ -80,13 +89,13 @@
                   <input id="alvo-ipt-{{ ct.id }}" class="input" type="number" min="1" step="1" name="contagem_alvo" placeholder="Ex.: 1000" required />
                   <button id="btn-start-{{ ct.id }}" class="btn btn-primary" type="submit">Iniciar contagem</button>
                 </form>
-                <!-- STOP (aparece só quando ativo) -->
-                <form id="stop-wrap-{{ ct.id }}" class="actions hide" method="post" action="{{ url_for('tc.tc_stop', ct_id=ct.id) }}">
+                <!-- STOP (aparece sÃ³ quando ativo) -->
+                <form id="stop-wrap-{{ ct.id }}" class="actions hide" method="post" action="{{ url_for('tc.tc_stop', tc_id=ct.id) }}">
                   <button id="btn-stop-{{ ct.id }}" class="btn btn-danger" type="submit">Parar contagem</button>
                 </form>
               </div>
             {% else %}
-              <div class="muted">Visualização apenas (sem controles).</div>
+              <div class="muted">VisualizaÃ§Ã£o apenas (sem controles).</div>
             {% endif %}
           </div>
         </div>
@@ -95,20 +104,141 @@
     </div>
   </div>
 
+  <div id="obs-backdrop" class="modal-backdrop"></div>
+  <div id="obs-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="obs-title">
+    <div id="obs-title" class="modal-title">Informe uma observação</div>
+    <div id="obs-message" class="muted">Descreva o motivo da diferença entre o total e o alvo.</div>
+    <textarea id="obs-text" placeholder="Digite pelo menos 10 caracteres..." maxlength="500"></textarea>
+    <div id="obs-hint" class="modal-hint">Digite pelo menos 10 caracteres.</div>
+    <div class="modal-actions">
+      <button type="button" id="obs-cancel" class="btn">Cancelar</button>
+      <button type="button" id="obs-ok" class="btn btn-primary" disabled>OK</button>
+    </div>
+  </div>
+
   <script>
-    const cts = {{ cts|tojson }};
+    const OBS_MIN_CHARS = 10;
+    const observationModal = (() => {
+      return {
+        backdrop: document.getElementById('obs-backdrop'),
+        modal: document.getElementById('obs-modal'),
+        textarea: document.getElementById('obs-text'),
+        ok: document.getElementById('obs-ok'),
+        cancel: document.getElementById('obs-cancel'),
+        message: document.getElementById('obs-message'),
+        hint: document.getElementById('obs-hint'),
+      };
+    })();
 
-    // Ajusta o rótulo visual de "Sessão ativa" para "Sessão operando"
-    // sem depender do texto original no HTML (robusto a encoding).
-    try {
-      cts.forEach(ct => {
-        const row = document.getElementById(`ativa-${ct.id}`)?.parentElement;
-        const label = row?.querySelector('.label');
-        if (label) label.textContent = 'Sessão operando';
+    function askObservationModal(message, initialValue){
+      return new Promise((resolve) => {
+        const refs = observationModal;
+        if (!refs.modal || !refs.ok || !refs.textarea){
+          const fallback = prompt(message || "Informe uma observação (mínimo 10 caracteres):", initialValue || "");
+          const trimmed = (fallback || "").trim();
+          resolve(trimmed.length >= OBS_MIN_CHARS ? trimmed : null);
+          return;
+        }
+
+        const { backdrop, modal, textarea, ok, cancel, message: msgEl, hint } = refs;
+        const originalOverflow = document.body.style.overflow;
+
+        function cleanup(){
+          ok.removeEventListener('click', onOk);
+          cancel.removeEventListener('click', onCancel);
+          textarea.removeEventListener('input', onInput);
+          textarea.removeEventListener('keydown', onKeydown);
+          if (backdrop) backdrop.removeEventListener('click', onBackdrop);
+        }
+
+        function close(){
+          modal.classList.remove('open');
+          if (backdrop) backdrop.classList.remove('open');
+          document.body.style.overflow = originalOverflow;
+          textarea.value = "";
+          ok.disabled = true;
+          if (hint) hint.textContent = `Digite pelo menos ${OBS_MIN_CHARS} caracteres.`;
+        }
+
+        function onInput(){
+          const trimmed = textarea.value.trim();
+          const len = trimmed.length;
+          ok.disabled = len < OBS_MIN_CHARS;
+          if (hint){
+            if (len < OBS_MIN_CHARS){
+              const remaining = OBS_MIN_CHARS - len;
+              hint.textContent = `Digite pelo menos ${remaining} caractere${remaining === 1 ? '' : 's'} para continuar.`;
+            } else {
+              hint.textContent = "Pressione OK para confirmar.";
+            }
+          }
+        }
+
+        function onOk(){
+          if (ok.disabled) return;
+          const value = textarea.value.trim();
+          cleanup();
+          close();
+          resolve(value);
+        }
+
+        function onCancel(){
+          cleanup();
+          close();
+          resolve(null);
+        }
+
+        function onKeydown(evt){
+          if (evt.key === "Escape"){
+            evt.preventDefault();
+            onCancel();
+          }
+          if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter"){
+            if (!ok.disabled){
+              evt.preventDefault();
+              onOk();
+            }
+          }
+        }
+
+        function onBackdrop(evt){
+          if (evt.target === backdrop){
+            onCancel();
+          }
+        }
+
+        if (msgEl){
+          msgEl.textContent = message || "Informe uma observação (total diferente do alvo).";
+        }
+
+        textarea.value = initialValue || "";
+        onInput();
+
+        if (backdrop){
+          backdrop.classList.add('open');
+          backdrop.addEventListener('click', onBackdrop);
+        }
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        textarea.addEventListener('input', onInput);
+        textarea.addEventListener('keydown', onKeydown);
+        ok.addEventListener('click', onOk);
+        cancel.addEventListener('click', onCancel);
+
+        setTimeout(() => {
+          textarea.focus();
+          const len = textarea.value.length;
+          try{
+            textarea.setSelectionRange(len, len);
+          }catch(_){ }
+        }, 40);
       });
-    } catch (_) {}
+    }
+  </script>
 
-    function setVisibility(ctId, active){
+  <script>
+    const cts = {{ cts|tojson }};\r\n    function setVisibility(ctId, active){
       const card = document.getElementById("ct-card-" + ctId);
       const canControl = card?.dataset?.canControl === "1";
       if (!canControl) return;
@@ -120,25 +250,26 @@
 
     function apply(ctId, data){
       const get = (id)=>document.getElementById(id + "-" + ctId);
-      const active = !!data.session_active;
+      const active = !!data.session_active || (String((data.db_status||''))==='operando' || String((data.db_status||'')).toLowerCase()==='operando');
       const elCount = get("count"); if(elCount) elCount.textContent = data.count ?? 0;
       const elLote = get("lote"); if(elLote){ elLote.textContent = data.lote || "-"; elLote.className="pill "+(data.lote&&data.lote!=="-"?"on":"off");}
       const elInicio = get("inicio"); if(elInicio){ elInicio.textContent = data.hora_inicio || "-"; elInicio.className="pill "+(data.hora_inicio&&data.hora_inicio!=="-"?"on":"off");}
       const elAlvo = get("alvo"); if(elAlvo){ const alvo = (data.contagem_alvo ?? '-'); elAlvo.textContent = alvo; elAlvo.className="pill "+(alvo&&alvo!=='-'?"on":"off");}
-      const elAtiva = get("ativa"); if(elAtiva){ elAtiva.textContent = active?"sim":"não"; elAtiva.className="pill "+(active?"on":"off");}
+      const elAtiva = get("ativa"); if(elAtiva){ elAtiva.textContent = active?"sim":"nÃ£o"; elAtiva.className="pill "+(active?"on":"off");}
       const pill=document.getElementById("status-"+ctId), pillText=document.getElementById("status-text-"+ctId);
       if(pill&&pillText){ pill.className="status-pill "+(active?"status-on":"status-off"); pillText.textContent=active?"Operando":"Parada";}
       setVisibility(ctId, active);
     }
 
+    const esMap = {};
     function connectSSE(ctId){
-      const es=new EventSource(`/sse/tc/${ctId}`);
-      es.onmessage=(evt)=>{try{apply(ctId,JSON.parse(evt.data));}catch(e){}};
-      es.onerror=()=>{setTimeout(()=>{es.close();connectSSE(ctId);},2000);};
-      return es;
+      const es = new EventSource(`/sse/tc/${ctId}`);
+      es.onmessage = (evt)=>{ try{ apply(ctId, JSON.parse(evt.data)); }catch(e){} };
+      es.onerror = ()=>{ setTimeout(()=>{ try{ es.close(); }catch(_){ } ; connectSSE(ctId); }, 2000); };
+      esMap[ctId] = es; return es;
     }
 
-    // STOP via AJAX (não sai do dashboard)
+    // STOP via AJAX (nÃ£o sai do dashboard)
     function bindStopAjax(ctId){
       const card = document.getElementById("ct-card-" + ctId);
       const canControl = card?.dataset?.canControl === "1";
@@ -156,9 +287,9 @@
           const tot = parseInt(countEl?.textContent||'0');
           let body;
           if (Number.isFinite(alvo) && alvo>0 && tot !== alvo){
-            const obs = prompt('Informe uma observação (total diferente do alvo):');
-            if (!obs || !obs.trim()) { btn.disabled=false; return; }
-            body = new URLSearchParams(); body.set('observacao', obs.trim());
+            const obs = await askObservationModal('Informe uma observação (total diferente do alvo):');
+            if (!obs) { btn.disabled=false; return; }
+            body = new URLSearchParams(); body.set('observacao', obs);
           }
           await fetch(form.action, { method:"POST", headers:{ "X-Requested-With":"fetch", "Content-Type": body?"application/x-www-form-urlencoded":"text/plain" }, body: body? String(body): undefined });
         }catch(_){}
@@ -166,10 +297,22 @@
       });
     }
 
-    cts.forEach(ct => {
-      bindStopAjax(ct.id);
-      connectSSE(ct.id);
-    });
+    
+    window.addEventListener('beforeunload', ()=>{ try{ Object.values(esMap).forEach(es=>{ try{ es.close(); }catch(_){ } }); }catch(_){ } });
   </script>
+  <script>
+    (function(){
+      const cts = {{ cts|tojson }};
+      const esMap = {};
+      function setVisibility(ctId, active){ const card=document.getElementById('ct-card-'+ctId); const canControl=card?.dataset?.canControl==='1'; if(!canControl) return; const s=document.getElementById('start-wrap-'+ctId); const p=document.getElementById('stop-wrap-'+ctId); if(s) s.classList.toggle('hide',!!active); if(p) p.classList.toggle('hide',!active); }
+      function apply(ctId,data){ const get=(id)=>document.getElementById(id+'-'+ctId); const active=!!data.session_active || String((data.db_status||''))==='operando' || String((data.db_status||'')).toLowerCase()==='operando'; const c=get('count'); if(c) c.textContent=data.count??0; const l=get('lote'); if(l){ l.textContent=data.lote||'-'; l.className='pill '+((data.lote&&data.lote!=='-')?'on':'off'); } const h=get('inicio'); if(h){ h.textContent=data.hora_inicio||'-'; h.className='pill '+((data.hora_inicio&&data.hora_inicio!=='-')?'on':'off'); } const a=get('alvo'); if(a){ const alvo=(data.contagem_alvo??'-'); a.textContent=alvo; a.className='pill '+((alvo&&alvo!=='-')?'on':'off'); } const at=get('ativa'); if(at){ at.textContent=active?'sim':'não'; at.className='pill '+(active?'on':'off'); } const pill=document.getElementById('status-'+ctId), pillText=document.getElementById('status-text-'+ctId); if(pill&&pillText){ pill.className='status-pill '+(active?'status-on':'status-off'); pillText.textContent=active?'Operando':'Parada'; } setVisibility(ctId, active); }
+      function connectSSE(ctId){ const es=new EventSource(`/sse/tc/${ctId}`); es.onmessage=(evt)=>{ try{ apply(ctId, JSON.parse(evt.data)); }catch(e){} }; es.onerror=()=>{ setTimeout(()=>{ try{ es.close(); }catch(_){ } ; connectSSE(ctId); },2000); }; esMap[ctId]=es; return es; }
+      function bindStopAjax(ctId){ const card=document.getElementById('ct-card-'+ctId); const canControl=card?.dataset?.canControl==='1'; if(!canControl) return; const form=document.getElementById('stop-wrap-'+ctId); const btn=document.getElementById('btn-stop-'+ctId); if(!form||!btn) return; form.addEventListener('submit', async (e)=>{ e.preventDefault(); btn.disabled=true; try{ const alvoEl=document.getElementById('alvo-'+ctId); const countEl=document.getElementById('count-'+ctId); const alvo=parseInt(alvoEl?.textContent||'0'); const tot=parseInt(countEl?.textContent||'0'); let body; if(Number.isFinite(alvo)&&alvo>0&&tot!==alvo){ const obs=await askObservationModal('Informe uma observação (total diferente do alvo):'); if(!obs){ btn.disabled=false; return;} body=new URLSearchParams(); body.set('observacao', obs); } await fetch(form.action,{ method:'POST', headers:{ 'X-Requested-With':'fetch', 'Content-Type': body?'application/x-www-form-urlencoded':'text/plain' }, body: body? String(body): undefined }); }catch(_){ } finally{ btn.disabled=false; } }); }
+      cts.forEach(ct=>{ bindStopAjax(ct.id); connectSSE(ct.id); });
+      window.addEventListener('beforeunload', ()=>{ try{ Object.values(esMap).forEach(es=>{ try{ es.close(); }catch(_){ } }); }catch(_){ } });
+    })();
+  </script>
+</div>
 </body>
 </html>
+

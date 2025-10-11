@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, request as req
 from functools import wraps
 from services.auth_repository import (
-    get_user_by_username, get_user_by_id, verify_password, user_can_view_ct
+    get_user_by_username, get_user_by_id, verify_password, user_can_view_tc
 )
 
 auth_bp = Blueprint("auth", __name__)
@@ -35,7 +35,7 @@ def role_required(*roles):
 
 def require_ct_access(ct_id:int):
     u = current_user()
-    return user_can_view_ct(u, ct_id)
+    return user_can_view_tc(u, ct_id)
 
 # ----- Rotas -----
 @auth_bp.route("/login", methods=["GET", "POST"])

@@ -77,19 +77,20 @@
       else { pill.classList.remove("status-on"); text.textContent = "Parado"; }
     }
     document.addEventListener("DOMContentLoaded", function() {
-      const evt = new EventSource("{{ url_for('tc.sse_tc', ct_id=ct.id) }}");
+      const evt = new EventSource("{{ url_for('tc.sse_tc', tc_id=ct.id) }}");
       evt.onmessage = function(e) {
         const d = JSON.parse(e.data);
-        setStatus(!!d.session_active);
+        const isOp = !!d.session_active || (String((d.db_status||''))).toLowerCase()==='operando';
+        setStatus(isOp);
         document.getElementById("lote_val").textContent = d.lote || "-";
         document.getElementById("data").textContent = d.data || "-";
         document.getElementById("hora").textContent = d.hora_inicio || "-";
         document.getElementById("count").textContent = d.count ?? 0;
         const alvoEl = document.getElementById('alvo_val'); if (alvoEl) alvoEl.textContent = (d.contagem_alvo ?? '-');
-        document.getElementById("startBtn").disabled = d.session_active;
-        document.getElementById("stopBtn").disabled = !d.session_active;
-        document.getElementById("videoLink").style.display = d.session_active ? "inline-block" : "none";
-        setFormVisible(!d.session_active);
+        document.getElementById("startBtn").disabled = isOp;
+        document.getElementById("stopBtn").disabled = !isOp;
+        document.getElementById("videoLink").style.display = isOp ? "inline-block" : "none";
+        setFormVisible(!isOp);
       };
       // Observação obrigatória se total != alvo (adiciona campo oculto)
       const stopForm = document.getElementById('stopForm');
@@ -139,12 +140,12 @@
             <div id="hora" class="value">-</div>
           </div>
         </div>
-        <a id="videoLink" href="{{ url_for('tc.tc_video', ct_id=ct.id) }}" target="_blank" class="video-link" style="display:none">Ver vídeo da sessão</a>
+        <a id="videoLink" href="{{ url_for('tc.tc_video', tc_id=ct.id) }}" target="_blank" class="video-link" style="display:none">Ver vídeo da sessão</a>
         <div class="hint">Dica: você pode deixar esta página fechada; a contagem continua em background.</div>
       </section>
       <section class="card controls">
         <div id="formArea">
-          <form method="POST" action="{{ url_for('tc.tc_start', ct_id=ct.id) }}">
+          <form method="POST" action="{{ url_for('tc.tc_start', tc_id=ct.id) }}">
             <div class="row">
               <div style="flex:1">
                 <label for="lote">Lote</label>
@@ -177,7 +178,7 @@
             </div>
           </form>
         </div>
-        <form id="stopForm" method="POST" action="{{ url_for('tc.tc_stop', ct_id=ct.id) }}">
+        <form id="stopForm" method="POST" action="{{ url_for('tc.tc_stop', tc_id=ct.id) }}">
           <div class="row">
             <button type="submit" id="stopBtn" class="btn btn-stop" style="flex:1" disabled>Stop</button>
           </div>

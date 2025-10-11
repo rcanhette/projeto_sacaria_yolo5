@@ -4,12 +4,13 @@
   <span style="flex:1"></span>
 
   {% if _u %}
-    <a href="{{ url_for('logs.logs_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Logs</a>
+    <a href="{{ url_for('logs.logs_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Sessões</a>
 
     {% if _u.role == 'admin' %}
+      <a href="{{ url_for('tc_admin.tc_admin_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Cadastro de TCs</a>
       <a href="{{ url_for('user_admin.user_access_by_tc_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acessos</a>
       <a href="{{ url_for('user_admin.users_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Usuários</a>
-      <a href="{{ url_for('ct_admin.ct_admin_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Ponto de Operação</a>
+      <a href="{{ url_for('tc.tc_multi') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Operações TCs</a>
     {% endif %}
 
     <span style="opacity:.8;">|</span>
@@ -19,3 +20,4 @@
     <a href="{{ url_for('auth.login') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Entrar</a>
   {% endif %}
 </nav>
+

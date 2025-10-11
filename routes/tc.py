@@ -3,11 +3,12 @@ import json
 import cv2
 from flask import Blueprint, render_template, Response, request, redirect, url_for, flash
 from services.capture_point import CapturePoint
-from services.tc_repository import get_tc
+from services.tc_repository import get_tc, list_tcs
 from services.session_repository import get_active_session_by_ct
 from services.runtime import tc_runtime
 from routes.auth import current_user, login_required
 from services.auth_repository import user_can_view_tc, user_can_control_tc
+from services.session_repository import get_active_session_by_ct
 
 tc_bp = Blueprint("tc", __name__)
 
@@ -30,6 +31,13 @@ def _ensure_cp(tc_row):
         "path": tc_row["source_path"],
         "roi": _parse_roi(tc_row["roi"]),
         "model": tc_row.get("model_path") or "sacaria_yolov5n.pt",
+        "line_offset_red": tc_row.get("line_offset_red", 40),
+        "line_offset_blue": tc_row.get("line_offset_blue", -40),
+        "flow_mode": tc_row.get("flow_mode") or "cima",
+        "max_lost": int(tc_row.get("max_lost", 2) or 0),
+        "match_dist": float(tc_row.get("match_dist", 150) or 150),
+        "min_conf": float(tc_row.get("min_conf", 0.8) or 0.8),
+        "missed_frame_dir": (tc_row.get("missed_frame_dir") or "").strip(),
     }
     cp = CapturePoint(tc_row, cfg)
     tc_runtime[tc_id] = cp
@@ -49,6 +57,16 @@ def tc_detail(tc_id):
         return redirect(url_for("index"))
     cp = _ensure_cp(tc_row)
     return render_template("tc_detail.html", tc=tc_row, ct=tc_row, cp=cp)
+
+@tc_bp.route("/tc-operacao")
+@login_required
+def tc_multi():
+    u = current_user()
+    if u["role"] != "admin":
+        flash("Acesso negado.", "error")
+        return redirect(url_for("index"))
+    tcs = list_tcs()
+    return render_template("tc_multi.html", tcs=tcs)
 
 @tc_bp.route("/tc/<int:tc_id>/start", methods=["POST"])
 @login_required
@@ -109,6 +127,50 @@ def tc_start(tc_id):
     flash(f"{tc_row['name']} iniciada com lote {lote}.", "success")
     return redirect(url_for("index"))
 
+# AJAX-friendly start endpoint used by Operações TCs
+@tc_bp.route("/tc/<int:tc_id>/start-ajax", methods=["POST"])
+@login_required
+def tc_start_ajax(tc_id):
+    u = current_user()
+    if not user_can_control_tc(u, tc_id):
+        return ("Você não tem permissão para iniciar esta TC.", 403)
+
+    tc_row = get_tc(tc_id)
+    if not tc_row:
+        return ("TC não encontrada.", 404)
+
+    lote = request.form.get("lote")
+    contagem_alvo_raw = request.form.get("contagem_alvo")
+    contagem_alvo = None
+    if contagem_alvo_raw is not None and str(contagem_alvo_raw).strip() != "":
+        try:
+            contagem_alvo = int(contagem_alvo_raw)
+            if contagem_alvo <= 0:
+                raise ValueError
+        except Exception:
+            return ("Contagem alvo deve ser um número inteiro positivo.", 400)
+
+    source_type = request.form.get("source_type", "rtsp")
+    file_path = (request.form.get("file_path") or "").strip() or None
+
+    if not lote:
+        return ("Lote é obrigatório.", 400)
+
+    cp = _ensure_cp(tc_row)
+    if cp.session_active or cp.session_db_id is not None:
+        return ("", 204)
+
+    try:
+        active = get_active_session_by_ct(tc_id)
+    except Exception:
+        active = None
+    if active and active.get("status") in ("operando", "ativo"):
+        return ("", 204)
+
+    cp.set_source(source_type, file_path)
+    cp.start_session(lote, contagem_alvo)
+    return ("", 204)
+
 @tc_bp.route("/tc/<int:tc_id>/stop", methods=["POST"])
 @login_required
 def tc_stop(tc_id):
@@ -123,19 +185,27 @@ def tc_stop(tc_id):
         return redirect(url_for("index"))
 
     # valida observação conforme regra contagem
-    observacao = request.form.get("observacao")
+    observacao = (request.form.get("observacao") or "").strip()
     try:
         alvo = cp.session_contagem_alvo
     except Exception:
         alvo = None
     qtd = int(cp.current_session_count)
-    if alvo is not None and qtd != int(alvo) and not (observacao and observacao.strip()):
+    require_obs = alvo is not None and qtd != int(alvo)
+    if require_obs and len(observacao) < 10:
+        message = "Observação (mín. 10 caracteres) é obrigatória quando total != contagem alvo."
         if request.headers.get("X-Requested-With") == "fetch":
-            return ("Observação é obrigatória quando total != contagem alvo.", 400)
-        flash("Observação é obrigatória quando total != contagem alvo.", "error")
+            return (message, 400)
+        flash(message, "error")
+        return redirect(url_for("index"))
+    if observacao and len(observacao) < 10:
+        message = "Observação deve ter pelo menos 10 caracteres."
+        if request.headers.get("X-Requested-With") == "fetch":
+            return (message, 400)
+        flash(message, "error")
         return redirect(url_for("index"))
 
-    cp.stop_session(observacao=observacao)
+    cp.stop_session(observacao=observacao or None)
 
     if request.headers.get("X-Requested-With") == "fetch":
         return ("", 204)
@@ -158,6 +228,15 @@ def sse_tc(tc_id):
 
     def stream():
         while True:
+            # Inclui status do banco para maior robustez (páginas que chegaram depois do START)
+            try:
+                db_row = get_active_session_by_ct(tc_id)
+                db_status = (db_row.get("status") if db_row else None)
+                db_total = db_row.get("total_final") if db_row else None
+            except Exception:
+                db_status = None
+                db_total = None
+
             payload = {
                 "session_active": cp.session_active,
                 "lote": cp.session_lote,
@@ -166,6 +245,8 @@ def sse_tc(tc_id):
                 "count": int(cp.current_session_count),
                 "fonte": cp.source_type,
                 "contagem_alvo": cp.session_contagem_alvo,
+                "db_status": db_status,
+                "db_total_final": db_total,
             }
             yield f"data: {json.dumps(payload)}\n\n"
             time.sleep(1)
@@ -221,3 +302,6 @@ def tc_video(tc_id):
                         yield (b'--frame\r\n'
                                b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
                 time.sleep(0.1)
+
+    # Stream MJPEG com boundary 'frame'
+    return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')

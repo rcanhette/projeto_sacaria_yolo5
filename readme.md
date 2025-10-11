@@ -1,112 +1,98 @@
-Projeto Sacaria YOLOv5 — Documentação
+# Projeto Sacaria YOLOv5
 
-Resumo
-- Contagem de sacarias usando YOLOv5 com rastreamento simples e dupla linha de cruzamento.
-- Frontend web em Flask com painéis por CT, streaming de vídeo/processado e SSE.
-- Uso local do repositório YOLOv5 em `third_party/yolov5` (sem downloads na inicialização).
+## Visao geral
 
-Requisitos
-- Python 3.13 (recomendado). 
-- PostgreSQL acessível (padrão: host `localhost`, database `contagem_sacaria`).
-- Windows (suportado via serviço com pywin32) ou execução em console com Waitress.
-- Pesos do modelo YOLOv5: arquivo `.pt` no diretório do projeto (padrão `sacaria_yolov5n.pt`).
+Aplicacao Flask para contagem de sacarias utilizando um modelo YOLOv5 executado localmente. O sistema oferece um painel web para monitorar as TCs (cameras), iniciar/parar contagens, exportar logs e registrar imagens das sacarias identificadas que nao foram contabilizadas.
 
-Instalação
-1) Clone o repositório e crie o venv:
-   - `python -m venv venv`
-   - `venv\Scripts\pip install --upgrade pip`
-   - `venv\Scripts\pip install -r requirements.txt`
-   - Observação: Torch pode exigir instalação específica. Se necessário, siga https://pytorch.org/get-started/locally e depois rode `pip install -r requirements.txt` novamente.
+## Requisitos principais
 
-Configuração
-- Banco de dados (variáveis de ambiente): `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`.
-- YOLOv5 local e Ultralytics: defina para evitar auto-instalações
-  - `YOLOV5_NO_AUTOINSTALL=1`
-  - `ULTRALYTICS_NO_AUTOINSTALL=1`
-- Vídeo (opcional):
-  - `VIDEO_RTSP_BUFFER_SIZE` (int, default 3) — buffer do backend RTSP.
-  - `VIDEO_FILE_DELAY_MS` (ms) ou `VIDEO_FILE_DELAY_FACTOR` (default 0.9) — delay para arquivos.
+- Windows 10/11 ou Windows Server (testado com Python 3.13).
+- Python 3.10+ com `pip`.
+- PostgreSQL acessivel (padrao: `localhost`, database `contagem_sacaria`, usuario `postgres`).
+- Camera RTSP ou arquivos de video conforme configuracao das TCs.
 
-Execução (desenvolvimento)
-- `venv\Scripts\python app.py`
-- O app subirá em `http://0.0.0.0:8080` por padrão.
+As dependencias Python estao listadas em [`requirements.txt`](requirements.txt).
 
-Execução (produção, recomendado)
-- Waitress (com mais threads por causa de SSE/vídeo):
-  - `venv\Scripts\waitress-serve --host 0.0.0.0 --port 80 --threads 64 --connection-limit 500 --channel-timeout 300 --call app:create_app`
-- Serviço Windows (pywin32):
-  - Arquivo: `windows_service.py`. Configuração opcional: `windows_service.ini`.
-  - Instalar: `venv\Scripts\python windows_service.py install`
-  - Iniciar: `venv\Scripts\python windows_service.py start`
-  - Parar/Remover: `... stop` / `... remove`
-  - `windows_service.ini` (se presente) permite ajustar `[server] host/port`, `[paths] waitress_exe/python_exe/logs_dir`, `[env]` variáveis.
+## Preparacao do ambiente (desenvolvimento/homologacao)
 
-Arquitetura (arquivos principais)
-- `app.py` (app.py:1): fábrica Flask `create_app()`; aplica `ensure_schema()` no boot; registra blueprints.
-- `routes/ct.py` (routes/ct.py:1): rotas por CT; START/STOP com validações de sessão única; SSE; streaming de vídeo.
-- `routes/logs.py` (routes/logs.py:1): listagem/consulta/exportação de logs e sessões.
-- `routes/auth.py`, `routes/user_admin.py`, `routes/ct_admin.py`: autenticação e administração.
-- `services/db.py` (services/db.py:1): conexão PostgreSQL e migrações leves via `ensure_schema()`.
-- `services/session_repository.py`: criação/log/finalização de sessão (idempotente para evitar duplicatas).
-- `services/video_source.py`: captura RTSP/arquivo com thread interna e controles de buffer/delay.
-- `services/industrial_tag_detector.py`: carga do YOLOv5 local e inferência (usa `third_party/yolov5`).
-- `services/capture_point.py`: orquestra câmera + detector, thread de processamento, contagem, e estado da sessão.
+1. Clone o repositorio para `C:\workspace\python\projeto_sacaria_yolo5` (ou outro diretorio).
+2. Crie um ambiente virtual (opcional, mas recomendado):
+   ```cmd
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+3. Instale as dependencias:
+   ```cmd
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+4. Configure o PostgreSQL conforme necessario. As variaveis `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER` e `PGPASSWORD` podem ser definidas no ambiente ou na secao `[database]` do arquivo `windows_service.ini`.
+5. Ajuste as TCs (camera, offsets, fluxo, pasta de snapshots) acessando o painel administrativo apos subir a aplicacao.
 
-Fluxo de dados (alto nível)
-1) Fonte de vídeo (`VideoSource`) lê frames continuamente (thread interna); aplica delay/RTSP buffer.
-2) `CapturePoint` executa loop de processamento: detecção (`IndustrialTagDetector`), rastreio simples e contagem por dupla linha, e envia frames para `/ct/<id>/video`.
-3) Sessão: `start_session()` inicia sessão (DB + memória); `stop_session()` finaliza (DB, libera threads e conexões).
-4) SSE (`/sse/ct/<id>`) envia atualizações de contagem/estado.
+## Execucao local (modo console)
 
-Prevenção de sessões duplicadas
-- Em memória: lock em `CapturePoint.start_session()` e checagem de flags.
-- Endpoint: `/ct/<id>/start` verifica sessão ativa no app e no DB antes de criar.
-- Repositório: `create_session()` é idempotente — retorna a ativa existente.
-- Banco: índice único parcial garante 1 sessão `ativo` por CT. Criado por `ensure_schema()`.
+1. Garanta que o banco esta ativo.
+2. Ative o ambiente virtual (caso tenha criado).
+3. Inicie o servidor:
+   ```cmd
+   python app.py
+   ```
+4. O servidor escuta em `http://0.0.0.0:8080`. Ajuste host/porta via variaveis de ambiente `APP_HOST` e `APP_PORT` antes de executar.
 
-YOLOv5 local
-- Código do YOLOv5 está em `third_party/yolov5` (precisa conter `hubconf.py`).
-- Carregamento do modelo: `services/industrial_tag_detector.py` usa `torch.hub.load(yolo_dir, 'custom', path=...)` com `source='local'`.
-- Pesos: arquivo `.pt` na raiz do projeto (padrão `sacaria_yolov5n.pt`). Configure por CT no banco/UI.
+## Snapshots de sacarias nao contadas
 
-Banco de dados
-- Tabelas principais: `users`, `ct`, `user_ct`, `session`, `session_log`.
-- `ensure_schema()` cria/ajusta schema e índices. Também:
-  - Consolida duplicatas antigas de sessão ativa (mantém a mais recente; demais viram `cancelado`).
-  - Cria índice único parcial `uq_session_one_active_per_ct` em `session(ct_id) WHERE status='ativo'`.
+- No cadastro da TC informe **Pasta para imagens das sacarias identificadas** (ex.: `C:\workspace\python\projeto_sacaria_yolo5\fotos` ou `\\servidor\compartilhamento`).
+- Durante a execucao, sempre que uma sacaria for identificada e sair do fluxo sem ser contabilizada, o sistema salva uma imagem em `caminho_configurado\<lote>\HHMMSS_id<ID>.jpg`.
+- Logs `INFO` confirmam o salvamento e logs `WARNING/ERROR` informam falhas (permissao, recorte invalido etc.).
 
-Variáveis de ambiente úteis
-- `YOLOV5_NO_AUTOINSTALL=1`, `ULTRALYTICS_NO_AUTOINSTALL=1` — desliga auto-instalações do Ultralytics.
-- `VIDEO_RTSP_BUFFER_SIZE`, `VIDEO_FILE_DELAY_MS`, `VIDEO_FILE_DELAY_FACTOR` — tuning de captura.
-- `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` — banco.
+## Instalacao como servico Windows
 
-Comandos comuns (Windows)
-- Ativar venv: `venv\Scripts\activate`
-- Rodar dev: `python app.py`
-- Rodar produção: `waitress-serve --host 0.0.0.0 --port 80 --threads 64 --connection-limit 500 --channel-timeout 300 --call app:create_app`
-- Serviço: `python windows_service.py install|start|stop|remove`
+1. Edite `windows_service.ini`:
+   - `[server]` define `host` e `port` utilizados pelo Waitress.
+   - `[paths]` permite especificar o Python/Waitress e o diretorio de logs.
+   - `[database]` define `host`, `port`, `database`, `user`, `password` do PostgreSQL (replicados em variaveis de ambiente pelo servico).
+   - `[env]` aceita variaveis adicionais (por exemplo outros ajustes de captura).
+2. (Opcional) Crie/ative o ambiente virtual e instale as dependencias.
+3. Execute com privilegios de administrador:
+   ```cmd
+   scripts\install_windows_service.bat
+   ```
+   O script instala e inicia o servico `ProjetoSacaria`.
+4. Para parar/remover:
+   ```cmd
+   scripts\uninstall_windows_service.bat
+   ```
+5. Logs padrao do servico ficam em `logs\service.out` e `logs\service.err`. Ajuste o caminho na secao `[paths]` do INI se desejar.
 
-Solução de problemas
-- Aviso "git não é reconhecido": inofensivo (metadados); instale Git ou ignore.
-- `ModuleNotFoundError` (pandas/seaborn/ultralytics): rode `pip install -r requirements.txt` no venv correto.
-- Fila do Waitress (Task queue depth): aumente `--threads` e `--connection-limit`, reduza frequência do SSE.
-- Exceção `cv2.error` em `cap.read()`: o código trata e encerra a thread; verifique rede RTSP/arquivo.
-- Console “pausando” saída: desabilite QuickEdit no console ou rode com logs redirecionados/como serviço.
+### Checklist de instalacao em um novo servidor
 
-Estrutura do projeto (principais pastas)
-- `routes/` — rotas Flask (ct, logs, auth, admin).
-- `services/` — lógica de domínio (db, captura, detector, sessões, runtime).
-- `templates/` — templates Jinja2 (UI).
-- `third_party/yolov5/` — código do YOLOv5 local.
-- `scripts/` — utilitários de teste (não necessários em produção).
+1. Instalar Python 3.x (x64) e adicionar ao PATH.
+2. Clonar/copiar o repositorio para o diretorio final (ex.: `C:\workspace\python\projeto_sacaria_yolo5`).
+3. Criar `venv` e instalar dependencias com `pip install -r requirements.txt`.
+4. Criar o banco e configurar a secao `[database]` do `windows_service.ini`.
+5. Ajustar `[server]` e `[paths]` conforme o ambiente.
+6. Executar `scripts\install_windows_service.bat` como administrador.
+7. Configurar em cada TC a pasta de snapshots e demais parametros.
+8. Validar logs em `logs\service.out` e `logs\service.err`.
+9. Abrir a porta configurada no firewall ou load balancer, se necessario.
+## Estrutura principal do projeto
 
-Segurança e papéis
-- Papéis: admin, supervisor, operator, viewer.
-- `routes/auth.py` implementa login, guarda sessão e decorators de autorização.
-- A UI e as rotas verificam permissões para iniciar/parar e visualizar CTs.
+```
+app.py                    # Entrada Flask (create_app + run)
+config.py                 # Configuracao inicial das TCs
+services/                 # Camada de servicos (detector, banco, repositorios, runtime)
+routes/                   # Blueprints Flask (tc, logs, auth, administracao)
+templates/                # Templates Jinja2 (painel web)
+scripts/                  # Utilitarios (instalacao do servico, testes)
+windows_service.py/.ini   # Definicao e configuracao do servico Windows
+third_party/yolov5/       # Repositorio YOLOv5 localizado
+logs/                     # Logs do servico/Waitress (configuravel)
+```
 
-Notas finais
-- Mantenha o arquivo de pesos compatível com a configuração do modelo.
-- Para ajustar ROI/modelo por CT, use o módulo de administração (`ct_admin`).
-- Em produção Windows, prefira serviço (pywin32) ou NSSM para evitar dependência do console.
+## Documentacao complementar
 
+- Arquitetura geral: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+- Dependencias: [`requirements.txt`](requirements.txt).
+- Utilitarios: pasta [`scripts/`](scripts/).
+
+Consulte os logs do servico ou as configuracoes das TCs para diagnosticar eventuais problemas de captura.

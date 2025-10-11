@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <title>Acesso por CT</title>
+  <title>Acesso por TC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{ --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff; --accent:#22c55e; --accent-weak:#16a34a;}
@@ -23,23 +23,23 @@
 <body>
   {% include '_navbar.html' %}
   <div class="wrap">
-    <h1>Acesso por CT</h1>
+    <h1>Acesso por TC</h1>
     <div class="muted" style="margin:0 4px 16px;">
-      Marque os <strong>operadores</strong> (podem iniciar/parar e ver logs) e os <strong>visualizadores</strong> (apenas logs) para cada CT.
-      Supervisores e Administradores têm acesso a todas as CTs automaticamente.
+      Marque os <strong>operadores</strong> (podem iniciar/parar e ver logs) e os <strong>visualizadores</strong> (apenas logs) para cada TC.
+      Supervisores e Administradores têm acesso a todas as TCs automaticamente.
     </div>
 
-    {% for ct in cts %}
+    {% for ct in tcs %}
     <div class="card">
-      <form method="post" action="{{ url_for('user_admin.user_access_by_ct_update', ct_id=ct.id) }}">
-        <h3 style="margin:0 0 12px;">CT {{ ct.id }} — {{ ct.name }}</h3>
+      <form method="post" action="{{ url_for('user_admin.user_access_by_tc_update', tc_id=ct.id) }}">
+        <h3 style="margin:0 0 12px;">TC {{ ct.id }} – {{ ct.name }}</h3>
         <div class="cols">
           <div class="box">
             <div style="font-weight:700; margin-bottom:8px;">Operadores</div>
             <div class="list">
               {% for u in operators %}
               <label class="row">
-                {% set checked = (u.id in ct_user_map.get(ct.id, [])) %}
+                {% set checked = (u.id in tc_user_map.get(ct.id, [])) %}
                 <input type="checkbox" name="op_user_id" value="{{ u.id }}" {% if checked %}checked{% endif %} />
                 <span>{{ u.username }}</span>
               </label>
@@ -51,7 +51,7 @@
             <div class="list">
               {% for u in viewers %}
               <label class="row">
-                {% set checked = (u.id in ct_user_map.get(ct.id, [])) %}
+                {% set checked = (u.id in tc_user_map.get(ct.id, [])) %}
                 <input type="checkbox" name="vw_user_id" value="{{ u.id }}" {% if checked %}checked{% endif %} />
                 <span>{{ u.username }}</span>
               </label>
@@ -60,7 +60,7 @@
           </div>
         </div>
         <div style="margin-top:12px; display:flex; justify-content:flex-end;">
-          <button class="btn" type="submit">Salvar CT {{ ct.id }}</button>
+          <button class="btn" type="submit">Salvar TC {{ ct.id }}</button>
         </div>
       </form>
     </div>

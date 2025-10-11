@@ -43,7 +43,7 @@
 
     <div class="card">
       <div class="toolbar">
-        <a class="btn btn-primary" href="{{ url_for('ct_admin.ct_admin_new') }}">+ Novo ponto de operação</a>
+        <a class="btn btn-primary" href="{{ url_for('tc_admin.tc_admin_new') }}">+ Novo ponto de operação</a>
       </div>
 
       <div class="table-wrap">
@@ -58,11 +58,11 @@
             </tr>
           </thead>
           <tbody>
-            {% for ct in cts %}
+            {% for ct in tcs %}
             <tr>
               <td>{{ ct.id }}</td>
               <td>
-                <a class="name-link" href="{{ url_for('ct.ct_detail', ct_id=ct.id) }}">
+                <a class="name-link" href="{{ url_for('tc.tc_detail', tc_id=ct.id) }}">
                   {{ ct.name }}
                 </a>
               </td>
@@ -70,8 +70,8 @@
               <td><span class="nowrap" title="{{ ct.model_path }}">{{ ct.model_path }}</span></td>
               <td>
                 <div class="row-actions">
-                  <a class="btn" href="{{ url_for('ct_admin.ct_admin_edit', ct_id=ct.id) }}">Editar</a>
-                  <form class="inline-form" method="post" action="{{ url_for('ct_admin.ct_admin_delete', ct_id=ct.id) }}"
+                  <a class="btn" href="{{ url_for('tc_admin.tc_admin_edit', tc_id=ct.id) }}">Editar</a>
+                  <form class="inline-form" method="post" action="{{ url_for('tc_admin.tc_admin_delete', tc_id=ct.id) }}"
                         onsubmit="return confirm('Excluir Ponto de Operação {{ ct.name }}? Esta ação é irreversível.')">
                     <button class="btn btn-danger" type="submit">Excluir</button>
                   </form>

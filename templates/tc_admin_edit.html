@@ -58,8 +58,63 @@
         <div class="muted" style="margin-top:4px;">Deixe vazio para não recortar a imagem.</div>
       </div>
 
+      <div>
+        <label>Deslocamento da linha vermelha (px)</label>
+        {% set red_offset = (ct.line_offset_red if ct and ct.line_offset_red is not none else 40) %}
+        <input type="number" name="line_offset_red" value="{{ red_offset }}" required />
+        <div class="muted" style="margin-top:4px;">Valor somado à linha superior (positivo move para baixo, negativo para cima).</div>
+      </div>
+
+      <div>
+        <label>Deslocamento da linha azul (px)</label>
+        {% set blue_offset = (ct.line_offset_blue if ct and ct.line_offset_blue is not none else -40) %}
+        <input type="number" name="line_offset_blue" value="{{ blue_offset }}" required />
+        <div class="muted" style="margin-top:4px;">Valor somado à linha inferior (positivo move para baixo, negativo para cima).</div>
+      </div>
+
+      <div>
+        {% set flow = (ct.flow_mode if ct and ct.flow_mode else 'cima') %}
+        <label>Fluxo de contagem</label>
+        <select name="flow_mode">
+          <option value="cima" {{ 'selected' if flow == 'cima' else '' }}>Fluxo CIMA (azul -> vermelha soma)</option>
+          <option value="baixo" {{ 'selected' if flow == 'baixo' else '' }}>Fluxo BAIXO (vermelha -> azul soma)</option>
+          <option value="sem_fluxo" {{ 'selected' if flow == 'sem_fluxo' else '' }}>SEM FLUXO (contagem sem linhas)</option>
+        </select>
+        <div class="muted" style="margin-top:4px;">
+          Defina como <strong>CIMA</strong> para contar subindo, <strong>BAIXO</strong> para contar descendo ou <strong>SEM FLUXO</strong> para contar cada detecção sem usar linhas.
+        </div>
+      </div>
+
+      <div>
+        {% set max_lost_val = (ct.max_lost if ct and ct.max_lost is not none else 2) %}
+        <label>Máximo de frames perdidos (max_lost)</label>
+        <input type="number" name="max_lost" value="{{ max_lost_val|int }}" min="0" required />
+        <div class="muted" style="margin-top:4px;">Quantidade de frames tolerada sem correspondência antes de descartar o objeto.</div>
+      </div>
+
+      <div>
+        {% set match_dist_val = (ct.match_dist if ct and ct.match_dist is not none else 150) %}
+        <label>Distância máxima de associação (match_dist)</label>
+        <input type="number" name="match_dist" value="{{ match_dist_val|int }}" min="1" step="1" required />
+        <div class="muted" style="margin-top:4px;">Distância máxima (em pixels) para associar detectores consecutivos ao mesmo objeto.</div>
+      </div>
+
+      <div>
+        {% set min_conf_val = (ct.min_conf if ct and ct.min_conf is not none else 0.8) %}
+        <label>Confiança mínima (min_conf)</label>
+        <input type="number" name="min_conf" value="{{ '%.2f'|format(min_conf_val) }}" min="0" max="1" step="0.01" required />
+        <div class="muted" style="margin-top:4px;">Filtra detecções abaixo deste nível de confiança (0 a 1).</div>
+      </div>
+
+      <div>
+        {% set missed_dir = (ct.missed_frame_dir if ct and ct.missed_frame_dir else '') %}
+        <label>Pasta para imagens das sacarias identificadas</label>
+        <input type="text" name="missed_frame_dir" value="{{ missed_dir }}" placeholder="\\servidor\pasta\sacarias" />
+        <div class="muted" style="margin-top:4px;">Quando preenchido, salva uma foto de cada sacaria identificada nesse diretório.</div>
+      </div>
+
       <div class="actions">
-        <a class="btn" href="{{ url_for('ct_admin.ct_admin_list') }}">Cancelar</a>
+        <a class="btn" href="{{ url_for('tc_admin.tc_admin_list') }}">Cancelar</a>
         <button class="btn btn-primary" type="submit">{{ 'Criar' if not ct else 'Salvar' }}</button>
       </div>
     </form>

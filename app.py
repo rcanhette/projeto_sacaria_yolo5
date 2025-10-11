@@ -112,4 +112,5 @@ if __name__ == "__main__":
 
     app = create_app()
     app.logger.info("Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)")
-    app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)
+    # Importante: 'threaded=True' para evitar travamentos com SSE/MJPEG no servidor de dev
+    app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)

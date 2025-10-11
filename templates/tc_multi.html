@@ -1,0 +1,369 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Operações TCs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --bg:#002F54; --card:#ffffff; --muted:#6B7280; --text:#002F54; --accent:#22c55e; --accent-weak:#16a34a; --border:#e5e7eb; --pill-on:#10b981; --pill-off:#9ca3af; --danger:#ef4444; --danger-weak:#dc2626; }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; background:#f8fafc; color:var(--text); min-height:100vh; }
+    .wrap{ padding:16px; max-width:1400px; margin:0 auto; }
+    .title-page{ font-weight:800; font-size:20px; letter-spacing:.02em; margin:10px 4px 16px; }
+    .grid{ display:grid; gap:16px; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    @media (max-width:1100px){ .grid{ grid-template-columns:1fr; } }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 4px 16px rgba(0,0,0,.08); overflow:hidden; display:flex; flex-direction:column; min-height: 260px; }
+    .card header{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); }
+    .h-title{ font-weight:800; letter-spacing:.02em; }
+    .status-pill{ display:inline-flex; align-items:center; gap:8px; background:#f3f4f6; color:#111827; padding:6px 10px; border-radius:999px; border:1px solid var(--border); font-size:12px; font-weight:700; letter-spacing:.02em; }
+    .status-dot{ width:10px; height:10px; border-radius:999px; background:var(--pill-off); }
+    .status-on{ background:#e6f2fb; border-color:#dbeafe; color:#0b3d66; }
+    .status-on .status-dot{ background:var(--pill-on); }
+    .body{ display:flex; flex-direction:row; }
+    @media (max-width:900px){ .body{ flex-direction:column; } }
+    /* Shrink left column to give more room to video */
+    .side{ flex:0 0 36%; max-width:42%; padding:12px; display:flex; flex-direction:column; gap:10px; background:#fafafa; }
+    .content{ flex:1 1 64%; padding:16px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+    .row{ display:flex; align-items:center; justify-content:flex-start; gap:8px; }
+    .label{ color:var(--muted); font-size:12px; }
+    .kpi{ font-size:28px; font-weight:800; letter-spacing:.02em; }
+    .pill{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:#fff; color:#111827; display:inline-flex; align-items:center; min-height:22px; }
+    .pill.on{ background:#e6f9f3; border-color:#bbf7d0; color:#064e3b; } .pill.off{ background:#f3f4f6; color:#374151; }
+    .content{ flex:1; padding:16px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+    .form{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; }
+    .input{ flex:1 1 240px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); outline:none; font-size:14px; }
+    .select{ padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#fff; }
+    .btn{ appearance:none; border:1px solid var(--border); background:#fff; color:#111827; padding:10px 14px; border-radius:10px; cursor:pointer; text-decoration:none; font-weight:700; transition:.15s ease; }
+    .btn:hover{ border-color:#94a3b8; } .btn-primary{ background:var(--accent); color:#062b16; border-color:transparent; } .btn-primary:hover{ background:var(--accent-weak); }
+    .btn-danger{ background:var(--danger); color:#fff; border-color:transparent; } .btn-danger:hover{ background:var(--danger-weak); }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+    .muted{ color:var(--muted); font-size:12px; } .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; }
+    .hide{ display:none !important; }
+    .video-wrap{ width:100%; display:flex; justify-content:center; }
+    .video{ max-width:100%; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(15,23,42,0.45); z-index:200; }
+    .modal{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 24px 56px rgba(15,23,42,0.3); width:min(90vw,420px); padding:24px; display:flex; flex-direction:column; gap:16px; z-index:210; }
+    .modal-title{ font-weight:700; font-size:16px; letter-spacing:.01em; color:var(--text); }
+    .modal textarea{ min-height:120px; resize:vertical; padding:12px; border-radius:12px; border:1px solid var(--border); font-size:14px; line-height:1.4; }
+    .modal textarea:focus{ outline:2px solid #7dd3fc; outline-offset:2px; }
+    .modal-actions{ display:flex; justify-content:flex-end; gap:10px; }
+    .modal-hint{ font-size:12px; color:var(--muted); }
+    /* New structured form */
+    .form-card{ width:100%; max-width:480px; display:flex; flex-direction:column; gap:10px; }
+    .field{ display:flex; flex-direction:column; gap:6px; width:100%; }
+    .field label{ color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .field .input, .field .select{ width:100%; flex:unset; }
+    .actions-row{ display:flex; gap:10px; }
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <div class="title-page">Operações TCs</div>
+    <div class="grid">
+      {% for ct in tcs %}
+      <section class="card" id="tc-card-{{ ct.id }}">
+        <header>
+          <div class="h-title">{{ ct.name }}</div>
+          <div id="status-{{ ct.id }}" class="status-pill status-off">
+            <span class="status-dot"></span><span id="status-text-{{ ct.id }}">Parada</span>
+          </div>
+        </header>
+        <div class="body">
+          <aside class="side">
+            <div class="row"><div class="label">Total da contagem</div><div class="kpi" id="count-{{ ct.id }}">0</div></div>
+            <div class="row"><div class="label">Lote</div><div id="lote-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Contagem alvo</div><div id="alvo-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Horário início</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Sessão operando</div><div id="ativa-{{ ct.id }}" class="pill off">nÃ£o</div></div>
+          </aside>
+          <div class="content">
+            <div class="form" onsubmit="return true;">
+              <form id="start-{{ ct.id }}" class="form-card" method="post" action="{{ url_for('tc.tc_start_ajax', tc_id=ct.id) }}">
+                <div class="field">
+                  <label for="lote-ipt-{{ ct.id }}">Lote</label>
+                  <input id="lote-ipt-{{ ct.id }}" class="input" type="text" name="lote" placeholder="Ex.: LOTE-12345" required />
+                </div>
+                <div class="field">
+                  <label for="alvo-ipt-{{ ct.id }}">Contagem alvo</label>
+                  <input id="alvo-ipt-{{ ct.id }}" class="input" type="number" min="1" step="1" name="contagem_alvo" placeholder="Ex.: 1000" required />
+                </div>
+                <div class="field">
+                  <label for="src-{{ ct.id }}">Fonte</label>
+                  <select id="src-{{ ct.id }}" class="select" name="source_type">
+                    <option value="rtsp" selected>RTSP</option>
+                    <option value="file">Arquivo local</option>
+                  </select>
+                </div>
+                <div class="field file-field" id="file-field-{{ ct.id }}" style="display:none;">
+                  <label for="file-{{ ct.id }}">Arquivo</label>
+                  <input id="file-{{ ct.id }}" class="input" type="text" name="file_path" placeholder="C:/videos/teste.mp4" />
+                </div>
+                <div class="actions-row">
+                  <button id="btn-start-{{ ct.id }}" class="btn btn-primary" type="submit" style="flex:1">Iniciar</button>
+                </div>
+              </form>
+              <form id="stop-{{ ct.id }}" class="actions hide" method="post" action="{{ url_for('tc.tc_stop', tc_id=ct.id) }}">
+                <button id="btn-stop-{{ ct.id }}" class="btn btn-danger" type="submit">Parar</button>
+              </form>
+              <div class="video-wrap">                <img id="video-{{ ct.id }}" class="video" src="" alt="pré-visualização" style="display:none;" />              </div>             </div>
+            </div>
+          </div>
+        </section>
+        {% endfor %}
+    </div>
+  </div>
+  <div id="obs-backdrop" class="modal-backdrop hide"></div>
+  <div id="obs-modal" class="modal hide" role="dialog" aria-modal="true" aria-labelledby="obs-title">
+    <div id="obs-title" class="modal-title">Informe uma observação</div>
+    <div id="obs-message" class="muted">Descreva o motivo da diferença entre o total e o alvo.</div>
+    <textarea id="obs-text" placeholder="Digite pelo menos 10 caracteres..." maxlength="500"></textarea>
+    <div id="obs-hint" class="modal-hint">Digite pelo menos 10 caracteres.</div>
+    <div class="modal-actions">
+      <button type="button" id="obs-cancel" class="btn">Cancelar</button>
+      <button type="button" id="obs-ok" class="btn btn-primary" disabled>OK</button>
+    </div>
+  </div>
+  <script>
+    const tcs = {{ tcs|tojson }};
+    const observationModal = (() => {
+      return {
+        backdrop: document.getElementById('obs-backdrop'),
+        modal: document.getElementById('obs-modal'),
+        textarea: document.getElementById('obs-text'),
+        ok: document.getElementById('obs-ok'),
+        cancel: document.getElementById('obs-cancel'),
+        message: document.getElementById('obs-message'),
+        hint: document.getElementById('obs-hint'),
+      };
+    })();
+
+    function askObservationModal(message){
+      return new Promise((resolve) => {
+        const refs = observationModal;
+        if (!refs.modal || !refs.ok || !refs.textarea){
+          const fallback = prompt(message || "Informe uma observação (minimo 20 caracteres):");
+          const trimmed = (fallback || "").trim();
+          resolve(trimmed.length >= 10 ? trimmed : null);
+          return;
+        }
+
+        const { backdrop, modal, textarea, ok, cancel, message: msgEl, hint } = refs;
+        const originalOverflow = document.body.style.overflow;
+
+        function cleanup(){
+          ok.removeEventListener('click', onOk);
+          cancel.removeEventListener('click', onCancel);
+          textarea.removeEventListener('input', onInput);
+          textarea.removeEventListener('keydown', onKeydown);
+          if (backdrop) backdrop.removeEventListener('click', onBackdrop);
+        }
+
+        function close(){
+          modal.classList.add('hide');
+          if (backdrop) backdrop.classList.add('hide');
+          document.body.style.overflow = originalOverflow;
+          textarea.value = "";
+          ok.disabled = true;
+          if (hint) hint.textContent = "Digite pelo menos 10 caracteres.";
+        }
+
+        function onInput(){
+          const trimmed = textarea.value.trim();
+          const len = trimmed.length;
+          ok.disabled = len < 10;
+          if (hint){
+            if (len < 10){
+              const remaining = 10 - len;
+              hint.textContent = `Digite pelo menos ${remaining} caractere${remaining === 1 ? '' : 's'} para continuar.`;
+            } else {
+              hint.textContent = "Pressione OK para confirmar.";
+            }
+          }
+        }
+
+        function onOk(){
+          if (ok.disabled) return;
+          const value = textarea.value.trim();
+          cleanup();
+          close();
+          resolve(value);
+        }
+
+        function onCancel(){
+          cleanup();
+          close();
+          resolve(null);
+        }
+
+        function onKeydown(evt){
+          if (evt.key === "Escape"){
+            evt.preventDefault();
+            onCancel();
+          }
+          if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter"){
+            if (!ok.disabled){
+              evt.preventDefault();
+              onOk();
+            }
+          }
+        }
+
+        function onBackdrop(evt){
+          if (evt.target === backdrop){
+            onCancel();
+          }
+        }
+
+        if (msgEl){
+          msgEl.textContent = message || "Informe uma observação (total diferente do alvo).";
+        }
+
+        if (backdrop){
+          backdrop.classList.remove('hide');
+        }
+        modal.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+        textarea.value = "";
+        ok.disabled = true;
+        onInput();
+
+        textarea.addEventListener('input', onInput);
+        textarea.addEventListener('keydown', onKeydown);
+        ok.addEventListener('click', onOk);
+        cancel.addEventListener('click', onCancel);
+        if (backdrop){
+          backdrop.addEventListener('click', onBackdrop);
+        }
+
+        setTimeout(() => textarea.focus(), 50);
+      });
+    }
+    function setVisibility(id, active){
+      const st = document.getElementById('start-'+id);
+      const sp = document.getElementById('stop-'+id);
+      if (st) st.classList.toggle('hide', !!active);
+      if (sp) sp.classList.toggle('hide', !active);
+      const card = document.getElementById('tc-card-'+id);
+      const content = card ? card.querySelector('.content') : null;
+      let vwrap = document.getElementById('video-wrap-'+id);
+      if (!vwrap && content){ vwrap = document.createElement('div'); vwrap.id='video-wrap-'+id; vwrap.className='video-wrap'; content.appendChild(vwrap); }
+      let img = document.getElementById('video-'+id);
+      if (!img && vwrap){ img = document.createElement('img'); img.id='video-'+id; img.className='video'; img.alt='pré-visualização'; img.style.display='none'; vwrap.appendChild(img); }
+      if (img){
+        if (active){ img.src = `/tc/${id}/video`; img.style.display = 'block'; }
+        else { img.style.display = 'none'; img.src = ''; }
+      }
+      if (active && sp && vwrap){ try{ vwrap.insertAdjacentElement('afterend', sp); }catch(_){} }
+    }
+    function apply(id, data){
+      const get = (p)=>document.getElementById(p+'-'+id);
+      const active = !!data.session_active;
+      const elCount = get('count'); if(elCount) elCount.textContent = data.count ?? 0;
+      const elLote = get('lote'); if(elLote){ elLote.textContent = data.lote || '-'; elLote.className='pill '+((data.lote&&data.lote!=='-')?'on':'off'); }
+      const elInicio = get('inicio'); if(elInicio){ elInicio.textContent = data.hora_inicio || '-'; elInicio.className='pill '+((data.hora_inicio&&data.hora_inicio!=='-')?'on':'off'); }
+      const elAlvo = get('alvo'); if(elAlvo){ const alvo=(data.contagem_alvo ?? '-'); elAlvo.textContent = alvo; elAlvo.className='pill '+((alvo&&alvo!=='-')?'on':'off'); }
+      const elAtiva = get('ativa'); if(elAtiva){ elAtiva.textContent = active ? 'sim' : 'não'; elAtiva.className='pill '+(active?'on':'off'); }
+      const pill=document.getElementById('status-'+id), pillText=document.getElementById('status-text-'+id);
+      if(pill&&pillText){ pill.className='status-pill '+(active?'status-on':'status-off'); pillText.textContent=active?'Operando':'Parada'; }
+      setVisibility(id, active);
+    }
+    function connectSSE(id){
+      const es=new EventSource(`/sse/tc/${id}`);
+      es.onmessage=(evt)=>{ try{ apply(id, JSON.parse(evt.data)); }catch(e){} };
+      es.onerror=()=>{ setTimeout(()=>{ es.close(); connectSSE(id); },2000); };
+    }
+    // bind select file + initial state
+    tcs.forEach(tc => {
+      const sel = document.getElementById('src-'+tc.id);
+      const f   = document.getElementById('file-'+tc.id);
+      const flab= document.querySelector('label[for="file-'+tc.id+'"]');
+      const fwrap = document.getElementById('file-field-'+tc.id);
+      if (sel && f){
+        const update = ()=>{
+          const on = (sel.value==='file');
+          if (fwrap) fwrap.style.display = on ? 'block' : 'none';
+          f.style.display = on ? 'inline-block' : 'none';
+          if (flab) flab.style.display = on ? 'inline-block' : 'none';
+        };
+        sel.addEventListener('change', update);
+        update();
+      }
+    });
+
+    // start via AJAX (permanece na pÃ¡gina)
+    tcs.forEach(tc => {
+      const form = document.getElementById('start-'+tc.id);
+      const btn  = document.getElementById('btn-start-'+tc.id);
+      form?.addEventListener('submit', async (e)=>{
+        e.preventDefault(); btn.disabled = true;
+        try{
+          const params = new URLSearchParams();
+          const sel = document.getElementById('src-'+tc.id);
+          const f   = document.getElementById('file-'+tc.id);
+          const lote= document.getElementById('lote-ipt-'+tc.id);
+          const alvo= document.getElementById('alvo-ipt-'+tc.id);
+          const loteVal = (lote?.value ?? '').trim();
+          const alvoVal = (alvo?.value ?? '').trim();
+          const srcVal  = (sel?.value ?? 'rtsp');
+          const fileVal = (f?.value ?? '').trim();
+          params.set('source_type', srcVal);
+          if (srcVal === 'file' && fileVal) params.set('file_path', fileVal);
+          params.set('lote', loteVal);
+          if (alvoVal) params.set('contagem_alvo', alvoVal);
+
+          let resp = await fetch(form.action, {
+            method:'POST',
+            headers:{ 'X-Requested-With':'fetch', 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: params.toString(),
+            redirect: 'follow'
+          });
+
+          // Fallback: se falhar mas temos lote, tenta multipart FormData
+          if ((!resp.ok || resp.redirected) && loteVal) {
+            const fd = new FormData();
+            fd.set('source_type', srcVal);
+            if (srcVal === 'file' && fileVal) fd.set('file_path', fileVal);
+            fd.set('lote', loteVal);
+            if (alvoVal) fd.set('contagem_alvo', alvoVal);
+            resp = await fetch(form.action, { method:'POST', headers:{ 'X-Requested-With':'fetch' }, body: fd });
+          }
+          if (!resp.ok || resp.redirected) {
+            try{ const txt = await resp.text(); alert((txt||'Falha ao iniciar').slice(0,300)); }catch(_){ alert('Falha ao iniciar'); }
+          }
+        }catch(_){ } finally { btn.disabled = false; }
+      });
+    });
+    // stop ajax obs rule
+    tcs.forEach(tc => {
+      const form = document.getElementById('stop-'+tc.id);
+      const btn  = document.getElementById('btn-stop-'+tc.id);
+      form?.addEventListener('submit', async (e)=>{
+        e.preventDefault(); btn.disabled=true;
+        try{
+          const alvoEl = document.getElementById('alvo-'+tc.id);
+          const countEl= document.getElementById('count-'+tc.id);
+          const alvo = parseInt(alvoEl?.textContent||'0');
+          const tot  = parseInt(countEl?.textContent||'0');
+          let body;
+          if (Number.isFinite(alvo) && alvo>0 && tot !== alvo){
+            const obs = await askObservationModal('Informe uma observação (total diferente do alvo):');
+            if (!obs) { btn.disabled=false; return; }
+            body = new URLSearchParams(); body.set('observacao', obs);
+          }
+          await fetch(form.action, { method:'POST', headers:{ 'X-Requested-With':'fetch', 'Content-Type': body?'application/x-www-form-urlencoded':'text/plain' }, body: body? String(body): undefined });
+        }catch(_){ } finally{ btn.disabled=false; }
+      });
+    });
+    // sse for each
+    const esMap = {};
+    tcs.forEach(tc => { esMap[tc.id]=connectSSE(tc.id); });
+    window.addEventListener('beforeunload', ()=>{
+      try{ Object.values(esMap).forEach(es=>{try{es.close()}catch(_){}}); }catch(_){ }
+      try{ tcs.forEach(tc=>{ const img=document.getElementById('video-'+tc.id); if(img){ img.src=''; img.style.display='none'; }}); }catch(_){ }
+    });
+  </script>
+</body>
+</html>
+

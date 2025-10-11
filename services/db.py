@@ -112,6 +112,15 @@ def ensure_schema() -> None:
             IF to_regclass('public.user_tc') IS NULL AND to_regclass('public.user_ct') IS NOT NULL THEN
                 EXECUTE 'ALTER TABLE user_ct RENAME TO user_tc';
             END IF;
+            -- renomeia coluna ct_id -> tc_id se ainda existir (legado)
+            IF to_regclass('public.user_tc') IS NOT NULL THEN
+                IF EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                     WHERE table_schema='public' AND table_name='user_tc' AND column_name='ct_id'
+                ) THEN
+                    EXECUTE 'ALTER TABLE user_tc RENAME COLUMN ct_id TO tc_id';
+                END IF;
+            END IF;
         END$$;
         """
     )
@@ -123,12 +132,33 @@ def ensure_schema() -> None:
       name TEXT NOT NULL,
       source_path TEXT NOT NULL,
       roi TEXT,
-      model_path TEXT
+      model_path TEXT,
+      line_offset_red INTEGER DEFAULT 40,
+      line_offset_blue INTEGER DEFAULT -40,
+      flow_mode TEXT DEFAULT 'cima',
+      max_lost INTEGER DEFAULT 2,
+      match_dist INTEGER DEFAULT 150,
+      min_conf NUMERIC(6,4) DEFAULT 0.8000,
+      missed_frame_dir TEXT
     );
     """)
     # colunas que podem faltar em esquemas antigos
     execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;")
     execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW();")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS line_offset_red INTEGER DEFAULT 40;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS line_offset_blue INTEGER DEFAULT -40;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS flow_mode TEXT DEFAULT 'cima';")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS max_lost INTEGER DEFAULT 2;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS match_dist INTEGER DEFAULT 150;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS min_conf NUMERIC(6,4) DEFAULT 0.8000;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS missed_frame_dir TEXT;")
+    execute("UPDATE tc SET line_offset_red = 40 WHERE line_offset_red IS NULL;")
+    execute("UPDATE tc SET line_offset_blue = -40 WHERE line_offset_blue IS NULL;")
+    execute("UPDATE tc SET flow_mode = 'cima' WHERE flow_mode IS NULL OR TRIM(flow_mode) = '';")
+    execute("UPDATE tc SET max_lost = 2 WHERE max_lost IS NULL;")
+    execute("UPDATE tc SET match_dist = 150 WHERE match_dist IS NULL;")
+    execute("UPDATE tc SET min_conf = 0.8000 WHERE min_conf IS NULL;")
+    execute("UPDATE tc SET missed_frame_dir = '' WHERE missed_frame_dir IS NULL;")
     execute("CREATE INDEX IF NOT EXISTS idx_tc_active ON tc(active);")
 
     # ---------- user_tc (vínculo N:N) ----------
@@ -162,7 +192,7 @@ def ensure_schema() -> None:
     execute("CREATE INDEX IF NOT EXISTS idx_session_status ON session(status);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_ct_inicio ON session(ct_id, data_inicio DESC);")
 
-    -- adicionar colunas em esquemas antigos
+    # adicionar colunas em esquemas antigos
     execute("ALTER TABLE session ADD COLUMN IF NOT EXISTS contagem_alvo INTEGER;")
     execute("ALTER TABLE session ADD COLUMN IF NOT EXISTS observacao TEXT;")
 
