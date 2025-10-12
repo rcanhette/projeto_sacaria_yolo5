@@ -1,52 +1,50 @@
-import cv2
-import threading
-import time 
+import logging
 import os
+import threading
+import time
+from typing import Optional, Tuple
+
+import cv2
+
+log = logging.getLogger(__name__)
+
 
 class VideoSource:
-    def __init__(self, source_path):
-        """Inicializa a fonte de vídeo (câmera ou arquivo) e o threading."""
+    """Wrapper simples para leitura contínua de frames com OpenCV."""
+
+    def __init__(self, source_path: str):
         self.source_path = source_path
-        self.cap = None
+        self.cap: Optional[cv2.VideoCapture] = None
         self.frame = None
         self.ret = False
         self.lock = threading.Lock()
         self.stop_event = threading.Event()
-        self.thread = None
-        
-        # === CORREÇÕES PARA RTSP E BUFFER ===
+        self.thread: Optional[threading.Thread] = None
+        self.delay = 0.0
         self.is_file = not source_path.lower().startswith("rtsp")
-        
-        if not self.is_file:
-            # Tenta usar o backend FFMPEG (mais robusto para RTSP)
-            self.cap = cv2.VideoCapture(source_path, cv2.CAP_FFMPEG) 
-            
-            # Reduz o buffer para pegar o frame mais recente e evitar atrasos/travamentos
+
+        log.info("Abrindo fonte de vídeo (%s): %s", "arquivo" if self.is_file else "stream", source_path)
+
+        if self.is_file:
+            self.cap = cv2.VideoCapture(source_path)
+        else:
+            self.cap = cv2.VideoCapture(source_path, cv2.CAP_FFMPEG)
             try:
-                buf_env = os.getenv('VIDEO_RTSP_BUFFER_SIZE')
+                buf_env = os.getenv("VIDEO_RTSP_BUFFER_SIZE")
                 buffer_size = int(buf_env) if buf_env is not None else 3
             except Exception:
                 buffer_size = 3
             self.cap.set(cv2.CAP_PROP_BUFFERSIZE, buffer_size)
-        else:
-            self.cap = cv2.VideoCapture(source_path)
-        # ======================================
 
-        if not self.cap.isOpened():
-            print(f"[ERRO] Não foi possível abrir a fonte de vídeo: {source_path}")
-            # Se não abrir, definimos como None para o loop não travar
-            self.cap = None 
-            return 
+        if not self.cap or not self.cap.isOpened():
+            log.error("Não foi possível abrir a fonte de vídeo: %s", source_path)
+            self.cap = None
+            return
 
-        # === LÓGICA DE SINCRONIZAÇÃO FPS ===
-        self.delay = 0 
-        
         if self.is_file:
             fps = self.cap.get(cv2.CAP_PROP_FPS)
-            
-            # Configuração por ambiente: fator ou delay fixo em ms
-            delay_ms_env = os.getenv('VIDEO_FILE_DELAY_MS')
-            delay_factor_env = os.getenv('VIDEO_FILE_DELAY_FACTOR')
+            delay_ms_env = os.getenv("VIDEO_FILE_DELAY_MS")
+            delay_factor_env = os.getenv("VIDEO_FILE_DELAY_FACTOR")
 
             if delay_ms_env is not None:
                 try:
@@ -59,70 +57,46 @@ class VideoSource:
                 except Exception:
                     factor = 0.9
                 self.delay = max(0.0, factor / fps)
-                print(f"[FPS] Vídeo FPS: {fps:.2f}. Delay ajustado para: {self.delay:.4f}s")
+                log.info("Arquivo %s: FPS=%.2f, delay ajustado para %.4fs", source_path, fps, self.delay)
             else:
-                # Fallback quando FPS não está disponível
                 self.delay = 0.033
-        # ==================================
-        
+
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
 
-    def _run(self):
-        """Método executado na thread separada para leitura contínua de frames."""
-        # Se self.cap não foi aberto no __init__, a thread não precisa rodar
+    def _run(self) -> None:
         if self.cap is None:
             return
-            
+
         while not self.stop_event.is_set():
-            
-            # Tenta ler o frame
             try:
                 ret, frame = self.cap.read()
-            except Exception as e:
-                # Proteção contra race condition: cap pode ser liberado durante read()
-                # ou backend lançar exceção C++ (cv2.error). Encerra a thread com segurança.
-                try:
-                    # registra uma mensagem simples (evita quebrar se logger não existir)
-                    print(f"[VideoSource] Exceção no read(): {e}. Encerrando thread de captura.")
-                except Exception:
-                    pass
+            except Exception as exc:
+                log.warning("Exceção ao ler frames da fonte %s: %s. Encerrando captura.", self.source_path, exc)
                 break
-            
+
             with self.lock:
                 self.ret = ret
                 if ret:
                     self.frame = frame
-                else:
-                    # Tratamento de falha (Se 'ret' for False)
-                    if self.is_file:
-                        # Se for um arquivo e chegar ao fim, reinicia
-                        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                        print("[INFO] Arquivo de vídeo reiniciado.")
-                        continue
-                        
-                    # Para streams, se a leitura falhar, apenas continua após o sleep
-                        
-            # Aplicação do delay (essencial para estabilidade e CPU)
-            if self.is_file and self.delay > 0:
-                 time.sleep(self.delay)
-            else:
-                 # Sleep para liberar CPU (essencial para streams e evitar travamento)
-                 time.sleep(0.001) 
+                elif self.is_file:
+                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    log.info("Arquivo de vídeo reiniciado: %s", self.source_path)
+                    continue
 
-    def get_frame(self):
-        """Retorna o frame mais recente."""
+            if self.is_file and self.delay > 0:
+                time.sleep(self.delay)
+            else:
+                time.sleep(0.001)
+
+    def get_frame(self) -> Tuple[bool, Optional[object]]:
         with self.lock:
             ret = self.ret
-            # Garante que frame.copy() só é chamado se frame não for None
             frame = self.frame.copy() if self.frame is not None else None
-
         return ret, frame
 
-    def release(self):
-        """Para a thread e libera a captura do OpenCV."""
-        # Ordem importa para evitar race com self.cap.read():
-        # 1) sinaliza parada, 2) aguarda thread sair do loop, 3) libera cap
+    def release(self) -> None:
+        log.info("Encerrando fonte de vídeo: %s", self.source_path)
         try:
             self.stop_event.set()
         except Exception:

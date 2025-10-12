@@ -37,7 +37,7 @@ class CapturePoint:
             self.line_offset_red = int(config.get("line_offset_red", 40))
 
         except Exception:
-
+            pass
             self.line_offset_red = 40
 
         try:
@@ -45,7 +45,7 @@ class CapturePoint:
             self.line_offset_blue = int(config.get("line_offset_blue", -40))
 
         except Exception:
-
+            pass
             self.line_offset_blue = -40
 
         flow_mode_cfg = str(config.get("flow_mode", "cima") or "cima").strip().lower()
@@ -63,6 +63,7 @@ class CapturePoint:
             self.max_lost = int(config.get("max_lost", 2))
 
         except Exception:
+            pass
 
             self.max_lost = 2
 
@@ -71,6 +72,7 @@ class CapturePoint:
             self.match_dist = float(config.get("match_dist", 150))
 
         except Exception:
+            pass
 
             self.match_dist = 150.0
 
@@ -152,6 +154,14 @@ class CapturePoint:
 
         self.camera = VideoSource(self.source_path)
 
+        if not self.camera or getattr(self.camera, "cap", None) is None:
+
+            log.error("[CT%s] Falha ao abrir a fonte de vÃ­deo: %s", self.ct.get('id'), self.source_path)
+
+        else:
+
+            log.info("[CT%s] Fonte de vÃ­deo pronta: %s", self.ct.get('id'), self.source_path)
+
         self.detector = IndustrialTagDetector(
 
             self.model_path,
@@ -180,6 +190,8 @@ class CapturePoint:
 
         )
 
+        log.info("[CT%s] Detector inicializado com modelo %s", self.ct.get('id'), getattr(self.detector, "model_path_for_load", self.model_path))
+
         if self.session_active and self.session_lote:
 
             try:
@@ -193,17 +205,11 @@ class CapturePoint:
         self._apply_cross_point_mode()
 
     def _apply_cross_point_mode(self):
-
-        """Garante que o ponto de cruzamento permanea central."""
-
+        """Garante que o ponto de cruzamento permanece central."""
         try:
-
             if self.detector and getattr(self.detector, "cross_point_mode", None) != "meio":
-
                 self.detector.cross_point_mode = "meio"
-
         except Exception:
-
             pass
 
     def _ensure_thread(self):
@@ -260,10 +266,9 @@ class CapturePoint:
 
                 except Exception as e:
 
-                    print(f"[CT{self.ct['id']}] loop error: {e}")
+                    log.warning("[CT%s] Erro no loop de captura: %s", self.ct.get('id'), e, exc_info=True)
 
                     time.sleep(0.05)
-
         # Garante que o evento de parada esteja limpo antes de iniciar uma nova thread
 
         self.stop_event.clear()
@@ -442,153 +447,94 @@ class CapturePoint:
 
         except Exception as e:
 
-            print(f"[ERRO LOG DB] CT{self.ct['id']} delta: {e}")
+            log.error("[CT%s] Falha ao registrar delta no banco: %s", self.ct.get('id'), e, exc_info=True)
 
     def stop_session(self, observacao: str | None = None):
-
-        # Mesmo que no haja sesso ativa, atender STOP deve encerrar captura
-
+        """Finaliza a sessao corrente e libera recursos."""
         agora = datetime.now()
+        lote_atual = self.session_lote
+        total_final = int(self.current_session_count)
 
         try:
-
             if self.session_active:
-
                 self.session_hora_fim = agora.strftime("%H:%M:%S")
-
                 quantidade = int(self.current_session_count)
-
+                total_final = quantidade
                 try:
-
                     if self.session_db_id is not None:
-
                         finish_session(self.session_db_id, quantidade, status='finalizado', observacao=observacao)
-
-                except Exception as e:
-
-                    print(f"[LOG DB] erro ao finalizar sesso: {e}")
-
+                except Exception as exc:
+                    log.error("[CT%s] Erro ao finalizar sessao no banco: %s", self.ct.get('id'), exc, exc_info=True)
         finally:
-
-            # limpa estado de sesso
-
             self.session_active = False
-
             self.session_lote = None
-
             self.session_data = None
-
             self.session_hora_inicio = None
-
             self.session_hora_fim = None
-
             self.session_db_id = None
-
             self.session_contagem_alvo = None
-
             self.current_session_count = 0
-
             self._last_session_logged_total = None
-
             self._base_counter_snapshot = 0
 
-        # IMPORTANTE: encerrar de fato a thread de captura e conexes (RTSP/Arquivo)
-
         try:
-
             if self.detector:
-
                 try:
-
                     self.detector.set_session_context(None)
-
                 except Exception:
-
                     pass
-
             self.stop_event.set()
-
             if self.thread and self.thread.is_alive():
-
                 self.thread.join(timeout=1.5)
-
         except Exception:
-
             pass
-
         finally:
-
             self.thread = None
 
-        # Encerra a fonte de vdeo (isso para a thread interna do VideoSource)
-
         if self.camera:
-
             try:
-
                 self.camera.release()
-
             except Exception:
-
                 pass
+            self.camera = None
 
-        self.camera = None
+        log.info("[CT%s] STOP lote='%s' concluido (total=%s)", self.ct.get('id'), lote_atual or "-", total_final)
 
-        # Solta o detector para liberar memria GPU/CPU
-
+        # Solta o detector para liberar memoria GPU/CPU
         self.detector = None
 
-        # Prepara um novo evento para prxima sesso (seno a thread sairia imediatamente)
-
+        # Prepara um novo evento para a proxima sessao
         self.stop_event = threading.Event()
 
     # ---------- fonte ----------
 
     def set_source(self, source_type: str, source_path: str | None):
-
-        # file s para teste da sesso corrente (no persiste no banco)
-
         if source_type == "file" and source_path:
-
             self.source_type = "file"
-
             self.source_path = source_path
-
         else:
-
             self.source_type = "rtsp"
-
             self.source_path = self.default_source_path
 
-        # Reabre a fonte apenas se j houver thread ativa; caso contrrio, ser aberta ao iniciar
-
         if self.thread and self.thread.is_alive():
-
             self._open_sources()
 
     # ---------- cleanup ----------
 
     def release(self):
-
         self.stop_event.set()
 
         try:
-
             if self.thread and self.thread.is_alive():
-
                 self.thread.join(timeout=1.0)
-
         except Exception:
-
             pass
 
         if self.camera:
-
-            try: self.camera.release()
-
-            except Exception: pass
-
-        self.camera = None
+            try:
+                self.camera.release()
+            except Exception:
+                pass
+            self.camera = None
 
         self.detector = None
-

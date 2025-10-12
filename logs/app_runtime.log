@@ -1,0 +1,196 @@
+2025-10-11 10:09:01,285 INFO [app] Garantindo schema...
+2025-10-11 10:09:08,554 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 10:09:08,693 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:09:23,392 INFO [app] Garantindo schema...
+2025-10-11 10:09:32,360 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:09:46,040 INFO [app] Garantindo schema...
+2025-10-11 10:09:51,109 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:10:18,461 INFO [app] Garantindo schema...
+2025-10-11 10:10:26,869 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 10:10:26,950 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:11:04,764 INFO [app] Garantindo schema...
+2025-10-11 10:11:10,448 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:11:38,765 INFO [app] Garantindo schema...
+2025-10-11 10:11:46,313 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
+2025-10-11 10:11:46,349 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.18.89:8080
+2025-10-11 10:11:46,349 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-11 10:12:20,447 INFO [app] Garantindo schema...
+2025-10-11 10:12:26,552 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:14:40,959 INFO [app] Garantindo schema...
+2025-10-11 10:14:46,966 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:16:37,470 INFO [app] Garantindo schema...
+2025-10-11 10:16:41,029 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:16:49,206 INFO [app] Garantindo schema...
+2025-10-11 10:16:56,558 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 10:16:56,654 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:17:08,718 INFO [app] Garantindo schema...
+2025-10-11 10:17:13,898 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:17:27,413 INFO [app] Garantindo schema...
+2025-10-11 10:17:32,259 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:17:53,617 INFO [app] Garantindo schema...
+2025-10-11 10:17:58,774 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:19:40,561 INFO [app] Garantindo schema...
+2025-10-11 10:19:45,937 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:21:59,699 INFO [app] Garantindo schema...
+2025-10-11 10:22:03,668 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:24:17,390 INFO [app] Garantindo schema...
+2025-10-11 10:24:21,518 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:26:35,174 INFO [app] Garantindo schema...
+2025-10-11 10:26:39,687 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:28:53,948 INFO [app] Garantindo schema...
+2025-10-11 10:29:00,540 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 10:31:59,580 INFO [app] Garantindo schema...
+2025-10-11 10:32:28,348 INFO [app] Garantindo schema...
+2025-10-11 10:32:34,786 INFO [services.capture_point] hello from capture point
+2025-10-11 10:47:10,890 INFO [app] Garantindo schema...
+2025-10-11 11:16:37,155 INFO [app] Garantindo schema...
+2025-10-11 11:16:42,302 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:16:50,176 INFO [app] Garantindo schema...
+2025-10-11 11:16:55,696 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:17:05,417 INFO [app] Garantindo schema...
+2025-10-11 11:17:11,965 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 11:17:12,102 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:17:48,687 INFO [app] Garantindo schema...
+2025-10-11 11:18:00,023 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:18:38,425 INFO [app] Garantindo schema...
+2025-10-11 11:18:46,059 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:19:56,095 INFO [app] Garantindo schema...
+2025-10-11 11:20:02,264 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:22:16,198 INFO [app] Garantindo schema...
+2025-10-11 11:22:21,864 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:22:49,622 INFO [app] Garantindo schema...
+2025-10-11 11:22:55,931 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:23:02,821 INFO [app] Garantindo schema...
+2025-10-11 11:23:09,243 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:23:35,212 INFO [app] Garantindo schema...
+2025-10-11 11:23:54,394 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 11:23:54,482 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:24:22,081 INFO [app] Garantindo schema...
+2025-10-11 11:24:26,284 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:25:04,488 INFO [app] Garantindo schema...
+2025-10-11 11:25:09,519 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:27:38,786 INFO [app] Garantindo schema...
+2025-10-11 11:27:46,050 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:27:54,815 INFO [app] Garantindo schema...
+2025-10-11 11:28:01,512 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:28:27,201 INFO [app] Garantindo schema...
+2025-10-11 11:28:48,829 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 11:30:26,338 INFO [app] Garantindo schema...
+2025-10-11 11:30:33,621 INFO [waitress] Serving on http://0.0.0.0:8090
+2025-10-11 11:33:01,106 INFO [app] Garantindo schema...
+2025-10-11 11:33:07,443 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
+2025-10-11 11:33:07,489 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.18.89:8080
+2025-10-11 11:33:07,489 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-11 20:03:54,868 INFO [app] Garantindo schema...
+2025-10-11 20:09:18,414 INFO [app] Garantindo schema...
+2025-10-11 20:13:15,561 INFO [app] Garantindo schema...
+2025-10-11 20:13:18,357 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:13:22,780 INFO [app] Garantindo schema...
+2025-10-11 20:13:24,873 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:13:31,413 INFO [app] Garantindo schema...
+2025-10-11 20:13:33,297 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:13:44,369 INFO [app] Garantindo schema...
+2025-10-11 20:13:46,477 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:14:42,596 INFO [app] Garantindo schema...
+2025-10-11 20:14:46,320 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:18:06,042 INFO [app] Garantindo schema...
+2025-10-11 20:18:10,018 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:20:25,308 INFO [app] Garantindo schema...
+2025-10-11 20:20:28,067 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:22:47,191 INFO [routes.tc] Inicializando CapturePoint para TC 1 (M1/2) com fonte 'rtsp://admin:Coop%402020@192.168.15.15:554/Streaming/Channels/101'
+2025-10-11 20:22:47,234 INFO [routes.tc] Inicializando CapturePoint para TC 2 (M1_CAM_NOVA) com fonte 'rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101'
+2025-10-11 20:22:47,571 INFO [app] Garantindo schema...
+2025-10-11 20:22:53,440 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:22:59,912 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:23:00,188 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\nova.mp4: FPS=14.99, delay ajustado para 0.0600s
+2025-10-11 20:23:00,191 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:23:00,194 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-11 20:23:24,979 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:23:28,591 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-11 20:23:28,593 INFO [services.capture_point] [CT2] START lote='323232' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='baixo', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.05, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
+2025-10-11 20:23:28,819 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\323232
+2025-10-11 20:23:38,524 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202338_id1.jpg
+2025-10-11 20:23:49,941 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:24:03,503 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202403_id2.jpg
+2025-10-11 20:24:14,963 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:24:28,417 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202428_id3.jpg
+2025-10-11 20:24:40,032 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:24:53,517 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202453_id4.jpg
+2025-10-11 20:25:05,125 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:25:11,638 INFO [app] Garantindo schema...
+2025-10-11 20:25:15,402 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 20:25:15,468 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:25:18,488 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202518_id5.jpg
+2025-10-11 20:25:20,809 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202520_id6.jpg
+2025-10-11 20:25:26,105 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-11 20:25:26,105 INFO [routes.tc] STOP autorizado para TC 2 (observacao=True)
+2025-10-11 20:25:26,483 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 20:25:26,595 INFO [services.capture_point] [CT2] STOP lote='323232' concluido (total=0)
+2025-10-11 20:25:26,596 INFO [routes.tc] STOP executado para TC 2 (total_final=0)
+2025-10-11 20:25:28,153 INFO [app] Garantindo schema...
+2025-10-11 20:25:31,242 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:25:44,634 INFO [app] Garantindo schema...
+2025-10-11 20:25:48,139 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 20:26:10,627 INFO [app] Garantindo schema...
+2025-10-11 20:26:14,624 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:13:08,132 INFO [app] Garantindo schema...
+2025-10-11 21:13:11,945 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:13:22,104 INFO [app] Garantindo schema...
+2025-10-11 21:13:25,633 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:13:38,942 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 21:13:38,970 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\nova.mp4: FPS=14.99, delay ajustado para 0.0600s
+2025-10-11 21:13:38,976 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 21:13:38,980 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-11 21:13:39,317 INFO [app] Garantindo schema...
+2025-10-11 21:13:39,452 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-11 21:13:39,455 INFO [services.capture_point] [CT2] START lote='312414' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='baixo', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.05, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
+2025-10-11 21:13:39,718 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\312414
+2025-10-11 21:13:43,193 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 21:13:43,263 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:13:52,690 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\312414\312414_211352_id1.jpg
+2025-10-11 21:14:01,996 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-11 21:14:01,997 INFO [routes.tc] STOP autorizado para TC 2 (observacao=True)
+2025-10-11 21:14:02,522 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\nova.mp4
+2025-10-11 21:14:02,605 INFO [services.capture_point] [CT2] STOP lote='312414' concluido (total=0)
+2025-10-11 21:14:02,606 INFO [routes.tc] STOP executado para TC 2 (total_final=0)
+2025-10-11 21:14:06,477 INFO [app] Garantindo schema...
+2025-10-11 21:14:09,999 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:14:16,431 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-11 21:14:16,468 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-11 21:14:16,474 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-11 21:14:16,475 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-11 21:14:16,896 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-11 21:14:16,899 INFO [services.capture_point] [CT1] START lote='1313414' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
+2025-10-11 21:14:17,157 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414
+2025-10-11 21:14:52,114 INFO [app] Garantindo schema...
+2025-10-11 21:14:57,753 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
+2025-10-11 21:14:57,841 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:16:01,016 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 1
+2025-10-11 21:16:01,016 INFO [routes.tc] STOP autorizado para TC 1 (observacao=True)
+2025-10-11 21:16:01,365 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-11 21:16:01,459 INFO [services.capture_point] [CT1] STOP lote='1313414' concluido (total=0)
+2025-10-11 21:16:01,459 INFO [routes.tc] STOP executado para TC 1 (total_final=0)
+2025-10-11 21:16:07,575 INFO [app] Garantindo schema...
+2025-10-11 21:16:11,027 INFO [waitress] Serving on http://0.0.0.0:8080
+2025-10-11 21:16:15,601 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\1.mp4
+2025-10-11 21:16:15,688 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\1.mp4: FPS=30.00, delay ajustado para 0.0300s
+2025-10-11 21:16:15,693 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\1.mp4
+2025-10-11 21:16:15,696 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-11 21:16:16,315 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-11 21:16:16,317 INFO [services.capture_point] [CT1] START lote='1313414' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
+2025-10-11 21:16:16,582 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414
+2025-10-11 21:16:57,003 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414\1313414_211656_id6.jpg
+2025-10-11 21:17:26,786 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414\1313414_211726_id7.jpg
+2025-10-11 21:18:22,756 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 1
+2025-10-11 21:18:22,758 INFO [routes.tc] STOP autorizado para TC 1 (observacao=True)
+2025-10-11 21:18:23,112 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\1.mp4
+2025-10-11 21:18:23,176 INFO [services.capture_point] [CT1] STOP lote='1313414' concluido (total=10)
+2025-10-11 21:18:23,177 INFO [routes.tc] STOP executado para TC 1 (total_final=0)
+2025-10-11 21:18:26,227 INFO [app] Garantindo schema...
+2025-10-11 21:18:30,305 INFO [waitress] Serving on http://0.0.0.0:8080

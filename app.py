@@ -1,5 +1,7 @@
 # app.py
 import logging
+from pathlib import Path
+from logging.config import dictConfig
 from flask import Flask, redirect, url_for, render_template, request
 from routes.tc import tc_bp
 from routes.logs import logs_bp
@@ -13,12 +15,59 @@ from services.db import ensure_schema
 from services.session_repository import close_all_active_sessions_on_boot
 from services.auth_repository import list_user_tc_ids, user_can_control_tc
 
+
+LOGS_DIR = Path(__file__).resolve().parent / "logs"
+
+
+def _configure_logging() -> None:
+    if getattr(_configure_logging, "_configured", False):
+        return
+
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
+    dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "standard": {
+                    "format": "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+                }
+            },
+            "handlers": {
+                "stdout": {
+                    "class": "logging.StreamHandler",
+                    "level": "INFO",
+                    "stream": "ext://sys.stdout",
+                    "formatter": "standard",
+                },
+                "file": {
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "level": "INFO",
+                    "formatter": "standard",
+                    "filename": str(LOGS_DIR / "app_runtime.log"),
+                    "maxBytes": 10 * 1024 * 1024,
+                    "backupCount": 5,
+                    "encoding": "utf-8",
+                },
+            },
+            "root": {
+                "level": "INFO",
+                "handlers": ["stdout", "file"],
+            },
+        }
+    )
+
+    logging.getLogger("services").setLevel(logging.INFO)
+    logging.getLogger("services.capture_point").setLevel(logging.INFO)
+    logging.getLogger("services.video_source").setLevel(logging.INFO)
+    logging.getLogger("services.industrial_tag_detector").setLevel(logging.INFO)
+
+    _configure_logging._configured = True
+
 def create_app():
     # ---- LOGGING ----
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s [%(name)s] %(message)s"
-    )
+    _configure_logging()
     log = logging.getLogger("app")
 
     app = Flask(__name__)

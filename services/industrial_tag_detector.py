@@ -303,7 +303,7 @@ class IndustrialTagDetector:
 
             except Exception as e:
 
-                print(f"[ERRO LOG] Falha ao escrever no log: {e}")
+                log.error("Falha ao escrever no log auxiliar: %s", e, exc_info=True)
 
     def set_session_context(self, lote: str | None):
         if lote is None:

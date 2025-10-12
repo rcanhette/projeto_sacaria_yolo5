@@ -148,7 +148,7 @@ Pontos de manutenção importantes
 
 Runbook resumido
 - Iniciar (console): `waitress-serve --host 0.0.0.0 --port 80 --threads 64 --connection-limit 500 --channel-timeout 300 --call app:create_app`
-- Iniciar (serviço): `python windows_service.py install|start` (ajuste `windows_service.ini` se necessário)
+- Iniciar (servico): `scripts\install_windows_service_nssm.bat` seguido de `nssm start ProjetoSacaria_v1` (ajuste `windows_service.ini` se necessario)
 - Backup: `pg_dump -h <host> -U <user> -d contagem_sacaria -F c -f backup.dump`
 - Restore: `pg_restore -h <host> -U <user> -d contagem_sacaria -c backup.dump`
 

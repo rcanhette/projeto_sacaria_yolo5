@@ -47,22 +47,32 @@ As dependencias Python estao listadas em [`requirements.txt`](requirements.txt).
 
 ## Instalacao como servico Windows
 
-1. Edite `windows_service.ini`:
-   - `[server]` define `host` e `port` utilizados pelo Waitress.
-   - `[paths]` permite especificar o Python/Waitress e o diretorio de logs.
-   - `[database]` define `host`, `port`, `database`, `user`, `password` do PostgreSQL (replicados em variaveis de ambiente pelo servico).
-   - `[env]` aceita variaveis adicionais (por exemplo outros ajustes de captura).
-2. (Opcional) Crie/ative o ambiente virtual e instale as dependencias.
-3. Execute com privilegios de administrador:
+### Arquivo `windows_service.ini`
+
+- `[server]` define `host`, `port` e ajustes de performance (`threads`, `backlog`, `connection_limit`, `channel_timeout`) utilizados pelo Waitress.
+- `[paths]` permite especificar o Python/Waitress/NSSM e o diretorio de logs.
+- `[database]` define `host`, `port`, `database`, `user`, `password` do PostgreSQL (replicados em variaveis de ambiente pelo servico).
+- `[env]` aceita variaveis adicionais que devem estar presentes ao iniciar o processo.
+
+### Instalacao via NSSM (Non-Sucking Service Manager)
+
+1. Baixe o NSSM (Non-Sucking Service Manager) em https://nssm.cc/download e extraia o ZIP.
+2. Copie `nssm.exe` para um diretorio permanente (ex.: `C:\Tools\nssm\nssm.exe`) e adicione-o ao `PATH` **ou** preencha `paths.nssm_exe` no `windows_service.ini`.
+3. Garanta que o projeto possua o ambiente virtual com as dependencias instaladas (`venv\Scripts\python.exe`).
+4. Abra um Prompt/PowerShell **como administrador**, navegue ate `C:\workspace\python\projeto_sacaria_yolo5` e execute:
    ```cmd
-   scripts\install_windows_service.bat
+   scripts\install_windows_service_nssm.bat
    ```
-   O script instala e inicia o servico `ProjetoSacaria`.
-4. Para parar/remover:
+   O instalador le `windows_service.ini`, configura o runner `scripts\nssm_service_runner.py`, cria/atualiza o servico e aponta os logs para `logs\service.out` e `logs\service.err`.
+5. Inicie o servico (o nome padrao exibido na instalacao e `ProjetoSacaria_v1`):
    ```cmd
-   scripts\uninstall_windows_service.bat
+   nssm start ProjetoSacaria_v1
    ```
-5. Logs padrao do servico ficam em `logs\service.out` e `logs\service.err`. Ajuste o caminho na secao `[paths]` do INI se desejar.
+6. Utilize `nssm stop ProjetoSacaria_v1`, `nssm restart ProjetoSacaria_v1` ou o Services.msc para administrar o servico. Para remover definitivamente:
+   ```cmd
+   nssm remove ProjetoSacaria_v1 confirm
+   ```
+7. Ao atualizar o codigo ou `windows_service.ini`, execute novamente `scripts\install_windows_service_nssm.bat` e reinicie o servico.
 
 ### Checklist de instalacao em um novo servidor
 
@@ -71,7 +81,7 @@ As dependencias Python estao listadas em [`requirements.txt`](requirements.txt).
 3. Criar `venv` e instalar dependencias com `pip install -r requirements.txt`.
 4. Criar o banco e configurar a secao `[database]` do `windows_service.ini`.
 5. Ajustar `[server]` e `[paths]` conforme o ambiente.
-6. Executar `scripts\install_windows_service.bat` como administrador.
+6. Instalar o servico via `scripts\install_windows_service_nssm.bat`.
 7. Configurar em cada TC a pasta de snapshots e demais parametros.
 8. Validar logs em `logs\service.out` e `logs\service.err`.
 9. Abrir a porta configurada no firewall ou load balancer, se necessario.
@@ -84,7 +94,7 @@ services/                 # Camada de servicos (detector, banco, repositorios, r
 routes/                   # Blueprints Flask (tc, logs, auth, administracao)
 templates/                # Templates Jinja2 (painel web)
 scripts/                  # Utilitarios (instalacao do servico, testes)
-windows_service.py/.ini   # Definicao e configuracao do servico Windows
+service_config.py + windows_service.ini # Configuracao compartilhada do servico Windows
 third_party/yolov5/       # Repositorio YOLOv5 localizado
 logs/                     # Logs do servico/Waitress (configuravel)
 ```

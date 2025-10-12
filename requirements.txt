@@ -31,7 +31,6 @@ torchvision
 
 # Servidor WSGI e Servico Windows
 waitress>=2.1
-pywin32>=306; platform_system == "Windows"
 
 # Dependencia necessaria para alguns modulos do YOLOv5 recente
 ultralytics>=8.2.64
