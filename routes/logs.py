@@ -242,9 +242,10 @@ def logs_panel():
 def log_detail(session_id: int):
     s = _get_session_or_404(session_id)
     
-    # Pagination: default last 10, optional 50
-    per_arg = (request.args.get("per") or "").strip()
-    per = 50 if per_arg == "50" else 10
+    # Exibição: por padrão mostra TODOS os eventos; opções: per=10, per=50
+    per_arg = (request.args.get("per") or "all").strip().lower()
+    show_all = per_arg == "all"
+    per = 0 if show_all else (50 if per_arg == "50" else 10)
     try:
         page = int(request.args.get("page", "1"))
     except ValueError:
@@ -259,25 +260,35 @@ def log_detail(session_id: int):
     ) or {"n": 0}
     total = int(total_count_row.get("n", 0))
 
-    # Compute offset from the end so page 1 shows the latest 'per' rows
-    # offset_from_start = max(0, total - page*per)
-    offset = total - page * per
-    if offset < 0:
-        offset = 0
-
-    rows = query_all(
-        f"""
-        SELECT id, ts, delta, total_atual
-          FROM session_log
-         WHERE session_id = %s
-         ORDER BY id ASC
-         OFFSET %s LIMIT %s
-        """,
-        [session_id, offset, per],
-    ) or []
-
-    # total pages (at least 1)
-    total_pages = (total + per - 1) // per if per > 0 else 1
+    if show_all:
+        rows = query_all(
+            """
+            SELECT id, ts, delta, total_atual
+              FROM session_log
+             WHERE session_id = %s
+             ORDER BY id ASC
+            """,
+            [session_id],
+        ) or []
+        total_pages = 1
+        page = 1
+        per = total
+    else:
+        # Compute offset from the end so page 1 shows the latest 'per' rows
+        offset = total - page * per
+        if offset < 0:
+            offset = 0
+        rows = query_all(
+            f"""
+            SELECT id, ts, delta, total_atual
+              FROM session_log
+             WHERE session_id = %s
+             ORDER BY id ASC
+             OFFSET %s LIMIT %s
+            """,
+            [session_id, offset, per],
+        ) or []
+        total_pages = (total + per - 1) // per if per > 0 else 1
     if total_pages < 1:
         total_pages = 1
 
@@ -290,6 +301,7 @@ def log_detail(session_id: int):
         logs=rows,
         page=page,
         per=per,
+        show_all=show_all,
         total=total,
         total_pages=total_pages,
         effective_total=effective_total,

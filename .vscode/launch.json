@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Central (app.py)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}\\app.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "args": []
+    },
+    {
+      "name": "Agente (agent_app.py)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}\\agent_app.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "args": []
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Iniciar Central + Agente",
+      "configurations": [
+        "Central (app.py)",
+        "Agente (agent_app.py)"
+      ],
+      "stopAll": true
+    }
+  ]
+}
+

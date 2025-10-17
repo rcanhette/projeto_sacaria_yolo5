@@ -65,8 +65,13 @@
       <section class="card" id="ct-card-{{ ct.id }}" data-can-control="{{ '1' if ct.can_control else '0' }}">
         <header>
           <div class="h-title">{{ ct.name }}</div>
-          <div id="status-{{ ct.id }}" class="status-pill status-off">
-            <span class="status-dot"></span><span id="status-text-{{ ct.id }}">Parada</span>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div class="status-pill {{ 'status-on' if ct.agent_online else 'status-off' }}" title="{{ ct.agent_hostname or '' }}">
+              <span class="status-dot"></span><span>{{ 'Agente Online' if ct.agent_online else 'Agente Offline' }}</span>
+            </div>
+            <div id="status-{{ ct.id }}" class="status-pill status-off">
+              <span class="status-dot"></span><span id="status-text-{{ ct.id }}">Parada</span>
+            </div>
           </div>
         </header>
         <div class="body">

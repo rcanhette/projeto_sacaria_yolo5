@@ -246,6 +246,93 @@ def ensure_schema() -> None:
         END$$;
         """
     )
+
+    # ---------- agents (agentes locais) ----------
+    # Tabela de cadastro de agentes (opcional quando sem auth)
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS agent (
+          id SERIAL PRIMARY KEY,
+          agent_id TEXT NOT NULL UNIQUE,
+          token TEXT UNIQUE,
+          tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL,
+          active BOOLEAN NOT NULL DEFAULT TRUE,
+          created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+        );
+        """
+    )
+    execute("CREATE INDEX IF NOT EXISTS idx_agent_active ON agent(active);")
+    execute("CREATE INDEX IF NOT EXISTS idx_agent_tc ON agent(tc_id);")
+
+    # Status por agente (chave primária = agent_id para ON CONFLICT)
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS agent_status (
+          agent_id INTEGER PRIMARY KEY REFERENCES agent(id) ON DELETE CASCADE,
+          last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+          hostname TEXT,
+          version TEXT,
+          status TEXT,
+          tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL
+        );
+        """
+    )
+    execute("CREATE INDEX IF NOT EXISTS idx_agent_status_last_seen ON agent_status(last_seen DESC);")
+
+    # Status por TC (para modo permissivo sem cadastro de agente)
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS tc_agent_status (
+          tc_id INTEGER PRIMARY KEY REFERENCES tc(id) ON DELETE CASCADE,
+          last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+          hostname TEXT,
+          version TEXT,
+          status TEXT
+        );
+        """
+    )
+    execute("CREATE INDEX IF NOT EXISTS idx_tc_agent_status_last_seen ON tc_agent_status(last_seen DESC);")
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS agent (
+          id SERIAL PRIMARY KEY,
+          agent_id TEXT NOT NULL UNIQUE,
+          token TEXT NOT NULL UNIQUE,
+          tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL,
+          active BOOLEAN NOT NULL DEFAULT TRUE,
+          created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+        );
+        """
+    )
+    execute("CREATE INDEX IF NOT EXISTS idx_agent_active ON agent(active);")
+    execute("CREATE INDEX IF NOT EXISTS idx_agent_tc ON agent(tc_id);")
+
+    # ---------- agent_status (heartbeat) ----------
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS agent_status (
+          agent_id INTEGER PRIMARY KEY REFERENCES agent(id) ON DELETE CASCADE,
+          last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+          hostname TEXT,
+          version TEXT,
+          status TEXT,
+          tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL
+        );
+        """
+    )
+
+    # ---------- tc_agent_status (modo sem token, por TC) ----------
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS tc_agent_status (
+          tc_id INTEGER PRIMARY KEY REFERENCES tc(id) ON DELETE CASCADE,
+          last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+          hostname TEXT,
+          version TEXT,
+          status TEXT
+        );
+        """
+    )
     
     # ---------- migração: adotar status 'operando' no lugar de 'ativo' ----------
     # Ajusta constraint, default, atualiza registros e recria índice único parcial

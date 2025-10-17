@@ -314,17 +314,12 @@ class CapturePoint:
                     status_txt = "nao encontrado"
 
                 log_msg = (
-
-                    f"[CT{self.ct['id']}] START lote='{lote}' modelo='{load_path}' "
-
-                    f"(solicitado='{requested}', resolvido='{resolved}', status={status_txt}, "
-
+                    f"[CT{self.ct['id']}] START lote='{lote}' "
+                    f"source(type='{self.source_type}', path='{self.source_path}'), "
+                    f"modelo='{load_path}' (solicitado='{requested}', resolvido='{resolved}', status={status_txt}), "
                     f"fluxo='{self.flow_mode}', offsets(red={self.line_offset_red}, azul={self.line_offset_blue}), "
-
                     f"max_lost={self.max_lost}, match_dist={self.match_dist}, min_conf={self.min_conf}, "
-
-                    f"missed_dir='{self.missed_frame_dir or '-'}')"
-
+                    f"missed_dir='{self.missed_frame_dir or '-'}'"
                 )
 
                 if exists is False:
@@ -351,9 +346,19 @@ class CapturePoint:
 
                 base = 0
 
-            # cria registro no banco e guarda o id
-
-            self.session_db_id = create_session(self.ct["id"], lote, contagem_alvo)
+            # cria registro no banco e guarda o id (com fallback via hook)
+            try:
+                self.session_db_id = create_session(self.ct["id"], lote, contagem_alvo)
+            except Exception as e:
+                try:
+                    cb = getattr(self, "on_create_session", None)
+                    if callable(cb):
+                        self.session_db_id = cb(self.ct["id"], lote, contagem_alvo)
+                    else:
+                        raise e
+                except Exception:
+                    log.error("[CT%s] Falha ao criar sessao: %s", self.ct.get('id'), e, exc_info=True)
+                    self.session_db_id = None
 
             self.session_active = True
 
@@ -411,17 +416,22 @@ class CapturePoint:
 
                     self._last_session_logged_total += 1
 
-                    insert_log(
-
-                        session_id=self.session_db_id,
-
-                        ct_id=self.ct["id"],
-
-                        delta=+1,
-
-                        total_atual=self._last_session_logged_total
-
-                    )
+                    try:
+                        insert_log(
+                            session_id=self.session_db_id,
+                            ct_id=self.ct["id"],
+                            delta=+1,
+                            total_atual=self._last_session_logged_total
+                        )
+                    except Exception as e:
+                        cb = getattr(self, "on_insert_log", None)
+                        if callable(cb):
+                            try:
+                                cb(self.session_db_id, self.ct["id"], +1, self._last_session_logged_total)
+                            except Exception:
+                                log.error("[CT%s] Falha no callback on_insert_log: %s", self.ct.get('id'), e, exc_info=True)
+                        else:
+                            log.error("[CT%s] Falha ao registrar delta no banco: %s", self.ct.get('id'), e, exc_info=True)
 
             else:
 
@@ -433,17 +443,22 @@ class CapturePoint:
 
                         self._last_session_logged_total = 0
 
-                    insert_log(
-
-                        session_id=self.session_db_id,
-
-                        ct_id=self.ct["id"],
-
-                        delta=-1,
-
-                        total_atual=self._last_session_logged_total
-
-                    )
+                    try:
+                        insert_log(
+                            session_id=self.session_db_id,
+                            ct_id=self.ct["id"],
+                            delta=-1,
+                            total_atual=self._last_session_logged_total
+                        )
+                    except Exception as e:
+                        cb = getattr(self, "on_insert_log", None)
+                        if callable(cb):
+                            try:
+                                cb(self.session_db_id, self.ct["id"], -1, self._last_session_logged_total)
+                            except Exception:
+                                log.error("[CT%s] Falha no callback on_insert_log: %s", self.ct.get('id'), e, exc_info=True)
+                        else:
+                            log.error("[CT%s] Falha ao registrar delta no banco: %s", self.ct.get('id'), e, exc_info=True)
 
         except Exception as e:
 
@@ -464,7 +479,15 @@ class CapturePoint:
                     if self.session_db_id is not None:
                         finish_session(self.session_db_id, quantidade, status='finalizado', observacao=observacao)
                 except Exception as exc:
-                    log.error("[CT%s] Erro ao finalizar sessao no banco: %s", self.ct.get('id'), exc, exc_info=True)
+                    # fallback via hook
+                    cb = getattr(self, "on_finish_session", None)
+                    if callable(cb):
+                        try:
+                            cb(self.session_db_id, quantidade, status='finalizado', observacao=observacao)
+                        except Exception:
+                            log.error("[CT%s] Erro no callback on_finish_session: %s", self.ct.get('id'), exc, exc_info=True)
+                    else:
+                        log.error("[CT%s] Erro ao finalizar sessao no banco: %s", self.ct.get('id'), exc, exc_info=True)
         finally:
             self.session_active = False
             self.session_lote = None

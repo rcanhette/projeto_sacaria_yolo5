@@ -1,4 +1,4 @@
-{% include '_navbar.html' %}
+﻿{% include '_navbar.html' %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -34,6 +34,14 @@
   <div class="wrap">
     {% include '_flash.html' %}
     <h1>{{ 'Novo ponto de operação' if not ct else 'Editar ponto de operação' }}</h1>
+    {% if ct and agent_status %}
+      <div class="card" style="margin-bottom:12px;">
+        <div class="muted">Agente (última conexão)</div>
+        <div><strong>Hostname:</strong> {{ agent_status.hostname or '-' }}</div>
+        <div><strong>Último visto:</strong> {{ agent_status.last_seen or '-' }}</div>
+        <div><strong>Status:</strong> {{ agent_status.status or '-' }}</div>
+      </div>
+    {% endif %}
 
     <form method="post" class="card grid">
       <div>
@@ -115,9 +123,15 @@
 
       <div class="actions">
         <a class="btn" href="{{ url_for('tc_admin.tc_admin_list') }}">Cancelar</a>
+        {% if ct %}
+          <a class="btn" href="{{ url_for('tc_admin.tc_admin_calibrate', tc_id=ct.id) }}">Abrir calibração</a>
+          <button class="btn" type="submit" formmethod="post" formaction="{{ url_for('tc_admin.tc_admin_test_agent', tc_id=ct.id) }}">Testar agente</button>
+        {% endif %}
         <button class="btn btn-primary" type="submit">{{ 'Criar' if not ct else 'Salvar' }}</button>
       </div>
     </form>
   </div>
 </body>
 </html>
+
+

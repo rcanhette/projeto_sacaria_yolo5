@@ -1,12 +1,15 @@
-import time
+﻿import time
 import json
 import cv2
 import logging
+import requests
 from flask import Blueprint, render_template, Response, request, redirect, url_for, flash
-from services.capture_point import CapturePoint
+# Lazy import de CapturePoint dentro de _ensure_cp para evitar carregar Torch
 from services.tc_repository import get_tc, list_tcs
 from services.session_repository import get_active_session_by_ct
-from services.runtime import tc_runtime
+from services.db import query_one
+from services.agent_repository import get_host_for_tc
+from services.runtime import tc_runtime, get_or_create_shadow
 from routes.auth import current_user, login_required
 from services.auth_repository import user_can_view_tc, user_can_control_tc
 from services.session_repository import get_active_session_by_ct
@@ -28,6 +31,15 @@ def _ensure_cp(tc_row):
     tc_id = tc_row["id"]
     if tc_id in tc_runtime:
         return tc_runtime[tc_id]
+    # Se existir agente remoto, use shadow e evite Torch no servidor
+    try:
+        _host = get_host_for_tc(tc_id)
+    except Exception:
+        _host = None
+    if _host:
+        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
+        tc_runtime[tc_id] = cp
+        return cp
     log.info(
         "Inicializando CapturePoint para TC %s (%s) com fonte '%s'",
         tc_id,
@@ -48,6 +60,7 @@ def _ensure_cp(tc_row):
         "missed_frame_dir": (tc_row.get("missed_frame_dir") or "").strip(),
     }
     log.debug("ConfiguraÃÂ§ÃÂ£o completa da TC %s: %s", tc_id, cfg)
+    from services.capture_point import CapturePoint
     cp = CapturePoint(tc_row, cfg)
     tc_runtime[tc_id] = cp
     return cp
@@ -113,6 +126,44 @@ def tc_start(tc_id):
         log.warning("START abortado: lote vazio para TC %s", tc_id)
         return redirect(url_for("index"))
 
+    # Se existir agente vinculado, aciona remoto em vez de rodar local
+    host = None
+    try:
+        host = get_host_for_tc(tc_id)
+    except Exception:
+        host = None
+    if host:
+        base = f"http://{host}:9090"
+        try:
+            r = requests.post(
+                f"{base}/api/agent/v1/command/start",
+                json={
+                    "lote": lote,
+                    "contagem_alvo": contagem_alvo,
+                    "source_type": source_type,
+                    "file_path": file_path,
+                },
+                timeout=15,
+            )
+            if request.headers.get("X-Requested-With") == "fetch":
+                return ("", 204 if r.ok else 500)
+            if r.ok:
+                flash(f"{tc_row['name']} iniciada remotamente (agente).", "success")
+            else:
+                flash("Falha ao iniciar no agente remoto.", "error")
+            return redirect(url_for("index"))
+        except Exception as e:
+            # Se falhar ao contatar, marque o agente como offline imediatamente
+            try:
+                from services.agent_repository import upsert_tc_status
+                upsert_tc_status(tc_id, hostname=host, version=None, status="offline")
+            except Exception:
+                pass
+            if request.headers.get("X-Requested-With") == "fetch":
+                return ("", 500)
+            flash(f"Falha ao contatar agente remoto: {e}", "error")
+            return redirect(url_for("index"))
+
     cp = _ensure_cp(tc_row)
 
     if cp.session_active or cp.session_db_id is not None:
@@ -173,6 +224,28 @@ def tc_start_ajax(tc_id):
     if not lote:
         return ("Lote ÃÂ© obrigatÃÂ³rio.", 400)
 
+    host = None
+    try:
+        host = get_host_for_tc(tc_id)
+    except Exception:
+        host = None
+    if host:
+        base = f"http://{host}:9090"
+        try:
+            r = requests.post(
+                f"{base}/api/agent/v1/command/start",
+                json={
+                    "lote": lote,
+                    "contagem_alvo": contagem_alvo,
+                    "source_type": source_type,
+                    "file_path": file_path,
+                },
+                timeout=15,
+            )
+            return ("", 204 if r.ok else 500)
+        except Exception:
+            return ("", 500)
+
     cp = _ensure_cp(tc_row)
     if cp.session_active or cp.session_db_id is not None:
         return ("", 204)
@@ -200,9 +273,15 @@ def tc_stop(tc_id):
 
     cp = tc_runtime.get(tc_id)
     if not cp:
-        flash("TC nao encontrada.", "error")
-        log.error("STOP abortado: TC %s nao encontrada", tc_id)
-        return redirect(url_for("index"))
+        # quando remoto, pode não haver cp local
+        tc_row = get_tc(tc_id)
+        if not tc_row:
+            flash("TC nao encontrada.", "error")
+            log.error("STOP abortado: TC %s nao encontrada", tc_id)
+            return redirect(url_for("index"))
+        # cria sombra apenas para leitura de contagem/alvo se necessário
+        from services.runtime import get_or_create_shadow
+        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
 
     observacao = (request.form.get("observacao") or "").strip()
     try:
@@ -231,6 +310,39 @@ def tc_stop(tc_id):
         flash(message, "error")
         return redirect(url_for("index"))
 
+    # Verifica se há agente vinculado e envia STOP remoto
+    host = None
+    try:
+        host = get_host_for_tc(tc_id)
+    except Exception:
+        host = None
+    if host:
+        base = f"http://{host}:9090"
+        try:
+            r = requests.post(
+                f"{base}/api/agent/v1/command/stop",
+                json={"observacao": observacao or None},
+                timeout=10,
+            )
+            if request.headers.get("X-Requested-With") == "fetch":
+                return ("", 204 if r.ok else 500)
+            if r.ok:
+                flash(f"{tc_id} parada remotamente.", "info")
+            else:
+                flash("Falha ao parar no agente remoto.", "error")
+            return redirect(url_for("index"))
+        except Exception as e:
+            # Se falhar ao contatar, marque o agente como offline imediatamente
+            try:
+                from services.agent_repository import upsert_tc_status
+                upsert_tc_status(tc_id, hostname=host, version=None, status="offline")
+            except Exception:
+                pass
+            if request.headers.get("X-Requested-With") == "fetch":
+                return ("", 500)
+            flash(f"Falha ao contatar agente remoto: {e}", "error")
+            return redirect(url_for("index"))
+
     log.info("STOP autorizado para TC %s (observacao=%s)", tc_id, bool(observacao))
     cp.stop_session(observacao=observacao or None)
     log.info("STOP executado para TC %s (total_final=%s)", tc_id, cp.current_session_count)
@@ -252,7 +364,7 @@ def sse_tc(tc_id):
         tc_row = get_tc(tc_id)
         if not tc_row:
             return "TC nÃÂ£o encontrada", 404
-        cp = _ensure_cp(tc_row)
+        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
 
     def stream():
         while True:
@@ -261,18 +373,78 @@ def sse_tc(tc_id):
                 db_row = get_active_session_by_ct(tc_id)
                 db_status = (db_row.get("status") if db_row else None)
                 db_total = db_row.get("total_final") if db_row else None
+                # Total "ao vivo" (último total_atual do session_log)
+                db_total_live = None
+                if db_row and db_row.get("id") is not None:
+                    row = query_one(
+                        "SELECT total_atual FROM session_log WHERE session_id = %s ORDER BY ts DESC LIMIT 1",
+                        [db_row["id"]],
+                    )
+                    if row and "total_atual" in row:
+                        db_total_live = int(row["total_atual"]) if row["total_atual"] is not None else None
             except Exception:
                 db_status = None
                 db_total = None
+                db_total_live = None
+
+            # Fallback para preencher campos a partir do banco quando o agente
+            # iniciou remotamente e o shadow ainda não possui todos os dados.
+            lote = cp.session_lote
+            hora_ini = cp.session_hora_inicio
+            cont_alvo = cp.session_contagem_alvo
+            if (not lote or lote.strip() == "-") and db_row:
+                try:
+                    lote = (db_row.get("lote") or "").strip() or None
+                except Exception:
+                    pass
+            if not hora_ini and db_row:
+                try:
+                    di = db_row.get("data_inicio")
+                    if di:
+                        from datetime import datetime
+                        try:
+                            hora_ini = di.strftime("%H:%M:%S") if hasattr(di, "strftime") else None
+                        except Exception:
+                            hora_ini = None
+                except Exception:
+                    pass
+            if cont_alvo is None and db_row:
+                try:
+                    cont_alvo = db_row.get("contagem_alvo")
+                except Exception:
+                    pass
+
+            # Define o count com regras:
+            #  - Se operando (runtime ativo ou DB ativo), permita fallback ao "ao vivo" do log
+            #  - Se parado, não use o "ao vivo"; mostre 0 ou o total_final do DB
+            try:
+                is_operando = bool(getattr(cp, "session_active", False)) or str(db_status or "").lower() in ("operando", "ativo")
+            except Exception:
+                is_operando = False
+
+            count_val = int(cp.current_session_count)
+            if is_operando:
+                if (count_val is None or count_val == 0) and (db_total_live is not None):
+                    try:
+                        count_val = int(db_total_live)
+                    except Exception:
+                        pass
+            else:
+                # parado: prefira total_final do banco se existir; caso contrário, mantenha o runtime (geralmente 0)
+                if db_total is not None:
+                    try:
+                        count_val = int(db_total)
+                    except Exception:
+                        pass
 
             payload = {
                 "session_active": cp.session_active,
-                "lote": cp.session_lote,
+                "lote": lote or "-",
                 "data": cp.session_data,
-                "hora_inicio": cp.session_hora_inicio,
-                "count": int(cp.current_session_count),
+                "hora_inicio": hora_ini or "-",
+                "count": count_val,
                 "fonte": cp.source_type,
-                "contagem_alvo": cp.session_contagem_alvo,
+                "contagem_alvo": cont_alvo,
                 "db_status": db_status,
                 "db_total_final": db_total,
             }
@@ -333,3 +505,91 @@ def tc_video(tc_id):
 
     # Stream MJPEG com boundary 'frame'
     return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@tc_bp.route("/tc/<int:tc_id>/video_proxy")
+@login_required
+def tc_video_proxy(tc_id):
+    # Proxy inteligente: se a TC estiver operando via agente remoto,
+    # redireciona/propaga o stream do agente; caso contrário, usa o stream local.
+    cp = tc_runtime.get(tc_id)
+    if not cp:
+        tc_row = get_tc(tc_id)
+        if not tc_row:
+            return "TC não encontrada", 404
+        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
+
+    if getattr(cp, "source_type", "") == "agent-remote":
+        host = None
+        try:
+            host = get_host_for_tc(tc_id)
+        except Exception:
+            host = None
+        if not host:
+            return "Agente offline ou não identificado.", 503
+        url = f"http://{host}:9090/api/agent/v1/video"
+        try:
+            r = requests.get(url, stream=True, timeout=(3, 30))
+        except Exception as e:
+            return f"Falha ao conectar ao agente: {e}", 502
+        if not r.ok:
+            return f"Agente respondeu HTTP {r.status_code}", 502
+        def proxy():
+            try:
+                for chunk in r.iter_content(chunk_size=4096):
+                    if not chunk:
+                        continue
+                    yield chunk
+            finally:
+                try:
+                    r.close()
+                except Exception:
+                    pass
+        return Response(proxy(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    # local: reutiliza o handler padrão
+    return tc_video(tc_id)
+
+@tc_bp.route("/tc/<int:tc_id>/snapshot.jpg")
+@login_required
+def tc_snapshot(tc_id):
+    """Retorna um snapshot JPEG atual para calibração (resolução real)."""
+    cp = tc_runtime.get(tc_id)
+    # Se origem é agente remoto, proxy o snapshot do agente
+    if cp and getattr(cp, "source_type", "") == "agent-remote":
+        host = None
+        try:
+            host = get_host_for_tc(tc_id)
+        except Exception:
+            host = None
+        if not host:
+            return ("Agente offline", 503)
+        try:
+            r = requests.get(f"http://{host}:9090/api/agent/v1/snapshot.jpg", timeout=5)
+        except Exception as e:
+            return (f"Falha ao obter snapshot do agente: {e}", 502)
+        if not r.ok:
+            return (f"Agente respondeu HTTP {r.status_code}", 502)
+        return Response(r.content, mimetype='image/jpeg')
+
+    # Local: usa last_vis_frame ou captura um frame da câmera
+    import cv2
+    if not cp:
+        tc_row = get_tc(tc_id)
+        if not tc_row:
+            return ("TC não encontrada", 404)
+        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
+    frame = getattr(cp, "last_vis_frame", None)
+    if frame is None and getattr(cp, "camera", None) is not None:
+        try:
+            ret, raw = cp.camera.get_frame()
+            if ret:
+                frame = raw
+        except Exception:
+            frame = None
+    if frame is None:
+        return ("no frame", 503)
+    ok, buf = cv2.imencode('.jpg', frame)
+    if not ok:
+        return ("encode error", 500)
+    return Response(buf.tobytes(), mimetype='image/jpeg')

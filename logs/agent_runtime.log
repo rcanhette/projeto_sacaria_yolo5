@@ -1,0 +1,132 @@
+2025-10-16 21:52:33,192 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=2, central_url=http://localhost:8080
+2025-10-16 21:52:33,193 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-16 21:52:33,217 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://10.245.41.14:9090
+2025-10-16 21:52:33,217 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 21:53:19,320 INFO [agent] Comando START recebido: lote=TESTE_OP, alvo=3, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:53:19,341 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:53:19] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-16 21:53:21,494 INFO [agent] Override de origem para TC 2: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-16 21:53:21,494 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:53:21,763 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-16 21:53:21,767 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:53:21,769 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='best.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt' | encontrado=sim
+2025-10-16 21:53:29,777 INFO [agent] Comando START recebido: lote=TESTE_OP, alvo=3, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:53:29,782 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:53:29] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-16 21:53:32,096 INFO [agent] Override de origem para TC 2: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-16 21:53:32,097 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:53:32,225 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-16 21:53:32,228 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:53:32,231 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='best.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt' | encontrado=sim
+2025-10-16 21:53:38,960 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\best.pt
+2025-10-16 21:53:38,961 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\best.pt
+2025-10-16 21:53:38,964 INFO [services.capture_point] [CT2] START lote='TESTE_OP' source(type='file', path='C:\workspace\python\VIDEOS\teste.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\best.pt' (solicitado='best.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt', status=encontrado), fluxo='baixo', offsets(red=110, azul=-80), max_lost=2, match_dist=150.0, min_conf=0.6, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-16 21:53:38,965 INFO [services.capture_point] [CT2] START lote='TESTE_OP' source(type='file', path='C:\workspace\python\VIDEOS\teste.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\best.pt' (solicitado='best.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt', status=encontrado), fluxo='baixo', offsets(red=110, azul=-80), max_lost=2, match_dist=150.0, min_conf=0.6, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-16 21:53:39,243 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP
+2025-10-16 21:53:40,657 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:53:40] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 21:53:41,653 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP
+2025-10-16 21:53:54,223 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:53:54] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 21:54:10,888 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:54:10] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 21:54:34,128 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP\TESTE_OP_215434_id1.jpg
+2025-10-16 21:54:35,014 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP\TESTE_OP_215434_id2.jpg
+2025-10-16 21:54:43,877 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP\TESTE_OP_215443_id1.jpg
+2025-10-16 21:54:45,282 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP\TESTE_OP_215445_id2.jpg
+2025-10-16 21:55:03,556 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP\TESTE_OP_215503_id4.jpg
+2025-10-16 21:55:15,457 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 21:55:15,574 INFO [services.capture_point] [CT2] STOP lote='TESTE_OP' concluido (total=1)
+2025-10-16 21:55:15,578 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:55:15] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-16 21:55:23,606 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:55:23] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-16 21:56:02,475 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_OP\TESTE_OP_215602_id4.jpg
+2025-10-16 21:56:38,623 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:56:38] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-16 21:56:39,777 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:56:39] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-16 21:56:41,134 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:56:41] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-16 21:56:42,012 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:56:42] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-16 21:56:52,122 INFO [services.capture_point] [CT2] STOP lote='-' concluido (total=0)
+2025-10-16 21:56:52,124 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 21:56:52] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-16 22:20:03,482 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-16 22:20:03,484 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-16 22:20:03,568 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://10.245.41.14:9090
+2025-10-16 22:20:03,569 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 22:20:30,257 INFO [agent] Comando START recebido: lote=TESTE, alvo=12, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 22:20:30,261 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 22:20:30] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-16 22:20:32,432 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-16 22:20:32,437 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 22:20:32,555 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-16 22:20:32,558 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 22:20:32,561 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-16 22:20:39,471 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-16 22:20:39,478 INFO [services.capture_point] [CT1] START lote='TESTE' source(type='file', path='C:\workspace\python\VIDEOS\teste.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado), fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-16 22:20:39,855 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE
+2025-10-16 22:20:41,466 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 22:20:41] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 22:21:37,281 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE\TESTE_222137_id2.jpg
+2025-10-16 22:23:00,321 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE\TESTE_222300_id5.jpg
+2025-10-16 22:23:44,036 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-16 22:23:44,083 INFO [services.capture_point] [CT1] STOP lote='TESTE' concluido (total=0)
+2025-10-16 22:23:44,086 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 22:23:44] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-16 23:12:38,325 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-16 23:12:38,332 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-16 23:12:38,501 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://10.245.41.14:9090
+2025-10-16 23:12:38,505 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 23:22:25,934 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=2, central_url=http://localhost:8080
+2025-10-16 23:22:25,935 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-16 23:22:25,985 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://10.245.41.14:9090
+2025-10-16 23:22:25,985 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 23:23:57,040 INFO [agent] Comando START recebido: lote=TESTE, alvo=12, source_type=file, file_path=C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:23:57,073 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:23:57] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-16 23:23:59,295 INFO [agent] Override de origem para TC 2: file='C:\workspace\python\VIDEOS\10.mp4'
+2025-10-16 23:23:59,296 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:23:59,857 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\10.mp4: FPS=30.00, delay ajustado para 0.0300s
+2025-10-16 23:23:59,881 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:23:59,892 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='best.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt' | encontrado=sim
+2025-10-16 23:24:21,650 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\best.pt
+2025-10-16 23:24:21,655 INFO [services.capture_point] [CT2] START lote='TESTE' source(type='file', path='C:\workspace\python\VIDEOS\10.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\best.pt' (solicitado='best.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt', status=encontrado), fluxo='baixo', offsets(red=70, azul=-120), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-16 23:24:21,937 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE
+2025-10-16 23:24:23,485 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:24:23] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 23:24:24,632 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE\TESTE_232424_id1.jpg
+2025-10-16 23:24:48,694 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE\TESTE_232448_id4.jpg
+2025-10-16 23:25:04,627 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:25:04,701 INFO [services.capture_point] [CT2] STOP lote='TESTE' concluido (total=3)
+2025-10-16 23:25:04,703 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:25:04] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-16 23:26:17,701 INFO [agent] Comando START recebido: lote=TESTANDO, alvo=12, source_type=rtsp, file_path=None
+2025-10-16 23:26:17,718 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:26:17] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-16 23:26:19,908 INFO [agent] Origem efetiva para TC 2: rtsp -> rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101
+2025-10-16 23:26:19,914 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101
+2025-10-16 23:26:49,980 ERROR [services.video_source] Não foi possível abrir a fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101
+2025-10-16 23:26:49,988 ERROR [services.capture_point] [CT2] Falha ao abrir a fonte de vÃ­deo: rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101
+2025-10-16 23:26:49,997 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='best.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt' | encontrado=sim
+2025-10-16 23:26:52,626 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\best.pt
+2025-10-16 23:26:52,645 INFO [services.capture_point] [CT2] START lote='TESTANDO' source(type='rtsp', path='rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101'), modelo='C:\workspace\python\projeto_sacaria_yolo5\best.pt' (solicitado='best.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt', status=encontrado), fluxo='baixo', offsets(red=70, azul=-120), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-16 23:26:52,981 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTANDO
+2025-10-16 23:27:04,262 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101
+2025-10-16 23:27:04,262 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:27:04] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 23:27:04,263 INFO [services.capture_point] [CT2] STOP lote='TESTANDO' concluido (total=0)
+2025-10-16 23:27:04,265 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:27:04] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-16 23:28:05,150 INFO [agent] Comando START recebido: lote=TESTE_ROI, alvo=12, source_type=file, file_path=C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:28:05,157 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:28:05] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-16 23:28:07,354 INFO [agent] Override de origem para TC 2: file='C:\workspace\python\VIDEOS\10.mp4'
+2025-10-16 23:28:07,355 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:28:07,526 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\10.mp4: FPS=30.00, delay ajustado para 0.0300s
+2025-10-16 23:28:07,532 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:28:07,535 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='best.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt' | encontrado=sim
+2025-10-16 23:28:08,861 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\best.pt
+2025-10-16 23:28:08,882 INFO [services.capture_point] [CT2] START lote='TESTE_ROI' source(type='file', path='C:\workspace\python\VIDEOS\10.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\best.pt' (solicitado='best.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\best.pt', status=encontrado), fluxo='baixo', offsets(red=70, azul=-120), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-16 23:28:09,206 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_ROI
+2025-10-16 23:28:11,156 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:28:11] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-16 23:28:13,336 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_ROI\TESTE_ROI_232813_id1.jpg
+2025-10-16 23:28:30,398 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_ROI\TESTE_ROI_232830_id3.jpg
+2025-10-16 23:28:47,900 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_ROI\TESTE_ROI_232847_id5.jpg
+2025-10-16 23:29:01,690 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_ROI\TESTE_ROI_232901_id7.jpg
+2025-10-16 23:29:23,783 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE_ROI\TESTE_ROI_232923_id9.jpg
+2025-10-16 23:29:29,752 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\10.mp4
+2025-10-16 23:29:29,905 INFO [services.capture_point] [CT2] STOP lote='TESTE_ROI' concluido (total=4)
+2025-10-16 23:29:29,912 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:29:29] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -

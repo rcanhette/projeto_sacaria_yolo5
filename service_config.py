@@ -28,12 +28,28 @@ def load_config(root: Path | str) -> configparser.ConfigParser:
     Read ``windows_service.ini`` from ``root`` when present.
     """
     cfg = configparser.ConfigParser()
-    ini_path = Path(root) / "windows_service.ini"
-    if ini_path.is_file():
-        try:
-            cfg.read(ini_path, encoding="utf-8")
-        except Exception:
-            pass
+    # Suporta múltiplos nomes para facilitar separação Central/Agente
+    import os
+    root_path = Path(root)
+    candidates = []
+    # 1) ENV var tem prioridade
+    central_ini_env = os.getenv("CENTRAL_INI")
+    if central_ini_env:
+        candidates.append(central_ini_env)
+    # 2) nomes padrão
+    candidates += [
+        root_path / "central.ini",
+        root_path / "windows_service.ini",
+        root_path / "server.ini",
+    ]
+    for ini_path in candidates:
+        p = Path(ini_path)
+        if p.is_file():
+            try:
+                cfg.read(p, encoding="utf-8-sig")
+                break
+            except Exception:
+                continue
     return cfg
 
 

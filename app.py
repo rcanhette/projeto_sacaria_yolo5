@@ -1,10 +1,11 @@
-# app.py
+﻿# app.py
 import logging
 from pathlib import Path
 from logging.config import dictConfig
 from flask import Flask, redirect, url_for, render_template, request
 from routes.tc import tc_bp
 from routes.logs import logs_bp
+from routes.agent import agent_bp
 from routes.auth import auth_bp, current_user
 from routes.user_admin import user_admin_bp
 from routes.tc_admin import tc_admin_bp
@@ -14,6 +15,8 @@ import atexit
 from services.db import ensure_schema
 from services.session_repository import close_all_active_sessions_on_boot
 from services.auth_repository import list_user_tc_ids, user_can_control_tc
+from services.agent_repository import get_tc_status
+from datetime import datetime, timedelta
 
 
 LOGS_DIR = Path(__file__).resolve().parent / "logs"
@@ -92,6 +95,7 @@ def create_app():
     app.register_blueprint(logs_bp)        # /logs
     app.register_blueprint(user_admin_bp)  # /users, /user-access-tc
     app.register_blueprint(tc_admin_bp)    # /tc-admin (CRUD de TCs)
+    app.register_blueprint(agent_bp)       # /api/agent/v1 (ingestão de agentes)
 
     # Disponibiliza current_user() nos templates (ex.: _navbar.html)
     @app.context_processor
@@ -102,7 +106,10 @@ def create_app():
     @app.before_request
     def require_login_guard():
         exempt = {"auth.login", "auth.logout", "static"}
-        if request.endpoint not in exempt and not current_user():
+        # Libera as APIs do agente sem exigir login
+        if request.endpoint and (request.endpoint in exempt or request.endpoint.startswith("agent.")):
+            return None
+        if not current_user():
             # preserva next para redirecionar após login
             return redirect(url_for("auth.login", next=request.path))
 
@@ -128,6 +135,32 @@ def create_app():
         for ct in allowed:
             row = dict(ct)
             row["can_control"] = user_can_control_tc(u, ct["id"])
+
+            online = False
+            hostname = None
+            try:
+                st = get_tc_status(ct["id"])
+                if st:
+                    hostname = st.get("hostname")
+                    last_seen = st.get("last_seen")
+                    status = (st.get("status") or "").strip().lower()
+                    if last_seen:
+                        try:
+                            now = (
+                                datetime.now(last_seen.tzinfo)
+                                if hasattr(last_seen, "tzinfo")
+                                else datetime.now()
+                            )
+                            online = (now - last_seen) <= timedelta(seconds=40)
+                        except Exception:
+                            pass
+                    if status == "offline":
+                        online = False
+            except Exception:
+                pass
+
+            row["agent_online"] = online
+            row["agent_hostname"] = hostname
             cts_view.append(row)
 
         return render_template("tc_dashboard.html", cts=cts_view, role=u["role"])
@@ -163,3 +196,5 @@ if __name__ == "__main__":
     app.logger.info("Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)")
     # Importante: 'threaded=True' para evitar travamentos com SSE/MJPEG no servidor de dev
     app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+
+

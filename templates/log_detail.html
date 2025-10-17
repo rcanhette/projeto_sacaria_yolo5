@@ -63,6 +63,12 @@
       <a class="link" href="{{ url_for('logs.log_export_xlsx', session_id=sess.id) }}">Baixar XLSX</a>
       &nbsp;|&nbsp;
       <a class="link" href="{{ url_for('logs.logs_panel', ct_id=sess.ct_id) }}">Voltar às sessões</a>
+      &nbsp;|&nbsp;
+      {% if show_all %}
+        <a class="link" href="{{ url_for('logs.log_detail', session_id=sess.id, per=50) }}">Ver últimas 50</a>
+      {% else %}
+        <a class="link" href="{{ url_for('logs.log_detail', session_id=sess.id, per='all') }}">Exibir todos</a>
+      {% endif %}
     </div>
 
     <table>
@@ -119,15 +125,16 @@
     })();
   </script>
   <script>
-    // Auto-atualização das linhas do log (polling leve; somente página 1)
+    // Auto-atualização das linhas do log (polling leve)
     (function(){
       const tbody = document.getElementById('logs_tbody');
       const sPage = {{ page }};
       const sPer  = {{ per }};
+      const showAll = {{ 'true' if show_all else 'false' }};
       let lastId = {{ logs[-1].id if logs and logs|length>0 else 0 }};
       async function tick(){
         try{
-          if (sPage !== 1) return; // apenas quando na página mais recente
+          if (!showAll && sPage !== 1) return; // apenas quando na página mais recente
           const url = "/log/{{ sess.id }}/events.json?after_id=" + lastId;
           const resp = await fetch(url, { headers: { 'Cache-Control':'no-cache' } });
           if (!resp.ok) return;
@@ -141,8 +148,10 @@
             tr.appendChild(tdHora); tr.appendChild(tdEvt); tr.appendChild(tdTot);
             tbody.appendChild(tr);
             if (typeof it.id === 'number' && it.id > lastId) lastId = it.id;
-            while (tbody.rows.length > sPer) {
-              tbody.deleteRow(0);
+            if (!showAll) {
+              while (tbody.rows.length > sPer) {
+                tbody.deleteRow(0);
+              }
             }
           }
         }catch(_){ }

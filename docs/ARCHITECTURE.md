@@ -1,4 +1,4 @@
-Arquitetura, Fluxos e Diagramas
+﻿Arquitetura, Fluxos e Diagramas
 
 Este documento complementa o README principal com diagramas (Mermaid) e detalhamento de fluxos, para facilitar manutenção por novos desenvolvedores.
 
@@ -65,18 +65,7 @@ sequenceDiagram
   participant CT as CapturePoint
   participant DB as DB (session_repository)
 
-  U->>W: POST /ct/{id}/start (lote, fonte)
-  W->>W: valida permissões
-  W->>W: checa sessão ativa (app + DB)
-  alt já existe
-    W-->>U: 200/204 Sessão já ativa
-  else criar
-    W->>CT: set_source(tipo, path)
-    W->>CT: start_session(lote) [lock]
-    CT->>DB: create_session (idempotente)
-    CT->>CT: _ensure_thread() (inicia loop)
-    W-->>U: 200/204 OK
-  end
+  U->>W: POST /tc/{id}/start (lote)\n  W->>Agent: POST /api/agent/v1/command/start\n  Agent->>W: POST /api/agent/v1/session/start\n  W->>DB: create_session (idempotente)\n  Agent->>Agent: _ensure_thread() (inicia loop)\n  W-->>U: 200/204 OK\n  end
 ```
 
 Sequência — Stop de sessão
@@ -88,67 +77,28 @@ sequenceDiagram
   participant CT as CapturePoint
   participant DB as DB
 
-  U->>W: POST /ct/{id}/stop
-  W->>CT: stop_session()
-  CT->>DB: finish_session()
-  CT->>CT: encerra thread loop
-  CT->>CT: VideoSource.release() (ordem segura)
-  W-->>U: 200/204 OK
+  U->>W: POST /tc/{id}/stop\n  W->>Agent: POST /api/agent/v1/command/stop\n  Agent->>W: POST /api/agent/v1/session/finish\n  W->>DB: finish_session()\n  Agent->>Agent: encerra thread loop / release()\n  W-->>U: 200/204 OK\n  end
+
+  subgraph Central[Servidor Central]
+    BP[/routes/*.py/]
+    RT[services/runtime.py (shadow)]
+    SR[(services/session_repository.py)]
+    DB[(PostgreSQL)]
+  end
+
+  subgraph Agent1[Agente Local (PC do ponto)]
+    CAP1[[services/capture_point.py]]
+    VS1[[services/video_source.py]]
+    YOLO1[third_party/yolov5]
+  end
+
+  UI -- HTTP/SSE --> BP
+  BP -- shadow(SSE) --> RT
+  BP -- persist --> SR
+  SR --- DB
+
+  CAP1 -- frames --> VS1
+  CAP1 -- detect --> YOLO1
+  CAP1 -- HTTP POST eventos --> BP
+  BP -- HTTP POST comandos --> CAP1
 ```
-
-Modelo de dados (ER simplificado)
-
-```mermaid
-erDiagram
-  USERS ||--o{ USER_CT : GRANTS
-  CT ||--o{ USER_CT : RELATION
-  CT ||--o{ SESSION : HAS
-  SESSION ||--o{ SESSION_LOG : HAS
-
-  USERS {
-    int id PK
-    text username
-    text password
-    text role
-  }
-
-  CT {
-    int id PK
-    text name
-    text source_path
-    text roi
-    text model_path
-  }
-
-  SESSION {
-    int id PK
-    int ct_id FK
-    text lote
-    timestamp data_inicio
-    timestamp data_fim
-    text status
-    int total_final
-  }
-
-  SESSION_LOG {
-    int id PK
-    int session_id FK
-    int ct_id FK
-    timestamp ts
-    int delta
-    int total_atual
-  }
-```
-
-Pontos de manutenção importantes
-- Sessão única por CT: protegido por aplicação (lock/idempotência) e por índice único parcial no DB.
-- Encerramento limpo: `services/capture_point.py.stop_session()` + `services/video_source.py.release()`.
-- Tuning de performance: Waitress (`--threads`, `--connection-limit`), SSE interval, CAP_PROP_BUFFERSIZE.
-- Logs/observabilidade: redirecionar stdout/stderr; ver `logs/service.out|err` quando rodar como serviço.
-
-Runbook resumido
-- Iniciar (console): `waitress-serve --host 0.0.0.0 --port 80 --threads 64 --connection-limit 500 --channel-timeout 300 --call app:create_app`
-- Iniciar (servico): `scripts\install_windows_service_nssm.bat` seguido de `nssm start ProjetoSacaria_v1` (ajuste `windows_service.ini` se necessario)
-- Backup: `pg_dump -h <host> -U <user> -d contagem_sacaria -F c -f backup.dump`
-- Restore: `pg_restore -h <host> -U <user> -d contagem_sacaria -c backup.dump`
-

@@ -1,196 +1,1076 @@
-2025-10-11 10:09:01,285 INFO [app] Garantindo schema...
-2025-10-11 10:09:08,554 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 10:09:08,693 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:09:23,392 INFO [app] Garantindo schema...
-2025-10-11 10:09:32,360 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:09:46,040 INFO [app] Garantindo schema...
-2025-10-11 10:09:51,109 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:10:18,461 INFO [app] Garantindo schema...
-2025-10-11 10:10:26,869 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 10:10:26,950 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:11:04,764 INFO [app] Garantindo schema...
-2025-10-11 10:11:10,448 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:11:38,765 INFO [app] Garantindo schema...
-2025-10-11 10:11:46,313 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
-2025-10-11 10:11:46,349 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+2025-10-16 21:52:17,146 INFO [app] Garantindo schema...
+2025-10-16 21:52:24,038 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
+2025-10-16 21:52:24,103 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:8080
- * Running on http://192.168.18.89:8080
-2025-10-11 10:11:46,349 INFO [werkzeug] [33mPress CTRL+C to quit[0m
-2025-10-11 10:12:20,447 INFO [app] Garantindo schema...
-2025-10-11 10:12:26,552 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:14:40,959 INFO [app] Garantindo schema...
-2025-10-11 10:14:46,966 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:16:37,470 INFO [app] Garantindo schema...
-2025-10-11 10:16:41,029 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:16:49,206 INFO [app] Garantindo schema...
-2025-10-11 10:16:56,558 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 10:16:56,654 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:17:08,718 INFO [app] Garantindo schema...
-2025-10-11 10:17:13,898 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:17:27,413 INFO [app] Garantindo schema...
-2025-10-11 10:17:32,259 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:17:53,617 INFO [app] Garantindo schema...
-2025-10-11 10:17:58,774 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:19:40,561 INFO [app] Garantindo schema...
-2025-10-11 10:19:45,937 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:21:59,699 INFO [app] Garantindo schema...
-2025-10-11 10:22:03,668 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:24:17,390 INFO [app] Garantindo schema...
-2025-10-11 10:24:21,518 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:26:35,174 INFO [app] Garantindo schema...
-2025-10-11 10:26:39,687 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:28:53,948 INFO [app] Garantindo schema...
-2025-10-11 10:29:00,540 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 10:31:59,580 INFO [app] Garantindo schema...
-2025-10-11 10:32:28,348 INFO [app] Garantindo schema...
-2025-10-11 10:32:34,786 INFO [services.capture_point] hello from capture point
-2025-10-11 10:47:10,890 INFO [app] Garantindo schema...
-2025-10-11 11:16:37,155 INFO [app] Garantindo schema...
-2025-10-11 11:16:42,302 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:16:50,176 INFO [app] Garantindo schema...
-2025-10-11 11:16:55,696 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:17:05,417 INFO [app] Garantindo schema...
-2025-10-11 11:17:11,965 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 11:17:12,102 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:17:48,687 INFO [app] Garantindo schema...
-2025-10-11 11:18:00,023 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:18:38,425 INFO [app] Garantindo schema...
-2025-10-11 11:18:46,059 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:19:56,095 INFO [app] Garantindo schema...
-2025-10-11 11:20:02,264 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:22:16,198 INFO [app] Garantindo schema...
-2025-10-11 11:22:21,864 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:22:49,622 INFO [app] Garantindo schema...
-2025-10-11 11:22:55,931 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:23:02,821 INFO [app] Garantindo schema...
-2025-10-11 11:23:09,243 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:23:35,212 INFO [app] Garantindo schema...
-2025-10-11 11:23:54,394 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 11:23:54,482 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:24:22,081 INFO [app] Garantindo schema...
-2025-10-11 11:24:26,284 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:25:04,488 INFO [app] Garantindo schema...
-2025-10-11 11:25:09,519 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:27:38,786 INFO [app] Garantindo schema...
-2025-10-11 11:27:46,050 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:27:54,815 INFO [app] Garantindo schema...
-2025-10-11 11:28:01,512 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:28:27,201 INFO [app] Garantindo schema...
-2025-10-11 11:28:48,829 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 11:30:26,338 INFO [app] Garantindo schema...
-2025-10-11 11:30:33,621 INFO [waitress] Serving on http://0.0.0.0:8090
-2025-10-11 11:33:01,106 INFO [app] Garantindo schema...
-2025-10-11 11:33:07,443 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
-2025-10-11 11:33:07,489 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://10.245.41.14:8080
+2025-10-16 21:52:24,103 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 21:52:35,279 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:52:35,444 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:52:37,630 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:37] "[32mGET / HTTP/1.1[0m" 302 -
+2025-10-16 21:52:37,674 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:37] "GET /login?next=/ HTTP/1.1" 200 -
+2025-10-16 21:52:37,894 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:37] "[32mGET /favicon.ico HTTP/1.1[0m" 302 -
+2025-10-16 21:52:38,220 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:38] "GET /login?next=/favicon.ico HTTP/1.1" 200 -
+2025-10-16 21:52:41,565 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:41] "[32mPOST /login?next=/ HTTP/1.1[0m" 302 -
+2025-10-16 21:52:42,626 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:42] "GET / HTTP/1.1" 200 -
+2025-10-16 21:52:43,241 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 21:52:43,589 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:43] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:52:43,870 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:43] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:52:47,484 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:52:47,647 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:52:48,189 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:48] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 21:52:50,456 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:50] "GET /tc-admin/2/edit HTTP/1.1" 200 -
+2025-10-16 21:52:57,223 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:57] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:52:58,659 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:58] "GET / HTTP/1.1" 200 -
+2025-10-16 21:52:59,693 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:52:59,736 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:59] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 21:52:59,909 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:52:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:53:00,490 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:00] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:53:00,525 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:00] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:53:11,975 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:53:12,160 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:53:19,345 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:19] "[35m[1mPOST /tc/2/start-ajax HTTP/1.1[0m" 204 -
+2025-10-16 21:53:21,491 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:21] "GET /api/agent/v1/config/2 HTTP/1.1" 200 -
+2025-10-16 21:53:24,213 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:53:24,387 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:24] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:53:29,788 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:29] "[35m[1mPOST /tc/2/start-ajax HTTP/1.1[0m" 204 -
+2025-10-16 21:53:32,090 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:32] "GET /api/agent/v1/config/2 HTTP/1.1" 200 -
+2025-10-16 21:53:36,535 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:53:36,810 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:53:40,659 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:40] "GET /tc/2/video_proxy HTTP/1.1" 200 -
+2025-10-16 21:53:41,303 INFO [routes.agent] [AGENT] session_start: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'lote': 'TESTE_OP', 'contagem_alvo': 3}
+2025-10-16 21:53:41,649 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:41] "POST /api/agent/v1/session/start HTTP/1.1" 200 -
+2025-10-16 21:53:48,851 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:53:49,035 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:53:54,228 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:54] "GET /tc/2/video_proxy HTTP/1.1" 200 -
+2025-10-16 21:53:54,634 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:54] "GET /sessoes HTTP/1.1" 200 -
+2025-10-16 21:53:55,769 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:53:55] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:54:01,093 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:54:01,245 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:54:03,257 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:03] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:54:04,255 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:04] "GET / HTTP/1.1" 200 -
+2025-10-16 21:54:05,048 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:05] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:54:05,172 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:05] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:54:09,191 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:09] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 21:54:10,027 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:10] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:54:10,149 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:10] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:54:10,893 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:10] "GET /tc/2/video_proxy HTTP/1.1" 200 -
+2025-10-16 21:54:13,293 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:54:13,464 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:13] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:54:25,500 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:54:25,713 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:54:37,757 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:54:37,945 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:54:50,012 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:54:50,298 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:54:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:55:02,343 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:55:02,557 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:55:14,553 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-16 21:55:14,617 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:55:14,885 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:14] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:55:15,583 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:15] "[35m[1mPOST /tc/2/stop HTTP/1.1[0m" 204 -
+2025-10-16 21:55:22,450 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:22] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:55:23,610 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:23] "[35m[1mGET /tc/2/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 21:55:23,675 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:23] "GET / HTTP/1.1" 200 -
+2025-10-16 21:55:24,585 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:24] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:55:24,750 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:24] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:55:26,949 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:55:27,101 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:55:28,809 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:28] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:55:29,856 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:29] "GET / HTTP/1.1" 200 -
+2025-10-16 21:55:30,640 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:30] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:55:30,670 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:30] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:55:34,933 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:34] "GET /sessoes HTTP/1.1" 200 -
+2025-10-16 21:55:37,564 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:37] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:55:38,604 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:38] "GET / HTTP/1.1" 200 -
+2025-10-16 21:55:39,167 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:55:39,289 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:55:39,443 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:39] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:55:39,674 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:39] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:55:51,362 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:55:51,536 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:55:57,375 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:57] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:55:58,692 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:58] "GET / HTTP/1.1" 200 -
+2025-10-16 21:55:59,616 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:59] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:55:59,634 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:55:59] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:56:03,601 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:56:03,812 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:03] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:56:15,850 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:56:16,043 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:56:28,074 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:56:28,268 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:56:37,035 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:37] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 21:56:37,538 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:37] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:56:37,716 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:37] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:56:38,626 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:38] "[35m[1mGET /tc/2/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 21:56:39,783 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:39] "[35m[1mGET /tc/2/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 21:56:40,324 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:56:40,557 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:56:41,138 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:41] "[35m[1mGET /tc/2/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 21:56:41,889 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:41] "GET /sessoes HTTP/1.1" 200 -
+2025-10-16 21:56:42,017 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:42] "[35m[1mGET /tc/2/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 21:56:44,637 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:44] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:56:45,645 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:45] "GET / HTTP/1.1" 200 -
+2025-10-16 21:56:46,631 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:46] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:56:46,686 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:46] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 21:56:52,003 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-16 21:56:52,127 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:52] "[35m[1mPOST /tc/2/stop HTTP/1.1[0m" 204 -
+2025-10-16 21:56:52,624 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:56:52,776 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:56:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:57:04,821 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 21:57:04,988 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:57:04] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 21:57:20,618 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:57:20] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 21:57:21,594 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:57:21] "GET / HTTP/1.1" 200 -
+2025-10-16 21:57:22,170 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:57:22] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 21:57:22,735 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 21:57:22] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 22:12:06,505 INFO [app] Garantindo schema...
+2025-10-16 22:12:15,428 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
+2025-10-16 22:12:15,566 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:8080
- * Running on http://192.168.18.89:8080
-2025-10-11 11:33:07,489 INFO [werkzeug] [33mPress CTRL+C to quit[0m
-2025-10-11 20:03:54,868 INFO [app] Garantindo schema...
-2025-10-11 20:09:18,414 INFO [app] Garantindo schema...
-2025-10-11 20:13:15,561 INFO [app] Garantindo schema...
-2025-10-11 20:13:18,357 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:13:22,780 INFO [app] Garantindo schema...
-2025-10-11 20:13:24,873 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:13:31,413 INFO [app] Garantindo schema...
-2025-10-11 20:13:33,297 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:13:44,369 INFO [app] Garantindo schema...
-2025-10-11 20:13:46,477 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:14:42,596 INFO [app] Garantindo schema...
-2025-10-11 20:14:46,320 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:18:06,042 INFO [app] Garantindo schema...
-2025-10-11 20:18:10,018 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:20:25,308 INFO [app] Garantindo schema...
-2025-10-11 20:20:28,067 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:22:47,191 INFO [routes.tc] Inicializando CapturePoint para TC 1 (M1/2) com fonte 'rtsp://admin:Coop%402020@192.168.15.15:554/Streaming/Channels/101'
-2025-10-11 20:22:47,234 INFO [routes.tc] Inicializando CapturePoint para TC 2 (M1_CAM_NOVA) com fonte 'rtsp://admin:Coop%402020@172.16.10.103:554/Streaming/Channels/101'
-2025-10-11 20:22:47,571 INFO [app] Garantindo schema...
-2025-10-11 20:22:53,440 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:22:59,912 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:23:00,188 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\nova.mp4: FPS=14.99, delay ajustado para 0.0600s
-2025-10-11 20:23:00,191 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:23:00,194 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
-2025-10-11 20:23:24,979 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:23:28,591 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
-2025-10-11 20:23:28,593 INFO [services.capture_point] [CT2] START lote='323232' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='baixo', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.05, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
-2025-10-11 20:23:28,819 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\323232
-2025-10-11 20:23:38,524 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202338_id1.jpg
-2025-10-11 20:23:49,941 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:24:03,503 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202403_id2.jpg
-2025-10-11 20:24:14,963 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:24:28,417 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202428_id3.jpg
-2025-10-11 20:24:40,032 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:24:53,517 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202453_id4.jpg
-2025-10-11 20:25:05,125 INFO [services.video_source] Arquivo de vídeo reiniciado: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:25:11,638 INFO [app] Garantindo schema...
-2025-10-11 20:25:15,402 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 20:25:15,468 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:25:18,488 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202518_id5.jpg
-2025-10-11 20:25:20,809 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\323232\323232_202520_id6.jpg
-2025-10-11 20:25:26,105 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
-2025-10-11 20:25:26,105 INFO [routes.tc] STOP autorizado para TC 2 (observacao=True)
-2025-10-11 20:25:26,483 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 20:25:26,595 INFO [services.capture_point] [CT2] STOP lote='323232' concluido (total=0)
-2025-10-11 20:25:26,596 INFO [routes.tc] STOP executado para TC 2 (total_final=0)
-2025-10-11 20:25:28,153 INFO [app] Garantindo schema...
-2025-10-11 20:25:31,242 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:25:44,634 INFO [app] Garantindo schema...
-2025-10-11 20:25:48,139 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 20:26:10,627 INFO [app] Garantindo schema...
-2025-10-11 20:26:14,624 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:13:08,132 INFO [app] Garantindo schema...
-2025-10-11 21:13:11,945 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:13:22,104 INFO [app] Garantindo schema...
-2025-10-11 21:13:25,633 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:13:38,942 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 21:13:38,970 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\nova.mp4: FPS=14.99, delay ajustado para 0.0600s
-2025-10-11 21:13:38,976 INFO [services.capture_point] [CT2] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 21:13:38,980 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
-2025-10-11 21:13:39,317 INFO [app] Garantindo schema...
-2025-10-11 21:13:39,452 INFO [services.capture_point] [CT2] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
-2025-10-11 21:13:39,455 INFO [services.capture_point] [CT2] START lote='312414' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='baixo', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.05, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
-2025-10-11 21:13:39,718 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\312414
-2025-10-11 21:13:43,193 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 21:13:43,263 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:13:52,690 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\312414\312414_211352_id1.jpg
-2025-10-11 21:14:01,996 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
-2025-10-11 21:14:01,997 INFO [routes.tc] STOP autorizado para TC 2 (observacao=True)
-2025-10-11 21:14:02,522 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\nova.mp4
-2025-10-11 21:14:02,605 INFO [services.capture_point] [CT2] STOP lote='312414' concluido (total=0)
-2025-10-11 21:14:02,606 INFO [routes.tc] STOP executado para TC 2 (total_final=0)
-2025-10-11 21:14:06,477 INFO [app] Garantindo schema...
-2025-10-11 21:14:09,999 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:14:16,431 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
-2025-10-11 21:14:16,468 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
-2025-10-11 21:14:16,474 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
-2025-10-11 21:14:16,475 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
-2025-10-11 21:14:16,896 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
-2025-10-11 21:14:16,899 INFO [services.capture_point] [CT1] START lote='1313414' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
-2025-10-11 21:14:17,157 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414
-2025-10-11 21:14:52,114 INFO [app] Garantindo schema...
-2025-10-11 21:14:57,753 INFO [app] Sessões ativas remanescentes finalizadas no boot: 1
-2025-10-11 21:14:57,841 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:16:01,016 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 1
-2025-10-11 21:16:01,016 INFO [routes.tc] STOP autorizado para TC 1 (observacao=True)
-2025-10-11 21:16:01,365 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
-2025-10-11 21:16:01,459 INFO [services.capture_point] [CT1] STOP lote='1313414' concluido (total=0)
-2025-10-11 21:16:01,459 INFO [routes.tc] STOP executado para TC 1 (total_final=0)
-2025-10-11 21:16:07,575 INFO [app] Garantindo schema...
-2025-10-11 21:16:11,027 INFO [waitress] Serving on http://0.0.0.0:8080
-2025-10-11 21:16:15,601 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\1.mp4
-2025-10-11 21:16:15,688 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\1.mp4: FPS=30.00, delay ajustado para 0.0300s
-2025-10-11 21:16:15,693 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\1.mp4
-2025-10-11 21:16:15,696 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
-2025-10-11 21:16:16,315 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
-2025-10-11 21:16:16,317 INFO [services.capture_point] [CT1] START lote='1313414' modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado, fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos')
-2025-10-11 21:16:16,582 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414
-2025-10-11 21:16:57,003 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414\1313414_211656_id6.jpg
-2025-10-11 21:17:26,786 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\1313414\1313414_211726_id7.jpg
-2025-10-11 21:18:22,756 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 1
-2025-10-11 21:18:22,758 INFO [routes.tc] STOP autorizado para TC 1 (observacao=True)
-2025-10-11 21:18:23,112 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\1.mp4
-2025-10-11 21:18:23,176 INFO [services.capture_point] [CT1] STOP lote='1313414' concluido (total=10)
-2025-10-11 21:18:23,177 INFO [routes.tc] STOP executado para TC 1 (total_final=0)
-2025-10-11 21:18:26,227 INFO [app] Garantindo schema...
-2025-10-11 21:18:30,305 INFO [waitress] Serving on http://0.0.0.0:8080
+ * Running on http://10.245.41.14:8080
+2025-10-16 22:12:15,567 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 22:12:15,934 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:15] "[32mGET / HTTP/1.1[0m" 302 -
+2025-10-16 22:12:15,974 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:15] "GET /login?next=/ HTTP/1.1" 200 -
+2025-10-16 22:12:16,207 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:16] "[32mGET /favicon.ico HTTP/1.1[0m" 302 -
+2025-10-16 22:12:16,524 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:16] "GET /login?next=/ HTTP/1.1" 200 -
+2025-10-16 22:12:16,636 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:16] "[32mGET /favicon.ico HTTP/1.1[0m" 302 -
+2025-10-16 22:12:16,783 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:16] "GET /login?next=/favicon.ico HTTP/1.1" 200 -
+2025-10-16 22:12:19,526 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:19] "[32mPOST /login?next=/ HTTP/1.1[0m" 302 -
+2025-10-16 22:12:20,424 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:20] "GET / HTTP/1.1" 200 -
+2025-10-16 22:12:21,054 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:21] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 22:12:21,705 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:21] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 22:12:21,832 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:21] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 22:12:26,077 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:26] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 22:12:29,322 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:12:29] "GET /tc-admin/2/edit HTTP/1.1" 200 -
+2025-10-16 22:19:37,386 INFO [app] Garantindo schema...
+2025-10-16 22:19:42,624 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
+2025-10-16 22:19:42,659 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://10.245.41.14:8080
+2025-10-16 22:19:42,659 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 22:20:05,572 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:20:05,718 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:20:10,407 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:10] "GET / HTTP/1.1" 200 -
+2025-10-16 22:20:11,074 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:11] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 22:20:11,465 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:11] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 22:20:16,241 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:16] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 22:20:16,756 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:16] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 22:20:16,775 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:16] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 22:20:17,764 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:20:17,918 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:20:29,993 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:20:30,267 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:30] "[35m[1mPOST /tc/1/start-ajax HTTP/1.1[0m" 204 -
+2025-10-16 22:20:30,268 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:20:32,428 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:32] "GET /api/agent/v1/config/1 HTTP/1.1" 200 -
+2025-10-16 22:20:41,467 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:41] "GET /tc/1/video_proxy HTTP/1.1" 200 -
+2025-10-16 22:20:42,296 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:20:42,430 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:20:54,492 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:20:54,615 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:20:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:21:06,672 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:21:06,806 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:21:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:21:18,879 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:21:19,012 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:21:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:21:31,076 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:21:31,267 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:21:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:21:43,310 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:21:43,460 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:21:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:21:55,506 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:21:55,669 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:21:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:22:07,721 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:22:07,880 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:22:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:22:19,938 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:22:20,113 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:22:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:22:32,146 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:22:32,339 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:22:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:22:44,376 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:22:44,524 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:22:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:22:56,596 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:22:56,731 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:22:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:23:08,801 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:23:08,936 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:23:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:23:20,966 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:23:21,142 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:23:21] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:23:33,193 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:23:33,341 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:23:33] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:23:43,257 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 1
+2025-10-16 22:23:44,090 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:23:44] "[35m[1mPOST /tc/1/stop HTTP/1.1[0m" 204 -
+2025-10-16 22:23:45,404 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:23:45,530 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:23:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:23:57,602 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:23:57,713 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:23:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:24:09,751 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:24:09,881 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:24:21,929 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:24:22,045 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:24:33,074 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:33] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 22:24:34,101 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:24:34,251 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:24:36,030 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:36] "GET /tc-admin/1/edit HTTP/1.1" 200 -
+2025-10-16 22:24:46,286 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:24:46,435 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:24:58,477 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:24:58,571 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:24:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:25:10,655 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:25:10,779 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:25:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:25:22,819 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:25:22,946 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:25:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:25:34,999 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:25:35,123 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:25:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:25:47,166 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:25:47,280 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:25:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:25:59,308 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:25:59,436 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:25:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:26:11,485 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:26:11,682 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:26:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:26:23,766 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:26:23,940 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:26:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:26:35,993 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:26:36,123 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:26:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:26:48,164 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:26:48,353 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:26:48] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:27:00,397 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:27:00,573 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:27:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:27:12,648 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:27:12,797 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:27:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:27:24,856 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:27:25,036 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:27:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:27:37,067 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:27:37,359 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:27:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:27:49,426 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:27:49,596 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:27:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:28:01,669 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:28:01,832 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:28:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:28:13,911 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:28:14,088 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:28:14] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:28:26,170 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:28:26,297 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:28:26] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:28:38,372 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:28:38,553 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:28:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:28:50,614 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:28:50,751 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:28:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:29:02,800 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:29:02,969 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:29:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:29:15,016 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:29:15,256 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:29:15] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:29:27,304 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:29:27,452 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:29:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:29:39,493 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:29:39,649 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:29:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:29:51,718 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:29:51,844 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:29:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:30:03,876 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:30:03,991 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:30:03] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:30:16,018 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:30:16,133 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:30:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:30:28,180 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:30:28,341 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:30:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:30:40,396 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:30:40,565 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:30:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:30:52,629 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:30:52,890 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:30:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:31:04,942 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:31:05,091 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:31:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:31:17,166 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:31:17,317 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:31:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:31:29,383 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:31:29,566 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:31:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:31:41,604 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:31:41,814 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:31:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:31:53,891 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:31:54,135 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:31:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:32:06,189 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:32:06,343 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:32:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:32:18,425 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:32:18,637 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:32:18] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:32:30,708 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:32:30,904 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:32:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:32:42,964 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:32:43,079 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:32:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:32:55,140 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:32:55,282 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:32:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:33:07,348 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:33:07,516 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:33:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:33:19,615 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:33:19,949 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:33:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:33:32,015 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:33:32,152 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:33:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:33:44,197 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:33:44,336 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:33:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:33:56,386 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:33:56,544 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:33:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:34:08,628 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:34:08,749 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:34:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:34:20,812 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:34:20,938 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:34:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:34:33,010 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:34:33,139 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:34:33] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:34:45,200 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:34:45,312 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:34:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:34:57,374 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:34:57,496 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:34:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:35:09,561 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:35:09,723 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:35:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:35:21,789 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:35:22,002 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:35:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:35:34,048 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:35:34,184 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:35:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:35:46,257 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:35:46,380 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:35:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:35:58,425 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:35:58,532 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:35:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:36:10,582 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:36:10,722 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:36:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:36:22,763 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:36:22,880 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:36:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:36:34,934 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:36:35,055 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:36:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:36:47,132 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:36:47,259 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:36:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:36:59,316 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:36:59,443 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:36:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:37:11,499 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:37:11,693 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:37:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:37:23,761 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:37:23,897 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:37:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:37:35,947 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:37:36,108 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:37:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:37:48,145 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:37:48,286 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:37:48] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:38:00,368 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:38:00,657 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:38:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:38:12,723 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:38:12,881 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:38:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:38:24,943 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:38:25,136 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:38:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:38:37,174 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:38:37,342 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:38:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:38:49,374 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:38:49,617 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:38:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:39:01,679 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:39:01,837 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:39:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:39:13,921 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:39:14,055 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:39:14] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:39:26,094 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:39:26,272 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:39:26] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:39:38,334 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:39:38,485 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:39:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:39:50,538 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:39:50,641 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:39:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:40:02,713 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:40:02,888 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:40:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:40:14,917 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:40:15,074 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:40:15] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:40:27,118 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:40:27,243 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:40:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:40:39,302 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:40:39,441 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:40:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:40:51,491 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:40:51,729 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:40:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:41:03,782 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:41:03,950 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:41:03] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:41:16,009 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:41:16,201 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:41:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:41:28,254 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:41:28,394 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:41:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:41:40,449 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:41:40,607 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:41:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:41:52,658 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:41:52,834 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:41:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:42:04,895 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:42:05,067 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:42:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:42:17,151 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:42:17,311 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:42:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:42:29,390 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:42:29,545 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:42:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:42:41,606 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:42:41,785 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:42:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:42:53,846 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:42:53,978 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:42:53] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:43:06,022 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:43:06,173 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:43:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:43:18,228 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:43:18,388 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:43:18] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:43:30,441 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:43:30,589 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:43:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:43:42,640 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:43:42,790 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:43:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:43:54,851 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:43:54,988 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:43:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:44:07,038 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:44:07,189 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:44:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:44:19,261 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:44:19,508 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:44:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:44:31,545 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:44:31,693 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:44:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:44:43,750 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:44:43,866 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:44:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:44:55,927 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:44:56,072 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:44:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:45:08,133 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:45:08,299 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:45:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:45:20,355 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:45:20,550 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:45:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:45:32,587 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:45:32,812 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:45:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:45:44,873 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:45:45,026 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:45:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:45:57,101 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:45:57,264 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:45:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:46:09,339 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:46:09,463 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:46:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:46:21,511 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:46:21,680 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:46:21] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:46:33,734 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:46:33,895 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:46:33] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:46:45,946 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:46:46,101 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:46:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:46:58,142 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:46:58,315 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:46:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:47:10,385 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:47:10,535 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:47:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:47:22,576 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:47:22,744 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:47:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:47:34,821 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:47:34,934 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:47:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:47:46,974 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:47:47,134 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:47:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:47:59,182 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:47:59,349 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:47:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:48:11,403 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:48:11,553 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:48:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:48:23,613 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:48:23,780 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:48:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:48:35,856 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:48:36,010 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:48:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:48:48,067 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:48:48,215 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:48:48] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:49:00,265 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:49:00,415 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:49:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:49:12,480 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:49:12,614 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:49:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:49:24,661 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:49:24,798 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:49:24] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:49:36,860 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:49:37,024 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:49:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:49:49,106 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:49:49,275 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:49:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:50:01,353 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:50:01,507 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:50:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:50:13,561 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:50:13,697 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:50:13] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:50:25,751 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:50:25,934 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:50:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:50:37,995 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:50:38,145 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:50:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:50:50,208 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:50:50,374 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:50:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:51:02,464 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:51:02,619 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:51:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:51:14,676 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:51:14,846 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:51:14] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:51:26,908 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:51:27,058 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:51:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:51:39,101 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:51:39,242 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:51:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:51:51,304 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:51:51,462 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:51:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:52:03,520 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:52:03,656 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:52:03] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:52:15,711 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:52:15,844 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:52:15] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:52:27,908 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:52:28,090 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:52:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:52:40,147 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:52:40,297 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:52:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:52:52,375 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:52:52,509 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:52:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:53:04,563 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:53:04,766 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:53:04] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:53:16,814 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:53:16,952 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:53:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:53:28,989 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:53:29,101 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:53:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:53:41,140 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:53:41,338 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:53:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:53:53,404 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:53:53,619 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:53:53] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:54:05,679 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:54:05,773 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:54:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:54:17,835 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:54:17,922 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:54:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:54:29,987 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:54:30,132 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:54:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:54:42,187 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:54:42,307 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:54:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:54:54,362 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:54:54,586 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:54:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:55:06,641 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:55:06,830 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:55:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:55:18,890 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:55:19,076 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:55:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:55:31,121 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:55:31,229 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:55:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:55:43,284 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:55:43,446 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:55:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:55:55,528 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:55:55,634 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:55:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:56:07,707 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:56:07,796 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:56:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:56:19,879 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:56:19,974 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:56:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:56:32,039 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:56:32,179 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:56:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:56:44,229 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:56:44,349 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:56:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:56:56,400 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:56:56,519 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:56:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:57:08,585 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:57:08,701 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:57:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:57:20,764 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:57:20,957 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:57:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:57:33,027 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:57:33,139 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:57:33] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:57:45,203 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:57:45,440 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:57:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:57:57,509 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:57:57,619 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:57:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:58:09,705 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:58:09,812 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:58:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:58:21,872 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:58:22,083 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:58:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:58:34,123 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:58:34,242 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:58:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:58:46,296 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:58:46,408 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:58:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:58:58,447 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:58:58,613 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:58:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:59:10,648 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:59:10,839 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:59:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:59:22,887 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:59:23,071 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:59:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:59:35,121 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:59:35,222 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:59:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:59:47,276 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:59:47,500 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:59:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 22:59:59,553 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 22:59:59,679 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 22:59:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:00:11,724 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:00:11,866 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:00:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:00:23,921 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:00:24,055 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:00:24] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:00:36,107 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:00:36,234 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:00:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:00:48,298 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:00:48,530 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:00:48] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:01:00,573 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:01:00,686 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:01:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:01:12,755 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:01:12,938 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:01:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:01:24,983 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:01:25,181 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:01:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:01:37,275 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:01:37,391 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:01:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:01:49,453 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:01:49,679 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:01:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:02:01,748 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:02:01,919 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:02:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:02:13,968 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:02:14,106 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:02:14] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:02:26,154 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:02:26,309 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:02:26] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:02:38,422 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:02:38,522 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:02:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:02:50,590 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:02:50,747 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:02:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:03:02,799 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:03:02,996 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:03:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:03:15,074 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:03:15,307 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:03:15] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:03:27,370 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:03:27,486 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:03:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:03:39,577 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:03:39,697 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:03:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:03:51,761 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:03:51,936 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:03:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:04:03,998 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:04:04,286 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:04:04] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:04:16,349 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:04:16,580 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:04:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:04:28,624 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:04:28,769 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:04:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:04:40,831 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:04:40,995 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:04:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:04:53,034 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:04:53,131 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:04:53] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:05:05,198 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:05:05,328 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:05:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:05:17,386 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:05:17,536 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:05:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:05:29,596 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:05:29,821 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:05:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:05:41,874 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:05:41,973 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:05:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:05:54,016 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:05:54,145 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:05:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:06:06,187 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:06:06,307 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:06:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:06:18,335 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:06:18,520 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:06:18] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:06:30,573 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:06:30,673 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:06:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:06:42,719 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:06:42,923 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:06:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:06:54,982 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:06:55,157 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:06:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:07:07,206 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:07:07,340 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:07:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:07:19,391 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:07:19,567 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:07:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:07:31,625 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:07:31,792 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:07:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:07:43,853 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:07:44,054 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:07:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:07:56,113 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:07:56,213 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:07:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:08:08,254 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:08:08,409 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:08:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:08:20,446 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:08:20,639 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:08:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:08:32,694 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:08:32,904 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:08:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:08:44,954 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:08:45,146 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:08:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:08:57,209 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:08:57,386 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:08:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:09:09,437 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:09:09,633 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:09:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:09:21,692 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:09:21,890 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:09:21] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:09:33,978 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:09:34,209 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:09:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:09:46,260 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:09:46,443 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:09:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:09:58,492 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:09:58,645 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:09:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:10:10,715 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:10:10,880 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:10:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:10:22,950 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:10:23,056 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:10:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:10:35,133 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:10:35,234 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:10:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:10:47,350 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:10:47,742 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:10:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:10:59,830 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:10:59,990 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:10:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:11:28,216 INFO [app] Garantindo schema...
+2025-10-16 23:11:34,751 INFO [app] Iniciando servidor Flask em 0.0.0.0:8080 (debug=True, use_reloader=False)
+2025-10-16 23:11:34,834 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://10.245.41.14:8080
+2025-10-16 23:11:34,834 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-16 23:11:39,600 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:39] "GET / HTTP/1.1" 200 -
+2025-10-16 23:11:40,414 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:40] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:11:40,702 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:40] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:11:42,954 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:42] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 23:11:48,684 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:48] "GET /tc-admin/1/edit HTTP/1.1" 200 -
+2025-10-16 23:11:52,540 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:52] "GET /tc-admin/1/calibrate HTTP/1.1" 200 -
+2025-10-16 23:11:54,993 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:54] "[35m[1mGET /tc/1/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 23:11:55,332 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:11:55] "[35m[1mGET /tc/1/snapshot.jpg?ts=1760667112593 HTTP/1.1[0m" 502 -
+2025-10-16 23:12:01,433 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:12:01] "[35m[1mGET /tc/1/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 23:12:34,345 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:12:34] "GET /tc-admin/1/calibrate HTTP/1.1" 200 -
+2025-10-16 23:12:36,785 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:12:36] "[35m[1mGET /tc/1/video_proxy HTTP/1.1[0m" 502 -
+2025-10-16 23:12:37,221 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:12:37] "[35m[1mGET /tc/1/snapshot.jpg?ts=1760667154413 HTTP/1.1[0m" 502 -
+2025-10-16 23:12:40,504 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:12:40,645 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:12:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:12:52,723 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:12:52,903 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:12:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:13:04,939 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:13:05,100 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:13:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:13:17,157 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:13:17,326 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:13:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:13:29,388 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:13:29,541 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:13:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:13:41,587 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:13:41,830 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:13:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:13:53,896 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:13:54,045 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:13:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:14:06,126 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:14:06,330 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:14:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:14:18,405 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:14:18,588 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:14:18] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:14:30,648 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:14:30,813 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:14:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:14:42,861 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:14:43,002 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:14:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:14:55,083 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:14:55,277 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:14:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:15:07,335 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:15:07,478 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:15:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:15:19,534 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:15:19,810 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:15:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:15:31,892 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:15:32,122 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:15:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:15:44,165 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:15:44,381 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:15:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:15:56,458 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:15:56,578 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:15:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:16:08,654 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:16:08,883 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:16:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:16:20,919 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:16:21,081 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:16:21] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:16:33,159 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:16:33,341 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:16:33] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:16:45,410 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:16:45,625 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:16:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:16:57,691 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:16:57,832 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:16:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:17:09,904 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:17:10,040 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:17:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:17:22,085 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:17:22,247 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:17:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:17:34,277 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:17:34,491 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:17:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:17:46,534 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:17:46,671 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:17:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:17:58,729 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:17:58,896 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:17:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:18:10,961 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:18:11,149 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:18:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:18:23,208 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:18:23,478 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:18:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:18:35,534 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:18:35,715 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:18:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:18:47,791 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:18:47,932 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:18:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:18:59,976 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:19:00,154 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:19:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:19:12,210 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:19:12,364 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:19:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:19:24,406 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:19:24,593 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:19:24] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:19:36,661 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:19:36,803 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:19:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:19:48,866 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:19:49,179 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:19:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:20:01,254 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:20:01,442 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:20:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:20:13,488 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:20:13,683 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:20:13] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:20:25,765 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:20:25,928 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:20:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:20:37,993 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:20:38,143 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:20:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:20:50,198 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:20:50,325 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:20:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:21:02,385 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:21:02,551 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:21:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:21:14,636 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:21:14,830 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:21:14] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:21:26,901 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:21:27,063 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:21:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:21:39,134 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:21:39,312 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:21:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:21:51,355 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:21:51,512 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:21:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:22:03,539 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 1, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:22:03,791 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:03] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:22:27,999 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:22:28,205 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:22:40,224 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:22:40,345 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:22:52,411 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:22:52,531 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:22:53,698 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:53] "GET / HTTP/1.1" 200 -
+2025-10-16 23:22:54,523 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:54] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:22:54,742 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:54] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:22:58,350 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:58] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 23:22:58,908 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:58] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:22:58,932 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:22:58] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:23:04,584 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:23:04,724 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:04] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:23:04,872 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:04] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 23:23:07,704 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:07] "GET /tc-admin/2/edit HTTP/1.1" 200 -
+2025-10-16 23:23:16,764 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:23:17,000 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:23:29,040 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:23:29,203 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:23:34,363 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:34] "[32mPOST /tc-admin/2/edit HTTP/1.1[0m" 302 -
+2025-10-16 23:23:35,488 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:35] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 23:23:41,125 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:41] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 23:23:41,254 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:23:41,479 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:23:42,254 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:42] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:23:42,506 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:42] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:23:53,544 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:23:53,701 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:53] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:23:57,090 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:57] "[35m[1mPOST /tc/2/start-ajax HTTP/1.1[0m" 204 -
+2025-10-16 23:23:59,291 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:23:59] "GET /api/agent/v1/config/2 HTTP/1.1" 200 -
+2025-10-16 23:24:05,743 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:24:05,915 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:24:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:24:17,977 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:24:18,075 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:24:18] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:24:23,497 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:24:23] "GET /tc/2/video_proxy HTTP/1.1" 200 -
+2025-10-16 23:24:30,127 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:24:30,342 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:24:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:24:42,410 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:24:42,557 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:24:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:24:54,623 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:24:54,789 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:24:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:25:03,829 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-16 23:25:04,706 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:04] "[35m[1mPOST /tc/2/stop HTTP/1.1[0m" 204 -
+2025-10-16 23:25:06,837 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:25:07,053 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:25:07,608 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:07] "[32mGET /acompanhamento HTTP/1.1[0m" 302 -
+2025-10-16 23:25:08,781 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:08] "GET / HTTP/1.1" 200 -
+2025-10-16 23:25:09,655 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:09] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:25:09,677 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:09] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:25:15,163 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:15] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 23:25:18,044 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:18] "GET /tc-admin/2/edit HTTP/1.1" 200 -
+2025-10-16 23:25:19,103 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:25:19,277 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:25:31,345 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:25:31,540 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:25:33,290 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:33] "[32mPOST /tc-admin/2/edit HTTP/1.1[0m" 302 -
+2025-10-16 23:25:34,391 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:34] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 23:25:43,591 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:25:43,740 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:25:46,735 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:46] "GET /tc-admin/2/edit HTTP/1.1" 200 -
+2025-10-16 23:25:55,783 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:25:55,921 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:25:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:26:06,466 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:06] "[32mPOST /tc-admin/2/edit HTTP/1.1[0m" 302 -
+2025-10-16 23:26:07,784 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:07] "GET /tc-admin HTTP/1.1" 200 -
+2025-10-16 23:26:07,968 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:26:08,124 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:26:10,269 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:10] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 23:26:10,983 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:10] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:26:11,226 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:11] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:26:17,728 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:17] "[35m[1mPOST /tc/2/start-ajax HTTP/1.1[0m" 204 -
+2025-10-16 23:26:19,905 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:19] "GET /api/agent/v1/config/2 HTTP/1.1" 200 -
+2025-10-16 23:26:20,204 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:26:20,372 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:26:25,308 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:25] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 23:26:26,171 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:26] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:26:26,217 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:26] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:26:32,438 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:26:32,582 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:26:43,437 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:43] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 23:26:44,272 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:44] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:26:44,297 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:44] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:26:44,652 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:26:44,940 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:26:57,017 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:26:57,193 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:26:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:27:03,795 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-16 23:27:04,268 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:04] "GET /tc/2/video_proxy HTTP/1.1" 200 -
+2025-10-16 23:27:04,272 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:04] "[35m[1mPOST /tc/2/stop HTTP/1.1[0m" 204 -
+2025-10-16 23:27:09,242 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:27:09,421 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:27:21,482 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:27:21,654 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:21] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:27:33,696 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:27:33,850 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:33] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:27:45,895 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:27:46,035 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:46] "GET /tc-operacao HTTP/1.1" 200 -
+2025-10-16 23:27:46,037 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:27:46,873 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:46] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:27:46,901 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:46] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:27:58,082 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:27:58,233 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:27:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:28:05,163 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:05] "[35m[1mPOST /tc/2/start-ajax HTTP/1.1[0m" 204 -
+2025-10-16 23:28:07,351 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:07] "GET /api/agent/v1/config/2 HTTP/1.1" 200 -
+2025-10-16 23:28:10,305 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:28:10,495 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:10] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:28:11,172 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:11] "GET /tc/2/video_proxy HTTP/1.1" 200 -
+2025-10-16 23:28:22,571 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:28:22,768 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:28:34,821 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:28:34,980 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:28:47,049 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:28:47,180 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:47] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:28:59,252 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:28:59,537 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:28:59] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:29:11,592 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:29:11,729 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:29:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:29:23,786 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:29:23,916 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:29:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:29:28,831 INFO [routes.tc] Usuario admin (admin) solicitou STOP para TC 2
+2025-10-16 23:29:29,921 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:29:29] "[35m[1mPOST /tc/2/stop HTTP/1.1[0m" 204 -
+2025-10-16 23:29:36,004 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:29:36,195 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:29:36] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:29:48,282 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:29:48,411 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:29:48] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:30:00,461 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:30:00,588 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:30:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:30:12,657 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:30:12,825 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:30:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:30:24,904 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:30:25,061 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:30:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:30:37,149 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:30:37,325 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:30:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:30:49,370 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:30:49,562 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:30:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:31:01,623 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:31:01,785 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:31:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:31:13,849 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:31:13,975 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:31:13] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:31:26,012 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:31:26,211 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:31:26] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:31:38,264 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:31:38,453 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:31:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:31:50,516 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:31:50,720 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:31:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:32:02,800 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:32:02,986 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:32:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:32:15,044 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:32:15,198 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:32:15] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:32:27,282 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:32:27,449 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:32:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:32:39,520 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:32:39,700 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:32:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:32:51,771 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:32:51,895 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:32:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:33:03,974 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:33:04,169 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:33:04] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:33:16,228 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:33:16,451 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:33:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:33:28,522 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:33:28,702 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:33:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:33:40,776 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:33:40,960 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:33:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:33:53,019 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:33:53,163 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:33:53] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:34:05,229 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:34:05,362 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:34:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:34:17,427 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:34:17,621 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:34:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:34:29,690 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:34:29,876 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:34:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:34:41,927 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:34:42,251 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:34:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:34:54,300 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:34:54,498 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:34:54] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:35:06,584 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:35:06,834 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:35:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:35:18,891 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:35:19,059 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:35:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:35:31,108 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:35:31,340 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:35:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:35:43,422 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:35:43,638 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:35:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:35:55,697 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:35:55,975 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:35:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:36:08,038 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:36:08,290 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:36:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:36:20,380 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:36:20,633 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:36:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:36:32,719 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:36:32,930 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:36:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:36:44,987 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:36:45,219 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:36:45] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:36:57,261 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:36:57,512 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:36:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:37:09,575 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:37:09,766 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:37:09] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:37:21,838 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:37:22,061 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:37:22] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:37:34,123 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:37:34,326 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:37:34] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:37:46,391 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:37:46,604 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:37:46] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:37:58,653 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:37:58,954 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:37:58] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:38:11,029 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:38:11,247 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:38:11] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:38:23,337 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:38:23,596 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:38:23] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:38:35,665 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:38:35,968 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:38:35] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:38:48,014 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:38:48,195 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:38:48] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:39:00,263 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:39:00,534 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:39:00] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:39:12,578 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:39:12,868 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:39:12] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:39:24,917 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:39:25,080 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:39:25] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:39:37,137 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:39:37,280 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:39:37] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:39:49,333 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:39:49,478 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:39:49] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:40:01,540 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:40:01,696 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:40:01] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:40:13,773 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:40:13,899 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:40:13] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:40:25,973 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:40:26,103 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:40:26] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:40:38,150 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:40:38,387 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:40:38] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:40:50,451 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:40:50,678 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:40:50] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:41:02,715 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:41:02,884 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:41:02] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:41:14,969 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:41:15,124 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:41:15] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:41:27,192 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:41:27,320 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:41:27] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:41:39,387 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:41:39,535 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:41:39] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:41:51,600 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:41:51,737 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:41:51] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:42:03,823 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:42:03,966 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:42:03] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:42:16,050 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:42:16,196 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:42:16] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:42:28,271 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:42:28,505 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:42:28] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:42:40,575 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:42:40,698 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:42:40] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:42:52,744 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:42:52,879 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:42:52] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:43:04,950 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:43:05,086 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:43:05] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:43:17,161 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:43:17,278 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:43:17] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:43:29,330 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:43:29,456 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:43:29] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:43:41,528 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:43:41,663 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:43:41] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:43:53,719 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:43:53,865 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:43:53] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:44:05,909 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:44:06,050 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:44:06] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:44:18,139 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:44:18,287 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:44:18] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:44:30,371 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:44:30,526 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:44:30] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:44:42,604 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:44:42,828 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:44:42] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:44:54,892 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:44:55,035 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:44:55] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:45:07,112 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:45:07,261 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:45:07] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:45:19,343 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:45:19,497 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:45:19] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:45:31,569 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:45:31,673 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:45:31] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:45:43,719 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:45:43,947 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:45:43] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:45:56,019 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:45:56,170 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:45:56] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:46:08,246 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:46:08,372 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:08] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:46:20,413 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:46:20,499 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:20] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:46:32,555 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:46:32,662 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:32] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:46:44,713 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:46:44,806 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:44] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -
+2025-10-16 23:46:50,595 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:50] "GET / HTTP/1.1" 200 -
+2025-10-16 23:46:51,566 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:51] "GET /sse/tc/1 HTTP/1.1" 200 -
+2025-10-16 23:46:51,979 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:51] "GET /sse/tc/2 HTTP/1.1" 200 -
+2025-10-16 23:46:56,860 INFO [routes.agent] [AGENT] heartbeat: {'agent_id': 'agent-2# ID da TC no servidor central que este agente opera', 'tc_id': 2, 'hostname': '192.168.18.89', 'status': 'running', 'version': 'agent-1'}
+2025-10-16 23:46:57,223 INFO [werkzeug] 127.0.0.1 - - [16/Oct/2025 23:46:57] "POST /api/agent/v1/heartbeat HTTP/1.1" 200 -

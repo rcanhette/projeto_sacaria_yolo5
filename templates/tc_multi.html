@@ -252,14 +252,14 @@
       let img = document.getElementById('video-'+id);
       if (!img && vwrap){ img = document.createElement('img'); img.id='video-'+id; img.className='video'; img.alt='pré-visualização'; img.style.display='none'; vwrap.appendChild(img); }
       if (img){
-        if (active){ img.src = `/tc/${id}/video`; img.style.display = 'block'; }
+        if (active){ img.src = `/tc/${id}/video_proxy`; img.style.display = 'block'; }
         else { img.style.display = 'none'; img.src = ''; }
       }
       if (active && sp && vwrap){ try{ vwrap.insertAdjacentElement('afterend', sp); }catch(_){} }
     }
     function apply(id, data){
       const get = (p)=>document.getElementById(p+'-'+id);
-      const active = !!data.session_active;
+      const active = !!data.session_active || String((data.db_status||'')).toLowerCase()==='operando';
       const elCount = get('count'); if(elCount) elCount.textContent = data.count ?? 0;
       const elLote = get('lote'); if(elLote){ elLote.textContent = data.lote || '-'; elLote.className='pill '+((data.lote&&data.lote!=='-')?'on':'off'); }
       const elInicio = get('inicio'); if(elInicio){ elInicio.textContent = data.hora_inicio || '-'; elInicio.className='pill '+((data.hora_inicio&&data.hora_inicio!=='-')?'on':'off'); }

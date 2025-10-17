@@ -34,6 +34,10 @@
     /* link do nome como ação primária, sem parecer botão */
     .name-link{ color:#0b1220; text-decoration:none; font-weight:800; }
     .name-link:hover{ text-decoration:underline; }
+    .status-badge{ display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:12px; }
+    .status-badge .dot{ width:8px; height:8px; border-radius:50%; background:#9ca3af; display:inline-block; }
+    .status-badge.on .dot{ background:#10b981; }
+    .status-badge.off .dot{ background:#9ca3af; }
   </style>
 </head>
 <body>
@@ -54,6 +58,7 @@
               <th>Nome (clique para abrir)</th>
               <th>Fonte (URL/Dispositivo)</th>
               <th>Modelo</th>
+              <th>Agente</th>
               <th style="text-align:right;">Ações</th>
             </tr>
           </thead>
@@ -69,6 +74,12 @@
               <td><span class="nowrap" title="{{ ct.source_path }}">{{ ct.source_path }}</span></td>
               <td><span class="nowrap" title="{{ ct.model_path }}">{{ ct.model_path }}</span></td>
               <td>
+                <span class="status-badge {{ 'on' if ct.agent_online else 'off' }}" title="{{ (ct.agent_hostname or '') + (', ' + ct.agent_last_seen|string if ct.agent_last_seen else '') }}">
+                  <span class="dot"></span>
+                  <span>{{ 'Online' if ct.agent_online else 'Offline' }}</span>
+                </span>
+              </td>
+              <td>
                 <div class="row-actions">
                   <a class="btn" href="{{ url_for('tc_admin.tc_admin_edit', tc_id=ct.id) }}">Editar</a>
                   <form class="inline-form" method="post" action="{{ url_for('tc_admin.tc_admin_delete', tc_id=ct.id) }}"
@@ -80,7 +91,7 @@
             </tr>
             {% else %}
             <tr>
-              <td colspan="5" style="padding:16px;text-align:center;color:var(--muted);">Nenhum ponto de operação cadastrado.</td>
+              <td colspan="6" style="padding:16px;text-align:center;color:var(--muted);">Nenhum ponto de operação cadastrado.</td>
             </tr>
             {% endfor %}
           </tbody>

@@ -225,15 +225,46 @@ class IndustrialTagDetector:
 
             )
 
-            self.model.eval()
-
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            # Thresholds de detecção baseados exatamente no min_conf configurado
+            try:
+                self.det_conf_add = float(self.min_conf)
+                self.det_conf_keep = float(self.min_conf)
+            except Exception:
+                self.det_conf_add = 0.80
+                self.det_conf_keep = 0.80
+            # Ajustes de modelo quando suportado
+            try:
+                if hasattr(self.model, 'conf'):
+                    self.model.conf = float(self.min_conf)
+                if hasattr(self.model, 'iou'):
+                    self.model.iou = 0.45
+                if hasattr(self.model, 'classes'):
+                    self.model.classes = self.target_ids
+                if self.device == 'cuda' and hasattr(self.model, 'half'):
+                    try:
+                        self.model.half()
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
+            self.model.eval()
 
         except Exception as e:
 
             log.error("Falha ao carregar o modelo YOLOv5 local: %s", e)
 
             self.model = None
+
+        # Garante thresholds mesmo se o modelo não carregar
+        if not hasattr(self, 'det_conf_add'):
+            try:
+                self.det_conf_add = max(0.50, float(self.min_conf))
+                self.det_conf_keep = max(0.30, float(self.min_conf) - 0.20)
+            except Exception:
+                self.det_conf_add = 0.80
+                self.det_conf_keep = 0.50
 
         # 2. Configuraaes do Rastreador (Tracking)
 
@@ -265,15 +296,26 @@ class IndustrialTagDetector:
 
             self.line_blue_y = y_roi + int(2 * h_roi / 3) + self.line_offset_blue
 
+            # Garante que as linhas fiquem dentro do ROI
+            y_min = int(y_roi)
+            y_max = int(y_roi + h_roi)
+            try:
+                self.line_red_y = min(max(self.line_red_y, y_min), y_max)
+                self.line_blue_y = min(max(self.line_blue_y, y_min), y_max)
+            except Exception:
+                pass
+
         else:
 
             self.line_red_y = 0
 
             self.line_blue_y = 0
 
-        # Filtros: ID e Confianaa
-
+        # Filtros: ID e Confiança
         self.target_ids = [0]
+        # Parâmetros de matching e suavização
+        self.iou_match_min = 0.10
+        self.ema_alpha = 0.6
 
         # Modo do ponto de cruzamento visual (inicio/meio/fim)
 
@@ -531,8 +573,9 @@ class IndustrialTagDetector:
 
         for x1, y1, x2, y2, conf, cls_id in detections:
 
-            if conf < self.min_conf or int(cls_id) not in self.target_ids:
-
+            # Usa limiar de "manter" para considerar para tracking; criação usa limiar mais alto adiante
+            if conf < float(self.min_conf) or int(cls_id) not in self.target_ids:
+                
                 continue
 
             center_x = (x1 + x2) / 2
@@ -551,21 +594,41 @@ class IndustrialTagDetector:
 
         matched_ids = []
 
+        def _iou(a, b):
+            ax1, ay1, ax2, ay2 = a
+            bx1, by1, bx2, by2 = b
+            inter_x1 = max(ax1, bx1)
+            inter_y1 = max(ay1, by1)
+            inter_x2 = min(ax2, bx2)
+            inter_y2 = min(ay2, by2)
+            iw = max(0.0, inter_x2 - inter_x1)
+            ih = max(0.0, inter_y2 - inter_y1)
+            inter = iw * ih
+            if inter <= 0:
+                return 0.0
+            area_a = max(0.0, (ax2 - ax1)) * max(0.0, (ay2 - ay1))
+            area_b = max(0.0, (bx2 - bx1)) * max(0.0, (by2 - by1))
+            denom = area_a + area_b - inter
+            return inter / denom if denom > 0 else 0.0
+
         for i, (dx1, dy1, dx2, dy2, dconf, dcx, dcy) in enumerate(filtered_detections):
 
             best_match_id = None
 
             min_dist = float('inf')
+            best_iou = 0.0
 
             for obj_id, obj_data in self.tracked_objects.items():
 
-                dist = ((obj_data['cx'] - dcx)**2 + (obj_data['cy'] - dcy)**2)**0.5
-
-                if dist < min_dist and dist < self.match_dist:
-
-                    min_dist = dist
-
+                iou_val = _iou((dx1, dy1, dx2, dy2), (obj_data['x1'], obj_data['y1'], obj_data['x2'], obj_data['y2']))
+                if iou_val >= getattr(self, 'iou_match_min', 0.10) and iou_val >= best_iou:
+                    best_iou = iou_val
                     best_match_id = obj_id
+                else:
+                    dist = ((obj_data['cx'] - dcx)**2 + (obj_data['cy'] - dcy)**2)**0.5
+                    if best_iou < getattr(self, 'iou_match_min', 0.10) and dist < min_dist and dist < self.match_dist:
+                        min_dist = dist
+                        best_match_id = obj_id
 
             if best_match_id is not None and best_match_id not in matched_ids:
 
@@ -575,11 +638,21 @@ class IndustrialTagDetector:
 
                 prev_cx = self.tracked_objects[best_match_id]['cx']
 
+                # Suavização de posição (EMA) para reduzir jitter
+                new_cx = float(dcx)
+                new_cy = float(dcy)
+                alpha = getattr(self, 'ema_alpha', 0.6)
+                try:
+                    sm_cx = alpha * new_cx + (1 - alpha) * float(prev_cx)
+                    sm_cy = alpha * new_cy + (1 - alpha) * float(prev_cy)
+                except Exception:
+                    sm_cx, sm_cy = new_cx, new_cy
+
                 self.tracked_objects[best_match_id].update({
 
                     'x1': dx1, 'y1': dy1, 'x2': dx2, 'y2': dy2,
 
-                    'cx': dcx, 'cy': dcy, 'prev_cy': prev_cy,
+                    'cx': sm_cx, 'cy': sm_cy, 'prev_cy': prev_cy,
 
                     'lost_frames': 0,
 
@@ -593,7 +666,9 @@ class IndustrialTagDetector:
 
             elif best_match_id is None:
 
-                # Inicializaao de um Novo Objeto
+                # Inicialização de um Novo Objeto (respeita min_conf do cadastro)
+                if dconf < float(self.min_conf):
+                    continue
 
                 self.tracked_objects[self.next_id] = {
 
