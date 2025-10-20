@@ -105,6 +105,9 @@ def create_app():
     # Força login para tudo, exceto login/logout/static
     @app.before_request
     def require_login_guard():
+        # Health sem login
+        if request.path == "/health":
+            return None
         exempt = {"auth.login", "auth.logout", "static"}
         # Libera as APIs do agente sem exigir login
         if request.endpoint and (request.endpoint in exempt or request.endpoint.startswith("agent.")):
@@ -169,6 +172,33 @@ def create_app():
     @app.route("/acompanhamento")
     def acompanhamento():
         return redirect(url_for("index"))
+
+    # Health/metrics leve (sem login)
+    @app.route("/health")
+    def health():
+        from services.db import query_one
+        db_ok = True
+        try:
+            query_one("SELECT 1")
+        except Exception:
+            db_ok = False
+        import os
+        pool_min = os.getenv("DB_POOL_MIN")
+        pool_max = os.getenv("DB_POOL_MAX")
+        try:
+            import routes.tc as tc_routes
+            sse_cache = len(getattr(tc_routes, "_sse_db_cache", {}) or {})
+            local_streams = len(getattr(tc_routes, "_mjpeg_state", {}) or {})
+        except Exception:
+            sse_cache = None
+            local_streams = None
+        return {
+            "ok": True,
+            "db_ok": db_ok,
+            "db_pool": {"min": pool_min, "max": pool_max},
+            "sse_cache_size": sse_cache,
+            "local_streams": local_streams,
+        }, 200
 
     return app
 

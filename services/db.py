@@ -1,7 +1,9 @@
-# services/db.py
+﻿# services/db.py
 import os
 import psycopg2
 import psycopg2.extras
+from psycopg2.pool import SimpleConnectionPool
+from contextlib import contextmanager
 
 PG_ENV_KEYS = (
     "PGHOST", "PGPORT", "PGDATABASE", "PGUSER", "PGPASSWORD",
@@ -25,14 +27,61 @@ def _strip_pg_env():
             removed[k] = os.environ.pop(k, None)
     return removed
 
-# -------------------------------
-# Conexão (robusta no Windows)
-# -------------------------------
+# #
+# Pool de conexÃµes (Central)
+# #
+_POOL: SimpleConnectionPool | None = None
+
+def _init_pool(minconn: int = 1, maxconn: int = 10) -> SimpleConnectionPool:
+    global _POOL
+    if _POOL is not None:
+        return _POOL
+    # Permite ajustar o tamanho do pool por variÃ¡veis de ambiente
+    try:
+        minconn = int(os.getenv("DB_POOL_MIN", str(minconn)))
+    except Exception:
+        pass
+    try:
+        maxconn = int(os.getenv("DB_POOL_MAX", str(maxconn)))
+    except Exception:
+        pass
+    host, port, db, usr, pwd = _read_db_config()
+    passfile = os.devnull
+    try:
+        os.environ["PGPASSFILE"] = passfile
+    except Exception:
+        pass
+    _POOL = SimpleConnectionPool(
+        minconn, maxconn,
+        host=host, port=port, dbname=db, user=usr, password=pwd,
+        passfile=passfile,
+    )
+    return _POOL
+
+@contextmanager
+def pooled_conn():
+    """Context manager que devolve a conexÃ£o ao pool no final."""
+    pool = _init_pool()
+    conn = pool.getconn()
+    try:
+        yield conn
+    finally:
+        try:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+        finally:
+            pool.putconn(conn, close=False)
+
+# #
+# ConexÃ£o (robusta no Windows)
+# #
 def get_conn():
     """
-    Evita ler pgpass/service com encoding problemático.
-    Força passfile=os.devnull (NUL no Windows) e, se necessário,
-    limpa variáveis PG* e reconecta.
+    Evita ler pgpass/service com encoding problemÃ¡tico.
+    ForÃ§a passfile=os.devnull (NUL no Windows) e, se necessÃ¡rio,
+    limpa variÃ¡veis PG* e reconecta.
     """
     host, port, db, usr, pwd = _read_db_config()
     passfile = os.devnull  # 'NUL' no Windows
@@ -51,11 +100,11 @@ def get_conn():
             passfile=passfile
         )
 
-# -------------------------------
+# #
 # Helpers de consulta
-# -------------------------------
+# #
 def query_all(sql, params=None):
-    with get_conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+    with pooled_conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute(sql, params or [])
         return list(cur.fetchall())
 
@@ -64,30 +113,30 @@ def query_one(sql, params=None):
     return rows[0] if rows else None
 
 def execute(sql, params=None):
-    with get_conn() as conn, conn.cursor() as cur:
+    with pooled_conn() as conn, conn.cursor() as cur:
         cur.execute(sql, params or [])
         conn.commit()
 
 def execute_returning(sql, params=None):
-    with get_conn() as conn, conn.cursor() as cur:
+    with pooled_conn() as conn, conn.cursor() as cur:
         cur.execute(sql, params or [])
         row = cur.fetchone()
         conn.commit()
         return row[0] if row else None
 
-# -------------------------------
-# Schema e migrações leves
-# -------------------------------
+# #
+# Schema e migraÃ§Ãµes leves
+# #
 def ensure_schema() -> None:
     """
-    Cria/ajusta tabelas necessárias ao app, de forma idempotente:
+    Cria/ajusta tabelas necessÃ¡rias ao app, de forma idempotente:
       - users, ct, user_ct
       - session, session_log
-    Também adiciona colunas que possam faltar em esquemas antigos
-    antes de criar os índices.
+    TambÃ©m adiciona colunas que possam faltar em esquemas antigos
+    antes de criar os Ã­ndices.
     """
 
-    # ---------- users ----------
+    # #
     execute("""
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -101,7 +150,7 @@ def ensure_schema() -> None:
     execute("CREATE INDEX IF NOT EXISTS idx_users_role   ON users(role);")
     execute("CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);")
 
-    # ---------- Migração: renomear ct -> tc (idempotente) ----------
+    # #
     execute(
         """
         DO $$
@@ -112,7 +161,6 @@ def ensure_schema() -> None:
             IF to_regclass('public.user_tc') IS NULL AND to_regclass('public.user_ct') IS NOT NULL THEN
                 EXECUTE 'ALTER TABLE user_ct RENAME TO user_tc';
             END IF;
-            -- renomeia coluna ct_id -> tc_id se ainda existir (legado)
             IF to_regclass('public.user_tc') IS NOT NULL THEN
                 IF EXISTS (
                     SELECT 1 FROM information_schema.columns
@@ -125,7 +173,7 @@ def ensure_schema() -> None:
         """
     )
 
-    # ---------- tc ----------
+    # #
     execute("""
     CREATE TABLE IF NOT EXISTS tc (
       id SERIAL PRIMARY KEY,
@@ -152,6 +200,9 @@ def ensure_schema() -> None:
     execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS match_dist INTEGER DEFAULT 150;")
     execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS min_conf NUMERIC(6,4) DEFAULT 0.8000;")
     execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS missed_frame_dir TEXT;")
+    # streaming params (persistentes por TC)
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS stream_fps INTEGER;")
+    execute("ALTER TABLE tc ADD COLUMN IF NOT EXISTS stream_quality INTEGER;")
     execute("UPDATE tc SET line_offset_red = 40 WHERE line_offset_red IS NULL;")
     execute("UPDATE tc SET line_offset_blue = -40 WHERE line_offset_blue IS NULL;")
     execute("UPDATE tc SET flow_mode = 'cima' WHERE flow_mode IS NULL OR TRIM(flow_mode) = '';")
@@ -161,7 +212,7 @@ def ensure_schema() -> None:
     execute("UPDATE tc SET missed_frame_dir = '' WHERE missed_frame_dir IS NULL;")
     execute("CREATE INDEX IF NOT EXISTS idx_tc_active ON tc(active);")
 
-    # ---------- user_tc (vínculo N:N) ----------
+    # #
     execute("""
     CREATE TABLE IF NOT EXISTS user_tc (
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -172,7 +223,7 @@ def ensure_schema() -> None:
     execute("CREATE INDEX IF NOT EXISTS idx_user_tc_user ON user_tc(user_id);")
     execute("CREATE INDEX IF NOT EXISTS idx_user_tc_tc   ON user_tc(tc_id);")
 
-    # ---------- session ----------
+    # #
     # usada por services/session_repository.py
     execute("""
     CREATE TABLE IF NOT EXISTS session (
@@ -187,7 +238,7 @@ def ensure_schema() -> None:
       observacao TEXT
     );
     """)
-    # índices úteis
+    # Ã­ndices Ãºteis
     execute("CREATE INDEX IF NOT EXISTS idx_session_ct ON session(ct_id);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_status ON session(status);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_ct_inicio ON session(ct_id, data_inicio DESC);")
@@ -196,7 +247,7 @@ def ensure_schema() -> None:
     execute("ALTER TABLE session ADD COLUMN IF NOT EXISTS contagem_alvo INTEGER;")
     execute("ALTER TABLE session ADD COLUMN IF NOT EXISTS observacao TEXT;")
 
-    # ---------- session_log ----------
+    # #
     execute("""
     CREATE TABLE IF NOT EXISTS session_log (
       id SERIAL PRIMARY KEY,
@@ -210,9 +261,9 @@ def ensure_schema() -> None:
     execute("CREATE INDEX IF NOT EXISTS idx_session_log_session_ts ON session_log(session_id, ts);")
     execute("CREATE INDEX IF NOT EXISTS idx_session_log_ct_ts ON session_log(ct_id, ts);")
 
-    # ---------- migração: garantir 1 sessão 'ativo' por CT ----------
+    # #
     # 1) limpa duplicatas antigas marcando as mais antigas como 'cancelado'
-    #    (mantém a sessão ativa mais recente de cada CT)
+    #    (mantÃ©m a sessÃ£o ativa mais recente de cada CT)
     execute(
         """
         UPDATE session s
@@ -229,7 +280,7 @@ def ensure_schema() -> None:
         """
     )
 
-    # 2) índice único parcial para impedir nova duplicidade
+    # 2) Ã­ndice Ãºnico parcial para impedir nova duplicidade
     execute(
         """
         DO $$
@@ -247,7 +298,7 @@ def ensure_schema() -> None:
         """
     )
 
-    # ---------- agents (agentes locais) ----------
+    # #
     # Tabela de cadastro de agentes (opcional quando sem auth)
     execute(
         """
@@ -264,7 +315,7 @@ def ensure_schema() -> None:
     execute("CREATE INDEX IF NOT EXISTS idx_agent_active ON agent(active);")
     execute("CREATE INDEX IF NOT EXISTS idx_agent_tc ON agent(tc_id);")
 
-    # Status por agente (chave primária = agent_id para ON CONFLICT)
+    # Status por agente (chave primÃ¡ria = agent_id para ON CONFLICT)
     execute(
         """
         CREATE TABLE IF NOT EXISTS agent_status (
@@ -292,57 +343,17 @@ def ensure_schema() -> None:
         """
     )
     execute("CREATE INDEX IF NOT EXISTS idx_tc_agent_status_last_seen ON tc_agent_status(last_seen DESC);")
-    execute(
-        """
-        CREATE TABLE IF NOT EXISTS agent (
-          id SERIAL PRIMARY KEY,
-          agent_id TEXT NOT NULL UNIQUE,
-          token TEXT NOT NULL UNIQUE,
-          tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL,
-          active BOOLEAN NOT NULL DEFAULT TRUE,
-          created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
-        );
-        """
-    )
-    execute("CREATE INDEX IF NOT EXISTS idx_agent_active ON agent(active);")
-    execute("CREATE INDEX IF NOT EXISTS idx_agent_tc ON agent(tc_id);")
-
-    # ---------- agent_status (heartbeat) ----------
-    execute(
-        """
-        CREATE TABLE IF NOT EXISTS agent_status (
-          agent_id INTEGER PRIMARY KEY REFERENCES agent(id) ON DELETE CASCADE,
-          last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
-          hostname TEXT,
-          version TEXT,
-          status TEXT,
-          tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL
-        );
-        """
-    )
-
-    # ---------- tc_agent_status (modo sem token, por TC) ----------
-    execute(
-        """
-        CREATE TABLE IF NOT EXISTS tc_agent_status (
-          tc_id INTEGER PRIMARY KEY REFERENCES tc(id) ON DELETE CASCADE,
-          last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
-          hostname TEXT,
-          version TEXT,
-          status TEXT
-        );
-        """
-    )
+    #
     
-    # ---------- migração: adotar status 'operando' no lugar de 'ativo' ----------
-    # Ajusta constraint, default, atualiza registros e recria índice único parcial
+    # #
+    # Ajusta constraint, default, atualiza registros e recria Ã­ndice Ãºnico parcial
     execute(
         """
         DO $$
         DECLARE
             cname text;
         BEGIN
-            -- Drop CHECK constraint existente (qualquer nome)
+            
             SELECT conname INTO cname
               FROM pg_constraint
              WHERE conrelid = 'session'::regclass
@@ -352,20 +363,20 @@ def ensure_schema() -> None:
                 EXECUTE format('ALTER TABLE session DROP CONSTRAINT %%I', cname);
             END IF;
 
-            -- Cria CHECK permitindo 'operando' (mantém 'cancelado' e 'finalizado')
+            
             BEGIN
                 ALTER TABLE session
                   ADD CONSTRAINT chk_session_status
                   CHECK (status IN ('operando','finalizado','cancelado'));
             EXCEPTION WHEN duplicate_object THEN
-                -- já existe
+                
             END;
 
-            -- Default passa a ser 'operando'
+            
             BEGIN
                 ALTER TABLE session ALTER COLUMN status SET DEFAULT 'operando';
             EXCEPTION WHEN others THEN
-                -- ignora
+                
             END;
         END$$;
         """
@@ -374,12 +385,12 @@ def ensure_schema() -> None:
     # Converte valores antigos
     execute("UPDATE session SET status='operando' WHERE status='ativo';")
 
-    # Garante unicidade por CT para sessões 'operando'
+    # Garante unicidade por CT para sessÃµes 'operando'
     execute(
         """
         DO $$
         BEGIN
-            -- Remove índice antigo (se existir)
+            
             IF EXISTS (
                 SELECT 1 FROM pg_indexes
                  WHERE schemaname = 'public'
@@ -388,7 +399,7 @@ def ensure_schema() -> None:
                 EXECUTE 'DROP INDEX IF EXISTS uq_session_one_active_per_ct';
             END IF;
 
-            -- Cria novo índice condicional em 'operando'
+            
             IF NOT EXISTS (
                 SELECT 1 FROM pg_indexes
                  WHERE schemaname = 'public'
@@ -401,3 +412,4 @@ def ensure_schema() -> None:
         END$$;
         """
     )
+

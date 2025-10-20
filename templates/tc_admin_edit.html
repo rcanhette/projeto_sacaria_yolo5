@@ -1,4 +1,4 @@
-﻿{% include '_navbar.html' %}
+{% include '_navbar.html' %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -40,6 +40,11 @@
         <div><strong>Hostname:</strong> {{ agent_status.hostname or '-' }}</div>
         <div><strong>Último visto:</strong> {{ agent_status.last_seen or '-' }}</div>
         <div><strong>Status:</strong> {{ agent_status.status or '-' }}</div>
+        {% if ct %}
+        <div style="margin-top:6px;">
+          <button class="btn" type="submit" formmethod="post" formaction="{{ url_for('tc_admin.tc_admin_test_ct', tc_id=ct.id) }}" title="Testar conexão da CT">Testar conexão</button>
+        </div>
+        {% endif %}
       </div>
     {% endif %}
 
@@ -51,8 +56,8 @@
 
       <div>
         <label>Fonte (URL/Dispositivo)</label>
-        <input type="text" name="source_path" value="{{ '' if not ct else ct.source_path }}" placeholder="ex.: rtsp://..., 0 (webcam), caminho de arquivo" required />
-        <div class="muted" style="margin-top:4px;">A URL pode ser longa; tudo bem, será truncada na listagem.</div>
+        <input type="text" name="source_path" value="{{ '' if not ct else ct.source_path }}" placeholder="ex.: rtsp://..., 0 (webcam), caminho de arquivo" required style="max-width:100%; width:100%;" />
+        <div class="muted" style="margin-top:4px;">Se usar RTSP, inclua usuário/senha e canal corretos.</div>
       </div>
 
       <div>
@@ -125,7 +130,6 @@
         <a class="btn" href="{{ url_for('tc_admin.tc_admin_list') }}">Cancelar</a>
         {% if ct %}
           <a class="btn" href="{{ url_for('tc_admin.tc_admin_calibrate', tc_id=ct.id) }}">Abrir calibração</a>
-          <button class="btn" type="submit" formmethod="post" formaction="{{ url_for('tc_admin.tc_admin_test_agent', tc_id=ct.id) }}">Testar agente</button>
         {% endif %}
         <button class="btn btn-primary" type="submit">{{ 'Criar' if not ct else 'Salvar' }}</button>
       </div>

@@ -52,6 +52,14 @@ def get_config(tc_id: int):
         }
         # tipo de fonte é sempre RTSP no modelo atual
         cfg["source_type"] = "rtsp"
+        # parâmetros opcionais de streaming (Central dita defaults para o Agent)
+        try:
+            if tc.get("stream_fps") is not None:
+                cfg["stream_fps"] = int(tc.get("stream_fps"))
+            if tc.get("stream_quality") is not None:
+                cfg["stream_quality"] = int(tc.get("stream_quality"))
+        except Exception:
+            pass
         return jsonify(cfg), 200
     except Exception as e:
         logs.exception("[AGENT] get_config failed: %s", e)

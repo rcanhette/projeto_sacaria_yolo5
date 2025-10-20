@@ -3,14 +3,14 @@ from services.db import query_all, query_one, execute, execute_returning
 def list_tcs():
     return query_all(
         "SELECT id, name, source_path, roi, model_path, line_offset_red, line_offset_blue, flow_mode, "
-        "max_lost, match_dist, min_conf, missed_frame_dir "
+        "max_lost, match_dist, min_conf, missed_frame_dir, stream_fps, stream_quality "
         "FROM tc ORDER BY id"
     )
 
 def get_tc(tc_id:int):
     return query_one(
         "SELECT id, name, source_path, roi, model_path, line_offset_red, line_offset_blue, flow_mode, "
-        "max_lost, match_dist, min_conf, missed_frame_dir "
+        "max_lost, match_dist, min_conf, missed_frame_dir, stream_fps, stream_quality "
         "FROM tc WHERE id=%s",
         [tc_id],
     )
@@ -19,7 +19,9 @@ def create_tc(name:str, source_path:str, roi:str, model_path:str,
               line_offset_red:int = 40, line_offset_blue:int = -40,
               flow_mode:str = "cima", max_lost:int = 2,
               match_dist:float = 150, min_conf:float = 0.8,
-              missed_frame_dir:str | None = None) -> int:
+              missed_frame_dir:str | None = None,
+              stream_fps: int | None = None,
+              stream_quality: int | None = None) -> int:
     if max_lost < 0:
         max_lost = 0
     match_dist = int(round(match_dist))
@@ -32,17 +34,19 @@ def create_tc(name:str, source_path:str, roi:str, model_path:str,
     dir_path = (missed_frame_dir or "").strip()
     return execute_returning(
         "INSERT INTO tc (name, source_path, roi, model_path, line_offset_red, line_offset_blue, flow_mode, "
-        "max_lost, match_dist, min_conf, missed_frame_dir) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
+        "max_lost, match_dist, min_conf, missed_frame_dir, stream_fps, stream_quality) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
         [name, source_path, roi, model_path, line_offset_red, line_offset_blue,
-         flow_mode, max_lost, match_dist, min_conf, dir_path]
+         flow_mode, max_lost, match_dist, min_conf, dir_path, stream_fps, stream_quality]
     )
 
 def update_tc(tc_id:int, name:str, source_path:str, roi:str, model_path:str,
               line_offset_red:int = 40, line_offset_blue:int = -40,
               flow_mode:str = "cima", max_lost:int = 2,
               match_dist:float = 150, min_conf:float = 0.8,
-              missed_frame_dir:str | None = None):
+              missed_frame_dir:str | None = None,
+              stream_fps: int | None = None,
+              stream_quality: int | None = None):
     if max_lost < 0:
         max_lost = 0
     match_dist = int(round(match_dist))
@@ -56,9 +60,9 @@ def update_tc(tc_id:int, name:str, source_path:str, roi:str, model_path:str,
     execute(
         "UPDATE tc SET name=%s, source_path=%s, roi=%s, model_path=%s, "
         "line_offset_red=%s, line_offset_blue=%s, flow_mode=%s, "
-        "max_lost=%s, match_dist=%s, min_conf=%s, missed_frame_dir=%s WHERE id=%s",
+        "max_lost=%s, match_dist=%s, min_conf=%s, missed_frame_dir=%s, stream_fps=%s, stream_quality=%s WHERE id=%s",
         [name, source_path, roi, model_path, line_offset_red, line_offset_blue,
-         flow_mode, max_lost, match_dist, min_conf, dir_path, tc_id]
+         flow_mode, max_lost, match_dist, min_conf, dir_path, stream_fps, stream_quality, tc_id]
     )
 
 def delete_tc(tc_id:int):

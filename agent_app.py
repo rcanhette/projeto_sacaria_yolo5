@@ -23,6 +23,35 @@ class CentralClient:
         self.base_url = base_url.rstrip('/')
         self.token = token
         self.agent_id = agent_id
+        # HTTP pool with keep-alive for efficiency
+        import requests
+        from requests.adapters import HTTPAdapter
+        try:
+            # Prefer urllib3 Retry for backoff com limites seguros
+            from urllib3.util.retry import Retry
+        except Exception:
+            Retry = None
+        try:
+            self.session = requests.Session()
+            if Retry is not None:
+                retry = Retry(
+                    total=3,
+                    connect=3,
+                    read=3,
+                    status=3,
+                    backoff_factor=0.3,  # ~0.3s, 0.6s, 1.2s
+                    status_forcelist=(429, 502, 503, 504),
+                    allowed_methods=("GET", "POST"),
+                    raise_on_status=False,
+                )
+                adapter = HTTPAdapter(max_retries=retry, pool_connections=50, pool_maxsize=50)
+            else:
+                adapter = HTTPAdapter(pool_connections=50, pool_maxsize=50)
+            self.session.mount('http://', adapter)
+            self.session.mount('https://', adapter)
+        except Exception:
+            # Fallback: direct requests if session fails
+            self.session = requests
 
     def _headers(self):
         return {
@@ -33,13 +62,16 @@ class CentralClient:
     def heartbeat(self, tc_id: int, hostname: str | None = None, status: str | None = None, version: str | None = None):
         url = f"{self.base_url}/api/agent/v1/heartbeat"
         payload = {"agent_id": self.agent_id, "tc_id": tc_id, "hostname": hostname, "status": status, "version": version}
-        requests.post(url, json=payload, headers=self._headers(), timeout=5)
+        try:
+            self.session.post(url, json=payload, headers=self._headers(), timeout=5)
+        except Exception:
+            pass
 
     def session_start(self, tc_id: int, lote: str, contagem_alvo: int | None = None) -> int | None:
         url = f"{self.base_url}/api/agent/v1/session/start"
         payload = {"agent_id": self.agent_id, "tc_id": tc_id, "lote": lote, "contagem_alvo": contagem_alvo}
         try:
-            r = requests.post(url, json=payload, headers=self._headers(), timeout=10)
+            r = self.session.post(url, json=payload, headers=self._headers(), timeout=10)
             r.raise_for_status()
             data = r.json()
             return data.get("session_db_id")
@@ -56,7 +88,7 @@ class CentralClient:
             "total": total,
         }
         try:
-            requests.post(url, json=payload, headers=self._headers(), timeout=5)
+            self.session.post(url, json=payload, headers=self._headers(), timeout=5)
         except Exception:
             pass
 
@@ -70,14 +102,14 @@ class CentralClient:
             "observacao": observacao,
         }
         try:
-            requests.post(url, json=payload, headers=self._headers(), timeout=10)
+            self.session.post(url, json=payload, headers=self._headers(), timeout=10)
         except Exception:
             pass
 
     def get_config(self, tc_id: int):
         url = f"{self.base_url}/api/agent/v1/config/{tc_id}"
         try:
-            r = requests.get(url, headers=self._headers(), timeout=10)
+            r = self.session.get(url, headers=self._headers(), timeout=10)
             if r.ok:
                 return r.json()
         except Exception:
@@ -117,6 +149,29 @@ class AgentService:
         self.cp = None
         self.thread = None
         self.stop_event = threading.Event()
+        # Optional streaming parameters
+        try:
+            self.stream_fps = max(1, int(a.get("stream_fps", fallback="12")))
+        except Exception:
+            self.stream_fps = 12
+        try:
+            self.jpeg_quality = min(95, max(30, int(a.get("jpeg_quality", fallback="80"))))
+        except Exception:
+            self.jpeg_quality = 80
+        # Shared JPEG buffer for fan-out
+        self._jpeg_lock = threading.Lock()
+        self._last_jpeg = None
+        self._last_jpeg_ts = 0.0
+        # Snapshot cache (câmera temporária aberta para capturar frames sem sessão)
+        self._snap_cam = None
+        self._snap_cam_src = None
+        self._snap_cam_opened_ts = 0.0
+        # Preferir parâmetros vindos da Central (runtime-only)
+        try:
+            pref = a.get("prefer_server_stream_params", fallback="true").strip().lower()
+            self.prefer_server_stream_params = (pref in ("1", "true", "yes", "on"))
+        except Exception:
+            self.prefer_server_stream_params = True
         try:
             self.log.info(
                 "Agente iniciado: id=%s, tc_id=%s, central_url=%s",
@@ -181,6 +236,26 @@ class AgentService:
             except Exception:
                 pass
 
+        # Ajusta streaming via Central se habilitado
+        if getattr(self, 'prefer_server_stream_params', True):
+            try:
+                sfps = cfg.get("stream_fps")
+                squa = cfg.get("stream_quality")
+                if sfps is not None:
+                    v = int(sfps)
+                    if 1 <= v <= 60:
+                        self.stream_fps = v
+                if squa is not None:
+                    q = int(squa)
+                    if 30 <= q <= 95:
+                        self.jpeg_quality = q
+                try:
+                    self.log.info("Aplicando streaming do servidor: fps=%s, qualidade=%s", self.stream_fps, self.jpeg_quality)
+                except Exception:
+                    pass
+            except Exception:
+                pass
+
         self.cp = CapturePoint(ct_info, capture_cfg)
         # callbacks para enviar ao servidor central
 
@@ -214,6 +289,12 @@ class AgentService:
                 self.cp.release()
         finally:
             self.stop_event.set()
+            try:
+                with self._jpeg_lock:
+                    self._last_jpeg = None
+                    self._last_jpeg_ts = 0.0
+            except Exception:
+                pass
 
         # Marca parada também no central se necessário (já feito via callback no stop_session)
 
@@ -291,6 +372,27 @@ def create_agent_app(cfg_path: str | None = None):
             "running": service.thread is not None and service.thread.is_alive(),
         })
 
+    @app.route("/health")
+    def health():
+        try:
+            running = service.thread is not None and service.thread.is_alive()
+        except Exception:
+            running = False
+        try:
+            age_ms = int((time.time() - service._last_jpeg_ts) * 1000) if getattr(service, "_last_jpeg_ts", 0) else None
+        except Exception:
+            age_ms = None
+        return jsonify({
+            "ok": True,
+            "agent_id": service.agent_id,
+            "tc_id": service.tc_id,
+            "running": running,
+            "stream_fps": getattr(service, "stream_fps", None),
+            "jpeg_quality": getattr(service, "jpeg_quality", None),
+            "last_jpeg_age_ms": age_ms,
+            "version": "agent-1",
+        })
+
     @app.route("/api/agent/v1/command/start", methods=["POST"])
     def cmd_start():
         data = request.get_json(silent=True) or {}
@@ -327,14 +429,53 @@ def create_agent_app(cfg_path: str | None = None):
     @app.route("/api/agent/v1/snapshot.jpg")
     def snapshot():
         cp = service.cp
-        if not cp or not getattr(cp, "session_active", False):
-            return ("no active session", 404)
-        frame = getattr(cp, "last_vis_frame", None)
-        if frame is None and getattr(cp, "camera", None) is not None:
+        frame = None
+        # 1) Tenta usar frame da sessão ativa
+        if cp and getattr(cp, "session_active", False):
+            frame = getattr(cp, "last_vis_frame", None)
+            if frame is None and getattr(cp, "camera", None) is not None:
+                try:
+                    ret, raw = cp.camera.get_frame()
+                    if ret:
+                        frame = raw
+                except Exception:
+                    frame = None
+        # 2) Fallback: abre fonte rapidamente para um snapshot mesmo sem sessão
+        if frame is None:
             try:
-                ret, raw = cp.camera.get_frame()
-                if ret:
-                    frame = raw
+                central = CentralClient(service.central_url, service.token, agent_id=service.agent_id)
+                cfg = central.get_config(service.tc_id) or {}
+                src = cfg.get("path") or ""
+                if src:
+                    from services.video_source import VideoSource
+                    now = time.time()
+                    cam = None
+                    # Reutiliza câmera cacheada por até 30 segundos
+                    try:
+                        if (service._snap_cam is not None and
+                            service._snap_cam_src == src and
+                            (now - service._snap_cam_opened_ts) < 30.0):
+                            cam = service._snap_cam
+                        else:
+                            # Fecha anterior, se houver
+                            try:
+                                if service._snap_cam is not None:
+                                    service._snap_cam.release()
+                            except Exception:
+                                pass
+                            service._snap_cam = VideoSource(src)
+                            service._snap_cam_src = src
+                            service._snap_cam_opened_ts = time.time()
+                            cam = service._snap_cam
+                        # Tenta várias amostras (até ~3s)
+                        for _ in range(30):
+                            ret, raw = cam.get_frame()
+                            if ret and raw is not None:
+                                frame = raw
+                                break
+                            time.sleep(0.1)
+                    except Exception:
+                        frame = None
             except Exception:
                 frame = None
         if frame is None:
@@ -350,6 +491,9 @@ def create_agent_app(cfg_path: str | None = None):
         if not cp or not getattr(cp, "session_active", False):
             return ("no active session", 404)
         def gen():
+            import cv2
+            interval = max(0.01, 1.0 / float(service.stream_fps or 12))
+            enc_params = [int(cv2.IMWRITE_JPEG_QUALITY), int(service.jpeg_quality or 80)]
             while True:
                 try:
                     if not getattr(cp, "session_active", False):
@@ -360,19 +504,27 @@ def create_agent_app(cfg_path: str | None = None):
                         if ret:
                             frame = raw
                     if frame is None:
-                        time.sleep(0.03)
+                        time.sleep(interval)
                         continue
-                    ok, buf = cv2.imencode('.jpg', frame)
-                    if not ok:
-                        time.sleep(0.01)
+                    now = time.time()
+                    data = None
+                    with service._jpeg_lock:
+                        if service._last_jpeg is None or (now - service._last_jpeg_ts) >= interval:
+                            ok, buf = cv2.imencode('.jpg', frame, enc_params)
+                            if ok:
+                                service._last_jpeg = buf.tobytes()
+                                service._last_jpeg_ts = now
+                        data = service._last_jpeg
+                    if data is None:
+                        time.sleep(interval)
                         continue
                     yield (b'--frame\r\n'
-                           b'Content-Type: image/jpeg\r\n\r\n' + buf.tobytes() + b'\r\n')
-                    time.sleep(0.03)
+                           b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n')
+                    time.sleep(interval)
                 except GeneratorExit:
                     break
                 except Exception:
-                    time.sleep(0.05)
+                    time.sleep(interval)
         return app.response_class(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     return app

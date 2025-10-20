@@ -1,8 +1,10 @@
 ﻿import time
+import os
 import json
 import cv2
 import logging
 import requests
+from requests.adapters import HTTPAdapter
 from flask import Blueprint, render_template, Response, request, redirect, url_for, flash
 # Lazy import de CapturePoint dentro de _ensure_cp para evitar carregar Torch
 from services.tc_repository import get_tc, list_tcs
@@ -16,6 +18,32 @@ from services.session_repository import get_active_session_by_ct
 
 tc_bp = Blueprint("tc", __name__)
 log = logging.getLogger(__name__)
+
+# Estado global para fan-out de JPEG no modo local
+_mjpeg_state = {}
+
+# Cache leve para SSE (por TC) para reduzir consultas por segundo
+_sse_db_cache = {}  # { tc_id: { 'ts': epoch_seconds, 'db_row': row, 'db_total_live': int|None } }
+
+# Sessão HTTP com keep-alive para falar com o Agent
+_agent_http = requests.Session()
+try:
+    _agent_http.mount('http://', HTTPAdapter(pool_connections=50, pool_maxsize=50))
+    _agent_http.mount('https://', HTTPAdapter(pool_connections=50, pool_maxsize=50))
+except Exception:
+    pass
+
+# Parâmetros de streaming locais via env (Central)
+def _env_int(name: str, default: int, lo: int, hi: int) -> int:
+    try:
+        v = int(os.getenv(name, str(default)))
+        return max(lo, min(hi, v))
+    except Exception:
+        return default
+
+CENTRAL_MJPEG_QUALITY = _env_int("CENTRAL_JPEG_QUALITY", 80, 30, 95)
+CENTRAL_MJPEG_FPS = _env_int("CENTRAL_MJPEG_FPS", 25, 1, 60)
+CENTRAL_MJPEG_INTERVAL = max(0.01, 1.0 / float(CENTRAL_MJPEG_FPS))
 
 def _parse_roi(roi_val):
     if roi_val is None:
@@ -78,7 +106,7 @@ def tc_detail(tc_id):
         flash("TC nÃÂ£o encontrada.", "error")
         return redirect(url_for("index"))
     cp = _ensure_cp(tc_row)
-    return render_template("tc_detail.html", tc=tc_row, ct=tc_row, cp=cp)
+    return redirect(url_for("tc_multi"))
 
 @tc_bp.route("/tc-operacao")
 @login_required
@@ -135,7 +163,7 @@ def tc_start(tc_id):
     if host:
         base = f"http://{host}:9090"
         try:
-            r = requests.post(
+            r = _agent_http.post(
                 f"{base}/api/agent/v1/command/start",
                 json={
                     "lote": lote,
@@ -319,7 +347,7 @@ def tc_stop(tc_id):
     if host:
         base = f"http://{host}:9090"
         try:
-            r = requests.post(
+            r = _agent_http.post(
                 f"{base}/api/agent/v1/command/stop",
                 json={"observacao": observacao or None},
                 timeout=10,
@@ -346,6 +374,11 @@ def tc_stop(tc_id):
     log.info("STOP autorizado para TC %s (observacao=%s)", tc_id, bool(observacao))
     cp.stop_session(observacao=observacao or None)
     log.info("STOP executado para TC %s (total_final=%s)", tc_id, cp.current_session_count)
+    # Limpa fan-out cache para liberar memória da TC
+    try:
+        _mjpeg_state.pop(tc_id, None)
+    except Exception:
+        pass
 
     if request.headers.get("X-Requested-With") == "fetch":
         return ("", 204)
@@ -376,12 +409,18 @@ def sse_tc(tc_id):
                 # Total "ao vivo" (último total_atual do session_log)
                 db_total_live = None
                 if db_row and db_row.get("id") is not None:
-                    row = query_one(
-                        "SELECT total_atual FROM session_log WHERE session_id = %s ORDER BY ts DESC LIMIT 1",
-                        [db_row["id"]],
-                    )
-                    if row and "total_atual" in row:
-                        db_total_live = int(row["total_atual"]) if row["total_atual"] is not None else None
+                    now = time.time()
+                    cached = _sse_db_cache.get(tc_id)
+                    if cached and cached.get('db_row') and cached['db_row'].get('id') == db_row.get('id') and (now - cached.get('ts', 0)) <= 1.0:
+                        db_total_live = cached.get('db_total_live')
+                    else:
+                        row = query_one(
+                            "SELECT total_atual FROM session_log WHERE session_id = %s ORDER BY ts DESC LIMIT 1",
+                            [db_row["id"]],
+                        )
+                        if row and "total_atual" in row:
+                            db_total_live = int(row["total_atual"]) if row["total_atual"] is not None else None
+                        _sse_db_cache[tc_id] = {'ts': now, 'db_row': db_row, 'db_total_live': db_total_live}
             except Exception:
                 db_status = None
                 db_total = None
@@ -465,6 +504,8 @@ def tc_video(tc_id):
     if not cp or not cp.session_active:
         return "Nenhuma sessÃÂ£o ativa para esta TC.", 404
 
+    # Fan-out state por TC para reduzir encodes por viewer
+    global _mjpeg_state
     def gen():
         frame = None
         raw = None
@@ -488,10 +529,45 @@ def tc_video(tc_id):
                 text = f"TOTAL: {int(cp.current_session_count)}"
                 cv2.putText(frame, text, (15, 45), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 3)
 
-                ok, buffer = cv2.imencode('.jpg', frame)
-                if ok:
+                state = _mjpeg_state.get(tc_id)
+                if not state:
+                    # Defaults por TC vindos do cadastro (quando existir)
+                    tc_row = None
+                    try:
+                        tc_row = get_tc(tc_id)
+                    except Exception:
+                        tc_row = None
+                    q = CENTRAL_MJPEG_QUALITY
+                    f = CENTRAL_MJPEG_FPS
+                    if tc_row is not None:
+                        try:
+                            if tc_row.get('stream_quality') is not None:
+                                q = int(tc_row.get('stream_quality'))
+                            if tc_row.get('stream_fps') is not None:
+                                f = int(tc_row.get('stream_fps'))
+                        except Exception:
+                            pass
+                    state = {'last_jpeg': None, 'last_ts': 0.0, 'quality': q, 'fps': f}
+                    _mjpeg_state[tc_id] = state
+                # Sobrepõe texto com configurações atuais
+                try:
+                    overlay = f"FPS:{int(state.get('fps', CENTRAL_MJPEG_FPS))} Q:{int(state.get('quality', CENTRAL_MJPEG_QUALITY))}"
+                    cv2.putText(frame, overlay, (15, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (180, 255, 180), 2)
+                except Exception:
+                    pass
+
+                fps = float(state.get('fps', CENTRAL_MJPEG_FPS))
+                interval = max(0.01, 1.0 / fps)
+                now = time.time()
+                if state['last_jpeg'] is None or (now - state['last_ts']) >= interval:
+                    ok, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), int(state.get('quality', CENTRAL_MJPEG_QUALITY))])
+                    if ok:
+                        state['last_jpeg'] = buffer.tobytes()
+                        state['last_ts'] = now
+                data = state['last_jpeg']
+                if data:
                     yield (b'--frame\r\n'
-                           b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+                           b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n')
                 time.sleep(0.01)
             except Exception as e:
                 if frame is not None:
@@ -529,7 +605,7 @@ def tc_video_proxy(tc_id):
             return "Agente offline ou não identificado.", 503
         url = f"http://{host}:9090/api/agent/v1/video"
         try:
-            r = requests.get(url, stream=True, timeout=(3, 30))
+            r = _agent_http.get(url, stream=True, timeout=(3, 30))
         except Exception as e:
             return f"Falha ao conectar ao agente: {e}", 502
         if not r.ok:
@@ -550,6 +626,47 @@ def tc_video_proxy(tc_id):
     # local: reutiliza o handler padrão
     return tc_video(tc_id)
 
+
+@tc_bp.route("/tc/<int:tc_id>/stream-settings", methods=["POST"])
+@login_required
+def tc_stream_settings(tc_id):
+    """Ajusta FPS/qualidade do MJPEG local (não persiste; runtime apenas)."""
+    u = current_user()
+    if u.get("role") != "admin":
+        return ("forbidden", 403)
+    try:
+        q = request.form.get("quality") or request.json.get("quality") if request.is_json else request.form.get("quality")
+    except Exception:
+        q = request.form.get("quality")
+    try:
+        f = request.form.get("fps") or request.json.get("fps") if request.is_json else request.form.get("fps")
+    except Exception:
+        f = request.form.get("fps")
+    try:
+        quality = int(q) if q is not None else None
+    except Exception:
+        quality = None
+    try:
+        fps = int(f) if f is not None else None
+    except Exception:
+        fps = None
+    # Sane bounds
+    if quality is not None:
+        quality = max(30, min(95, quality))
+    if fps is not None:
+        fps = max(1, min(60, fps))
+
+    st = _mjpeg_state.get(tc_id)
+    if not st:
+        st = {'last_jpeg': None, 'last_ts': 0.0, 'quality': CENTRAL_MJPEG_QUALITY, 'fps': CENTRAL_MJPEG_FPS}
+        _mjpeg_state[tc_id] = st
+    if quality is not None:
+        st['quality'] = quality
+    if fps is not None:
+        st['fps'] = fps
+
+    return ("", 204)
+
 @tc_bp.route("/tc/<int:tc_id>/snapshot.jpg")
 @login_required
 def tc_snapshot(tc_id):
@@ -565,7 +682,7 @@ def tc_snapshot(tc_id):
         if not host:
             return ("Agente offline", 503)
         try:
-            r = requests.get(f"http://{host}:9090/api/agent/v1/snapshot.jpg", timeout=5)
+            r = _agent_http.get(f"http://{host}:9090/api/agent/v1/snapshot.jpg", timeout=5)
         except Exception as e:
             return (f"Falha ao obter snapshot do agente: {e}", 502)
         if not r.ok:

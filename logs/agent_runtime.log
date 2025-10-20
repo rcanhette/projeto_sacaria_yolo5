@@ -130,3 +130,218 @@
 2025-10-16 23:29:29,752 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\10.mp4
 2025-10-16 23:29:29,905 INFO [services.capture_point] [CT2] STOP lote='TESTE_ROI' concluido (total=4)
 2025-10-16 23:29:29,912 INFO [werkzeug] 192.168.18.89 - - [16/Oct/2025 23:29:29] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-17 16:16:25,613 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=2, central_url=http://localhost:8080
+2025-10-17 16:16:25,615 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-17 16:16:25,632 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://192.168.3.60:9090
+2025-10-17 16:16:25,633 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-17 16:17:32,013 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-17 16:17:32,014 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-17 16:17:32,038 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://192.168.3.60:9090
+2025-10-17 16:17:32,038 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-17 16:18:27,606 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:18:27] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-17 16:18:27,617 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:18:27] "[33mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 404 -
+2025-10-17 16:19:03,648 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:19:03] "[33mGET /api/agent/v1/video HTTP/1.1[0m" 404 -
+2025-10-17 16:19:30,049 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:19:30] "[33mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 404 -
+2025-10-17 16:20:05,709 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:20:05] "[33mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 404 -
+2025-10-17 16:20:05,942 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:20:05] "[33mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 404 -
+2025-10-17 16:20:13,536 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:20:13] "[33mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 404 -
+2025-10-17 16:20:13,582 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:20:13] "[33mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 404 -
+2025-10-17 16:21:09,076 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-17 16:21:09,077 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-17 16:21:09,094 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://192.168.3.60:9090
+2025-10-17 16:21:09,095 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-17 16:21:35,820 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:35,826 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:36,778 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:36,851 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:21:36] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:21:37,738 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:37,801 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:21:37] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:21:41,738 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:42,620 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:42,672 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:21:42] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:21:46,567 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:47,472 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:47,532 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:21:47] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:21:51,454 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:52,298 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:21:52,349 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:21:52] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:21:58,118 INFO [agent] Comando START recebido: lote=TESTE, alvo=12, source_type=rtsp, file_path=None
+2025-10-17 16:21:58,121 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:21:58] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-17 16:22:00,196 INFO [agent] Origem efetiva para TC 1: rtsp -> rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:22:00,197 INFO [agent] Aplicando streaming do servidor: fps=12, qualidade=80
+2025-10-17 16:22:00,198 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:22:01,133 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:22:01,149 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-17 16:22:19,745 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-17 16:22:19,747 INFO [services.capture_point] [CT1] START lote='TESTE' source(type='rtsp', path='rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101'), modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado), fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-17 16:22:19,876 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE
+2025-10-17 16:22:23,895 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:22:23] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-17 16:22:54,434 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:22:54,478 INFO [services.capture_point] [CT1] STOP lote='TESTE' concluido (total=8)
+2025-10-17 16:22:54,482 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:22:54] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-17 16:23:10,051 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:10,062 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:10,926 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:11,011 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:11] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:11,799 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:11,857 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:11] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:14,852 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:14,900 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:15,722 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:15,773 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:15] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:16,662 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:16,736 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:16] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:19,698 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:20,591 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:20,638 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:20] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:24,531 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:25,456 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:25,509 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:25] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:29,427 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:30,331 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:30,391 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:30] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:34,314 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:35,188 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:35,236 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:35] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:39,151 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:40,013 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:40,058 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:40] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:43,992 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:44,896 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:23:44,951 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:23:44] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-17 16:23:48,830 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:24:27,882 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-17 16:24:27,883 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-17 16:24:27,910 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://192.168.3.60:9090
+2025-10-17 16:24:27,910 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-17 16:24:38,336 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:24:38] "GET /api/agent/v1/status HTTP/1.1" 200 -
+2025-10-17 16:24:44,894 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:24:45,004 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:24:45,872 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:24:45] "GET /api/agent/v1/snapshot.jpg HTTP/1.1" 200 -
+2025-10-17 16:24:46,778 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:24:46] "GET /api/agent/v1/snapshot.jpg HTTP/1.1" 200 -
+2025-10-17 16:25:31,664 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:25:31,688 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:25:32,768 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:25:32] "GET /api/agent/v1/snapshot.jpg HTTP/1.1" 200 -
+2025-10-17 16:25:33,248 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:25:33] "GET /api/agent/v1/snapshot.jpg HTTP/1.1" 200 -
+2025-10-17 16:30:54,866 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:30:54,918 INFO [services.video_source] Encerrando fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:30:54,920 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:30:54,928 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-17 16:30:55,930 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:30:55] "GET /api/agent/v1/snapshot.jpg HTTP/1.1" 200 -
+2025-10-17 16:30:56,894 INFO [werkzeug] 192.168.3.60 - - [17/Oct/2025 16:30:56] "GET /api/agent/v1/snapshot.jpg HTTP/1.1" 200 -
+2025-10-17 16:46:20,613 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-17 16:46:20,614 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-17 16:46:20,640 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://192.168.3.60:9090
+2025-10-17 16:46:20,641 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-18 15:03:36,971 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-18 15:03:36,975 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-18 15:03:37,067 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://10.245.41.14:9090
+2025-10-18 15:03:37,067 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-18 15:04:04,947 INFO [agent] Comando START recebido: lote=TESTE, alvo=12, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:04:04,954 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:04:04] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-18 15:04:07,029 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-18 15:04:07,029 INFO [agent] Aplicando streaming do servidor: fps=25, qualidade=80
+2025-10-18 15:04:07,030 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:04:07,345 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-18 15:04:07,351 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:04:07,359 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-18 15:04:16,573 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-18 15:04:16,576 INFO [services.capture_point] [CT1] START lote='TESTE' source(type='file', path='C:\workspace\python\VIDEOS\teste.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado), fluxo='cima', offsets(red=100, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-18 15:04:16,720 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE
+2025-10-18 15:04:17,807 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:04:17] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-18 15:05:12,930 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE\TESTE_150512_id2.jpg
+2025-10-18 15:05:33,263 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:05:33,353 INFO [services.capture_point] [CT1] STOP lote='TESTE' concluido (total=0)
+2025-10-18 15:05:33,354 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:05:33] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-18 15:05:46,002 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:05:46,175 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:05:52,886 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:05:58,607 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:06:00,112 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:06:06,736 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:06:08,409 INFO [services.video_source] Abrindo fonte de vídeo (stream): rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:06:16,095 ERROR [services.video_source] Não foi possível abrir a fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:06:19,123 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:06:19] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-18 15:06:26,921 INFO [agent] Comando START recebido: lote=TESTE, alvo=1, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:06:26,927 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:06:26] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-18 15:06:28,989 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-18 15:06:28,989 INFO [agent] Aplicando streaming do servidor: fps=30, qualidade=95
+2025-10-18 15:06:28,990 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:06:46,139 ERROR [services.video_source] Não foi possível abrir a fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:06:49,164 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:06:49] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-18 15:07:16,219 ERROR [services.video_source] Não foi possível abrir a fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:07:19,236 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:07:19] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-18 15:07:23,089 INFO [agent] Comando START recebido: lote=TESTE, alvo=1, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:07:23,102 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:07:23] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-18 15:07:25,174 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-18 15:07:25,180 INFO [agent] Aplicando streaming do servidor: fps=30, qualidade=95
+2025-10-18 15:07:25,182 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:07:46,319 ERROR [services.video_source] Não foi possível abrir a fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:07:49,339 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:07:49] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-18 15:08:15,696 INFO [agent] Comando START recebido: lote=TESTE, alvo=12, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:08:15,703 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:08:15] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-18 15:08:16,413 ERROR [services.video_source] Não foi possível abrir a fonte de vídeo: rtsp://admin:Coop%402020@172.16.10.83:554/Streaming/Channels/101
+2025-10-18 15:08:17,778 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-18 15:08:17,778 INFO [agent] Aplicando streaming do servidor: fps=30, qualidade=95
+2025-10-18 15:08:17,779 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:08:19,435 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:08:19] "[35m[1mGET /api/agent/v1/snapshot.jpg HTTP/1.1[0m" 503 -
+2025-10-18 15:08:39,998 INFO [agent] Agente iniciado: id=agent-2# ID da TC no servidor central que este agente opera, tc_id=1, central_url=http://localhost:8080
+2025-10-18 15:08:40,001 INFO [agent] Usando config do agente em: C:\workspace\python\projeto_sacaria_yolo5\agent.ini
+2025-10-18 15:08:40,076 INFO [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:9090
+ * Running on http://10.245.41.14:9090
+2025-10-18 15:08:40,077 INFO [werkzeug] [33mPress CTRL+C to quit[0m
+2025-10-18 15:09:38,929 INFO [agent] Comando START recebido: lote=TESTE, alvo=1, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:09:38,934 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:09:38] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-18 15:09:41,016 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-18 15:09:41,017 INFO [agent] Aplicando streaming do servidor: fps=30, qualidade=95
+2025-10-18 15:09:41,022 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:09:41,135 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-18 15:09:41,140 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:09:41,144 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-18 15:09:48,248 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-18 15:09:48,251 INFO [services.capture_point] [CT1] START lote='TESTE' source(type='file', path='C:\workspace\python\VIDEOS\teste.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado), fluxo='cima', offsets(red=40, azul=-40), max_lost=2, match_dist=150.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-18 15:09:48,416 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE
+2025-10-18 15:09:56,535 WARNING [urllib3.connectionpool] Retrying (Retry(total=2, connect=2, read=3, redirect=None, status=3)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024194F5AF90>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /api/agent/v1/heartbeat
+2025-10-18 15:10:01,233 WARNING [urllib3.connectionpool] Retrying (Retry(total=1, connect=1, read=3, redirect=None, status=3)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024194F7D310>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /api/agent/v1/heartbeat
+2025-10-18 15:10:06,792 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:10:06] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-18 15:10:43,300 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TESTE\TESTE_151043_id2.jpg
+2025-10-18 15:11:27,206 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:11:27,311 INFO [services.capture_point] [CT1] STOP lote='TESTE' concluido (total=0)
+2025-10-18 15:11:27,313 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:11:27] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -
+2025-10-18 15:12:16,896 INFO [agent] Comando START recebido: lote=TEST, alvo=1, source_type=file, file_path=C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:12:16,902 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:12:16] "POST /api/agent/v1/command/start HTTP/1.1" 200 -
+2025-10-18 15:12:18,962 INFO [agent] Override de origem para TC 1: file='C:\workspace\python\VIDEOS\teste.mp4'
+2025-10-18 15:12:18,965 INFO [agent] Aplicando streaming do servidor: fps=30, qualidade=95
+2025-10-18 15:12:18,968 INFO [services.video_source] Abrindo fonte de vídeo (arquivo): C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:12:19,089 INFO [services.video_source] Arquivo C:\workspace\python\VIDEOS\teste.mp4: FPS=15.00, delay ajustado para 0.0600s
+2025-10-18 15:12:19,092 INFO [services.capture_point] [CT1] Fonte de vÃ­deo pronta: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:12:19,097 INFO [services.industrial_tag_detector] [Detector] Modelo solicitado='sacaria_yolov5n.pt' | resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' | encontrado=sim
+2025-10-18 15:12:20,134 INFO [services.capture_point] [CT1] Detector inicializado com modelo C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt
+2025-10-18 15:12:20,139 INFO [services.capture_point] [CT1] START lote='TEST' source(type='file', path='C:\workspace\python\VIDEOS\teste.mp4'), modelo='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt' (solicitado='sacaria_yolov5n.pt', resolvido='C:\workspace\python\projeto_sacaria_yolo5\sacaria_yolov5n.pt', status=encontrado), fluxo='cima', offsets(red=45, azul=-40), max_lost=2, match_dist=180.0, min_conf=0.8, missed_dir='C:\workspace\python\projeto_sacaria_yolo5\fotos'
+2025-10-18 15:12:20,168 INFO [services.industrial_tag_detector] Snapshots de nao contadas ativos em C:\workspace\python\projeto_sacaria_yolo5\fotos\TEST
+2025-10-18 15:12:21,274 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:12:21] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-18 15:12:45,501 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:12:45] "GET /api/agent/v1/video HTTP/1.1" 200 -
+2025-10-18 15:13:24,257 INFO [services.industrial_tag_detector] Snapshot nao contado salvo: C:\workspace\python\projeto_sacaria_yolo5\fotos\TEST\TEST_151324_id2.jpg
+2025-10-18 15:13:36,335 INFO [services.video_source] Encerrando fonte de vídeo: C:\workspace\python\VIDEOS\teste.mp4
+2025-10-18 15:13:36,423 INFO [services.capture_point] [CT1] STOP lote='TEST' concluido (total=1)
+2025-10-18 15:13:36,425 INFO [werkzeug] 192.168.18.89 - - [18/Oct/2025 15:13:36] "POST /api/agent/v1/command/stop HTTP/1.1" 200 -

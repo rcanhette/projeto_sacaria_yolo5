@@ -174,6 +174,21 @@ def tc_admin_calibrate(tc_id):
     match_dist = _parse_float(request.form.get("match_dist"), float(tc.get("match_dist") or 150))
     min_conf = _parse_float(request.form.get("min_conf"), float(tc.get("min_conf") or 0.8))
     missed_frame_dir = (request.form.get("missed_frame_dir") or tc.get("missed_frame_dir") or "").strip()
+    # streaming persistente (opcional)
+    stream_fps = request.form.get("stream_fps")
+    stream_quality = request.form.get("stream_quality")
+    try:
+        stream_fps = int(stream_fps) if stream_fps not in (None, "") else None
+    except Exception:
+        stream_fps = None
+    try:
+        stream_quality = int(stream_quality) if stream_quality not in (None, "") else None
+    except Exception:
+        stream_quality = None
+    if stream_fps is not None:
+        stream_fps = max(1, min(60, stream_fps))
+    if stream_quality is not None:
+        stream_quality = max(30, min(95, stream_quality))
 
     if max_lost < 0:
         max_lost = 0
@@ -187,7 +202,8 @@ def tc_admin_calibrate(tc_id):
 
     update_tc(tc_id, name, source_path, roi, model_path,
               line_offset_red, line_offset_blue, flow_mode,
-              max_lost, match_dist, min_conf, missed_frame_dir)
+              max_lost, match_dist, min_conf, missed_frame_dir,
+              stream_fps, stream_quality)
     drop_tc_runtime(tc_id)
     flash("Calibração salva.", "success")
     return redirect(url_for("tc_admin.tc_admin_calibrate", tc_id=tc_id))
@@ -216,5 +232,41 @@ def tc_admin_test_agent(tc_id: int):
             flash(f"Agente em {host}: respondeu HTTP {r.status_code}.", "error")
     except Exception as e:
         flash(f"Falha ao contatar agente em {host}: {e}", "error")
+    return redirect(url_for("tc_admin.tc_admin_edit", tc_id=tc_id))
+
+@tc_admin_bp.route("/tc-admin/<int:tc_id>/test-ct", methods=["POST"])
+def tc_admin_test_ct(tc_id: int):
+    tc = get_tc(tc_id)
+    if not tc:
+        flash("TC não encontrada.", "error")
+        return redirect(url_for("tc_admin.tc_admin_list"))
+    src = (tc.get("source_path") or "").strip()
+    if not src:
+        flash("Fonte (URL) não configurada.", "error")
+        return redirect(url_for("tc_admin.tc_admin_edit", tc_id=tc_id))
+    try:
+        from services.video_source import VideoSource
+        cam = VideoSource(src)
+        ok_any = False
+        try:
+            import time
+            deadline = time.time() + 3.0
+            while time.time() < deadline:
+                ret, frame = cam.get_frame()
+                if ret and frame is not None:
+                    ok_any = True
+                    break
+                time.sleep(0.1)
+        finally:
+            try:
+                cam.release()
+            except Exception:
+                pass
+        if ok_any:
+            flash("Conexão da CT OK (frame capturado).", "success")
+        else:
+            flash("Não foi possível obter frame (tempo esgotado).", "error")
+    except Exception as e:
+        flash(f"Falha ao abrir fonte: {e}", "error")
     return redirect(url_for("tc_admin.tc_admin_edit", tc_id=tc_id))
 

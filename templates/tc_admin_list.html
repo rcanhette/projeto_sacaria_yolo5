@@ -31,6 +31,8 @@
     .inline-form{ display:inline-block; margin:0; }
     .muted{ color:var(--muted); }
     .nowrap{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; display:inline-block; }
+    /* fonte URL ocupa menos largura para caber no layout sem scroll */
+    .nowrap-url{ max-width:280px; }
     /* link do nome como ação primária, sem parecer botão */
     .name-link{ color:#0b1220; text-decoration:none; font-weight:800; }
     .name-link:hover{ text-decoration:underline; }
@@ -67,11 +69,9 @@
             <tr>
               <td>{{ ct.id }}</td>
               <td>
-                <a class="name-link" href="{{ url_for('tc.tc_detail', tc_id=ct.id) }}">
-                  {{ ct.name }}
-                </a>
+                <span class="name-link">{{ ct.name }}</span>
               </td>
-              <td><span class="nowrap" title="{{ ct.source_path }}">{{ ct.source_path }}</span></td>
+              <td><span class="nowrap nowrap-url" title="{{ ct.source_path }}">{{ ct.source_path }}</span></td>
               <td><span class="nowrap" title="{{ ct.model_path }}">{{ ct.model_path }}</span></td>
               <td>
                 <span class="status-badge {{ 'on' if ct.agent_online else 'off' }}" title="{{ (ct.agent_hostname or '') + (', ' + ct.agent_last_seen|string if ct.agent_last_seen else '') }}">
