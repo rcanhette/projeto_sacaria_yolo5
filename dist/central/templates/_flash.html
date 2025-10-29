@@ -1,0 +1,12 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div style="margin:10px 0;">
+      {% for category, msg in messages %}
+        <div style="padding:8px 12px;border-radius:6px;margin-bottom:6px;
+                    background:{% if category=='success' %}#e6ffed{% elif category=='error' %}#ffe6e6{% else %}#eef2ff{% endif %};">
+          {{ msg }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

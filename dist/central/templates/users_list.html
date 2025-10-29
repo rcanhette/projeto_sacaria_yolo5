@@ -1,0 +1,84 @@
+{% include '_navbar.html' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Usuários</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff;
+      --primary:#002F54; --primary-weak:#0f3d68; --danger:#ef4444; --danger-weak:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui; }
+    .wrap{ padding:16px; max-width:1100px; margin:0 auto; }
+    h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .toolbar{ display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px; }
+    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800;}
+    .btn:hover{ border-color:#94a3b8; }
+    .btn-primary{ background:var(--primary); color:#fff; border-color:transparent; }
+    .btn-primary:hover{ background:var(--primary-weak); }
+    .btn-danger{ background:var(--danger); color:#fff; border-color:transparent; }
+    .btn-danger:hover{ background:var(--danger-weak); }
+    .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; }
+    th, td{ padding:12px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+    thead th{ background:#f5f7fb; font-weight:700; }
+    .muted{ color:var(--muted); }
+    .row-actions{ display:flex; gap:8px; justify-content:flex-end; }
+    .inline-form{ display:inline-block; margin:0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <h1>Usuários</h1>
+
+    <div class="card">
+      <div class="toolbar">
+        <a class="btn btn-primary" href="{{ url_for('user_admin.users_new') }}">+ Novo usuário</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuário</th>
+              <th>Papel</th>
+              <th>Status</th>
+              <th style="text-align:right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.id }}</td>
+              <td>{{ u.username }}</td>
+              <td>{{ u.role }}</td>
+              <td class="muted">{{ 'Ativo' if u.active else 'Inativo' }}</td>
+              <td>
+                <div class="row-actions">
+                  <a class="btn" href="{{ url_for('user_admin.users_edit', user_id=u.id) }}">Editar</a>
+                  <form class="inline-form" method="post" action="{{ url_for('user_admin.users_delete', user_id=u.id) }}"
+                        onsubmit="return confirm('Excluir usuário {{ u.username }}? Esta ação é irreversível.')">
+                    <button class="btn btn-danger" type="submit">Excluir</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" style="padding:16px;text-align:center;color:var(--muted);">Nenhum usuário cadastrado.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,417 @@
+{% include '_navbar.html' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Sessões</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff; --primary:#002F54; --primary-weak:#0f3d68; }
+    *{box-sizing:border-box}
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui; }
+    .wrap{ padding:16px; max-width:1200px; margin:0 auto; }
+    h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .row{ display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+    select, input[type="date"], input[type="text"]{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; }
+    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800;}
+    .btn:hover{ border-color:#94a3b8; }
+    .btn-primary{ background:var(--primary); color:#fff; border-color:transparent; }
+    .btn-primary:hover{ background:var(--primary-weak); }
+    .btn-danger{ background:#ef4444; color:#fff; border-color:transparent; }
+    .btn-danger:hover{ background:#dc2626; }
+    .btn:disabled.btn-danger{ background:#fff; color:#0b1220; border-color:var(--border); }
+    .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; }
+    th, td{ padding:12px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+    thead th{ background:#f5f7fb; font-weight:700; }
+    .muted{ color:var(--muted); }
+    .actions{ display:flex; gap:8px; justify-content:flex-end; }
+    .status-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:#f3f4f6; color:#111827; font-weight:800; font-size:12px; }
+    .status-on{ background:#16a34a; border-color:transparent; color:#fff; }
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(15,23,42,0.45); z-index:200; display:none; }
+    .modal{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 24px 56px rgba(15,23,42,0.3); width:min(90vw,420px); padding:24px; display:none; flex-direction:column; gap:16px; z-index:210; }
+    .modal.open{ display:flex; }
+    .modal-backdrop.open{ display:block; }
+    .modal-title{ font-weight:700; font-size:16px; letter-spacing:.01em; color:var(--text); }
+    .modal textarea{ min-height:120px; resize:vertical; padding:12px; border-radius:12px; border:1px solid var(--border); font-size:14px; line-height:1.4; }
+    .modal textarea:focus{ outline:2px solid #7dd3fc; outline-offset:2px; }
+    .modal-actions{ display:flex; justify-content:flex-end; gap:10px; }
+    .modal-hint{ font-size:12px; color:var(--muted); }
+  </style>
+ </head>
+<body>
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <h1>Sessões</h1>
+
+    <div class="card">
+      <form class="row" method="get" action="{{ url_for('logs.logs_panel') }}">
+        <label for="ct_id">TC:</label>
+        <select name="ct_id" id="ct_id">
+          <option value="all" {{ 'selected' if current_ct_id=='all' else '' }}>Todas</option>
+          {% for c in cts %}
+            <option value="{{ c.id }}" {{ 'selected' if current_ct_id==c.id|string else '' }}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="status">Status:</label>
+        <select name="status" id="status">
+          {% set st = (current_status or 'operando') %}
+          <option value="all" {{ 'selected' if st=='all' else '' }}>Todos</option>
+          <option value="operando" {{ 'selected' if st=='operando' else '' }}>Operando</option>
+          <option value="finalizado" {{ 'selected' if st=='finalizado' else '' }}>Finalizado</option>
+          <option value="cancelado" {{ 'selected' if st=='cancelado' else '' }}>Cancelado</option>
+        </select>
+
+        <label for="lote">Lote:</label>
+        <input type="text" id="lote" name="lote" value="{{ current_lote or '' }}" placeholder="Pesquisar lote" />
+
+        <label for="ini_de">Início de:</label>
+        <input type="date" id="ini_de" name="ini_de" value="{{ current_ini_de or '' }}" />
+        <label for="ini_ate">até:</label>
+        <input type="date" id="ini_ate" name="ini_ate" value="{{ current_ini_ate or '' }}" />
+
+        <input type="hidden" name="page" value="1" />
+
+        <button class="btn" type="submit">Filtrar</button>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sessão</th>
+              <th>TC</th>
+              <th>Lote</th>
+              <th>Início</th>
+              <th>Fim</th>
+              <th>Status</th>
+              <th>Alvo</th>
+              <th>Total</th>
+              <!--<th>Observação</th>-->
+              <th style="text-align:right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in sessions %}
+              <tr data-ct-id="{{ s.ct_id }}" data-session-id="{{ s.id }}" data-status="{{ s.status }}" data-obs-deadline="{{ s.obs_deadline_iso or '' }}" data-obs-text="{{ s.obs_text or '' }}">
+                <td>{{ s.id }}</td>
+                <td>{{ s.ct_name }}</td>
+                <td>{{ s.lote or '-' }}</td>
+                <td>{{ s.data_inicio.strftime('%d/%m/%Y %H:%M:%S') if s.data_inicio else '-' }}</td>
+                <td>{{ s.data_fim.strftime('%d/%m/%Y %H:%M:%S') if s.data_fim else '-' }}</td>
+                <td><span id="st-{{ s.id }}" class="status-badge {{ 'status-on' if (s.status or '').lower()=='operando' else '' }}">{{ s.status }}</span></td>
+                <td>{{ s.contagem_alvo if s.contagem_alvo is not none else '-' }}</td>
+                <td id="tot-{{ s.id }}">{{ s.total_final }}</td>
+               <!-- <td id="obs-{{ s.id }}">{{ s.observacao or '-' }}</td> -->
+                <td>
+                  <div class="actions">
+                    <a class="btn" href="{{ url_for('logs.log_detail', session_id=s.id) }}">Log</a>
+                    <button id="btn-obs-{{ s.id }}" class="btn" type="button" data-deadline="{{ s.obs_deadline_iso or '' }}" data-current-obs="{{ s.obs_text or '' }}" {{ '' if s.can_edit_obs else 'disabled' }}>Alterar OBS</button>
+                  </div>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="9" class="muted" style="padding:16px; text-align:center;">Nenhuma sessão encontrada para esse filtro.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="row" style="justify-content: space-between; align-items:center; margin-top:12px;">
+        <div class="muted">Página {{ page }} de {{ total_pages }}</div>
+        <div class="actions">
+          {% if page > 1 %}
+            <a class="btn" href="{{ url_for('logs.logs_panel', ct_id=current_ct_id, status=current_status, lote=current_lote, ini_de=current_ini_de, ini_ate=current_ini_ate, page=page-1) }}">Mais recentes</a>
+          {% endif %}
+          {% if page < total_pages %}
+            <a class="btn" href="{{ url_for('logs.logs_panel', ct_id=current_ct_id, status=current_status, lote=current_lote, ini_de=current_ini_de, ini_ate=current_ini_ate, page=page+1) }}">Mais antigos</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="obs-edit-backdrop" class="modal-backdrop"></div>
+  <div id="obs-edit-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="obs-edit-title">
+    <div id="obs-edit-title" class="modal-title">Alterar observação</div>
+    <div id="obs-edit-message" class="muted">Atualize a observação desta sessão. Mínimo de 10 caracteres.</div>
+    <textarea id="obs-edit-text" placeholder="Digite pelo menos 10 caracteres..." maxlength="500"></textarea>
+    <div id="obs-edit-hint" class="modal-hint">Digite pelo menos 10 caracteres.</div>
+    <div class="modal-actions">
+      <button type="button" id="obs-edit-cancel" class="btn">Cancelar</button>
+      <button type="button" id="obs-edit-ok" class="btn btn-primary" disabled>Salvar</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const MIN_OBS_CHARS = 10;
+      const obsButtons = [];
+
+      const modalRefs = {
+        backdrop: document.getElementById('obs-edit-backdrop'),
+        modal: document.getElementById('obs-edit-modal'),
+        textarea: document.getElementById('obs-edit-text'),
+        ok: document.getElementById('obs-edit-ok'),
+        cancel: document.getElementById('obs-edit-cancel'),
+        hint: document.getElementById('obs-edit-hint'),
+      };
+
+      function parseDeadline(str){
+        if (!str) return null;
+        const dt = new Date(str);
+        return isNaN(dt.getTime()) ? null : dt;
+      }
+
+      function syncDeadlineAttr(btn){
+        if (!btn) return;
+        const value = btn.dataset.deadline || '';
+        if (value){
+          btn.setAttribute('data-deadline', value);
+        } else {
+          btn.removeAttribute('data-deadline');
+        }
+      }
+
+      function refreshObsButton(btn){
+        if (!btn) return;
+        const deadlineStr = btn.dataset.deadline || btn.getAttribute('data-deadline') || '';
+        const deadline = parseDeadline(deadlineStr);
+        if (!deadline){
+          btn.disabled = true;
+          btn.classList.remove('btn-danger');
+          return;
+        }
+        const remaining = deadline.getTime() - Date.now();
+        btn.disabled = remaining <= 0;
+        btn.classList.toggle('btn-danger', !btn.disabled);
+      }
+
+      function registerObsButton(btn, tr){
+        if (!btn) return;
+        const rowDeadline = tr && tr.dataset ? tr.dataset.obsDeadline : undefined;
+        if (rowDeadline) btn.dataset.deadline = rowDeadline;
+        const attrDeadline = btn.getAttribute('data-deadline');
+        if (attrDeadline) btn.dataset.deadline = attrDeadline;
+        const rowObs = tr && tr.dataset ? tr.dataset.obsText : undefined;
+        if (typeof rowObs !== 'undefined') {
+          btn.dataset.currentObs = rowObs || '';
+        } else if (!btn.dataset.currentObs) {
+          btn.dataset.currentObs = btn.getAttribute('data-current-obs') || '';
+        }
+        syncDeadlineAttr(btn);
+        refreshObsButton(btn);
+        if (!btn.dataset.obsRegistered){
+          obsButtons.push(btn);
+          btn.dataset.obsRegistered = '1';
+        }
+      }
+
+      function askObservationModal(initialValue){
+        return new Promise(resolve => {
+          const refs = modalRefs;
+          if (!refs.modal || !refs.textarea || !refs.ok){
+            const fallback = prompt('Nova observação (mínimo 10 caracteres):', initialValue || '');
+            const trimmed = (fallback || '').trim();
+            resolve(trimmed.length >= MIN_OBS_CHARS ? trimmed : null);
+            return;
+          }
+
+          const { backdrop, modal, textarea, ok, cancel, hint } = refs;
+          const previousOverflow = document.body.style.overflow;
+
+          function cleanup(){
+            ok.removeEventListener('click', onOk);
+            cancel.removeEventListener('click', onCancel);
+            textarea.removeEventListener('input', onInput);
+            textarea.removeEventListener('keydown', onKeydown);
+            if (backdrop) backdrop.removeEventListener('click', onBackdrop);
+          }
+
+          function close(){
+            modal.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('open');
+            document.body.style.overflow = previousOverflow;
+            textarea.value = '';
+            ok.disabled = true;
+            if (hint) hint.textContent = `Digite pelo menos ${MIN_OBS_CHARS} caracteres.`;
+          }
+
+          function onInput(){
+            const trimmed = textarea.value.trim();
+            const len = trimmed.length;
+            ok.disabled = len < MIN_OBS_CHARS;
+            if (hint){
+              if (len < MIN_OBS_CHARS){
+                const remaining = MIN_OBS_CHARS - len;
+                hint.textContent = `Digite pelo menos ${remaining} caractere${remaining === 1 ? '' : 's'} para continuar.`;
+              }else{
+                hint.textContent = 'Pressione Salvar para confirmar.';
+              }
+            }
+          }
+
+          function onOk(){
+            if (ok.disabled) return;
+            const value = textarea.value.trim();
+            cleanup();
+            close();
+            resolve(value);
+          }
+
+          function onCancel(){
+            cleanup();
+            close();
+            resolve(null);
+          }
+
+          function onKeydown(evt){
+            if (evt.key === 'Escape'){
+              evt.preventDefault();
+              onCancel();
+            }
+            if ((evt.ctrlKey || evt.metaKey) && evt.key === 'Enter'){
+              if (!ok.disabled){
+                evt.preventDefault();
+                onOk();
+              }
+            }
+          }
+
+          function onBackdrop(evt){
+            if (evt.target === backdrop){
+              onCancel();
+            }
+          }
+
+          textarea.value = initialValue || '';
+          onInput();
+
+          if (backdrop){
+            backdrop.classList.add('open');
+            backdrop.addEventListener('click', onBackdrop);
+          }
+          modal.classList.add('open');
+          document.body.style.overflow = 'hidden';
+
+          textarea.addEventListener('input', onInput);
+          textarea.addEventListener('keydown', onKeydown);
+          ok.addEventListener('click', onOk);
+          cancel.addEventListener('click', onCancel);
+
+          setTimeout(() => {
+            textarea.focus();
+            const len = textarea.value.length;
+            try{
+              textarea.setSelectionRange(len, len);
+            }catch(_){}
+          }, 40);
+        });
+      }
+
+      function handleObservationEdit(btn, sessId){
+        btn.addEventListener('click', async ()=>{
+          refreshObsButton(btn);
+          if (btn.disabled) return;
+          const current = btn.dataset.currentObs || '';
+          const updated = await askObservationModal(current);
+          if (!updated) return;
+          try{
+            const body = new URLSearchParams();
+            body.set('observacao', updated);
+            const resp = await fetch(`/log/${sessId}/observacao`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: body.toString()
+            });
+            if (resp.ok){
+              btn.dataset.currentObs = updated;
+              const tr = document.querySelector(`tr[data-session-id="${sessId}"]`);
+              if (tr) tr.dataset.obsText = updated;
+            } else {
+              const txt = await resp.text();
+              alert(txt || 'Não foi possível alterar.');
+            }
+          }catch(_){
+            alert('Não foi possível alterar.');
+          }
+        });
+      }
+
+      try{
+        const rows = Array.from(document.querySelectorAll('tbody tr[data-ct-id][data-session-id]'));
+
+        const byCt = new Map();
+        rows.forEach(tr => {
+          const sessId = tr.getAttribute('data-session-id');
+          const status = (tr.getAttribute('data-status')||'').toLowerCase();
+          if (status === 'operando'){
+            const ctId = tr.getAttribute('data-ct-id');
+            if (!byCt.has(ctId)) byCt.set(ctId, []);
+            byCt.get(ctId).push(sessId);
+          }
+          const btn = document.getElementById(`btn-obs-${sessId}`);
+          if (btn){
+            registerObsButton(btn, tr);
+            handleObservationEdit(btn, sessId);
+          }
+        });
+
+        byCt.forEach((sessIds, ctId) => {
+          try{
+            const es = new EventSource(`/sse/tc/${ctId}`);
+            es.onmessage = function(e){
+              try{
+                const d = JSON.parse(e.data||'{}');
+                const totTxt = (typeof d.count === 'number') ? String(d.count) : undefined;
+                const active = !!d.session_active;
+                sessIds.forEach(id => {
+                  const totEl = document.getElementById(`tot-${id}`);
+                  if (totEl && totTxt!==undefined) totEl.textContent = totTxt;
+                  const stEl  = document.getElementById(`st-${id}`);
+                  if (stEl){
+                    if (active){
+                      stEl.textContent = 'operando';
+                      stEl.classList.add('status-on');
+                    } else {
+                      stEl.textContent = 'finalizado';
+                      stEl.classList.remove('status-on');
+                    }
+                  }
+                  const tr = document.querySelector(`tr[data-session-id="${id}"]`);
+                  if (tr) tr.dataset.status = active ? 'operando' : 'finalizado';
+                  const btn = document.getElementById(`btn-obs-${id}`);
+                  if (btn){
+                    if (active){
+                      btn.disabled = true;
+                      btn.dataset.deadline = '';
+                      syncDeadlineAttr(btn);
+                      btn.classList.remove('btn-danger');
+                      if (tr) tr.dataset.obsDeadline = '';
+                    } else {
+                      if (!btn.dataset.deadline){
+                        const deadline = new Date(Date.now() + 600000).toISOString();
+                        btn.dataset.deadline = deadline;
+                        if (tr) tr.dataset.obsDeadline = deadline;
+                      }
+                      syncDeadlineAttr(btn);
+                      refreshObsButton(btn);
+                    }
+                  }
+                });
+              }catch(_){ }
+            };
+            es.onerror = function(){ try{ es.close(); }catch(_){ } };
+          }catch(_){ }
+        });
+
+        setInterval(() => {
+          obsButtons.forEach(refreshObsButton);
+        }, 15000);
+      }catch(_){ }
+    })();
+  </script>
+</body>
+</html>

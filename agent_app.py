@@ -10,16 +10,18 @@ import cv2
 
 # Reuso do CapturePoint local
 from services.capture_point import CapturePoint
+from services.local_queue import LocalQueue
 
 # Config via INI simples (um arquivo por agente)
 import configparser
 import requests
+from uuid import uuid4
 
 LOGS_DIR = Path(__file__).resolve().parent / "logs"
 
 
 class CentralClient:
-    def __init__(self, base_url: str, token: str, agent_id: str):
+    def __init__(self, base_url: str, token: str, agent_id: str, verify: bool | str | None = True):
         self.base_url = base_url.rstrip('/')
         self.token = token
         self.agent_id = agent_id
@@ -49,6 +51,18 @@ class CentralClient:
                 adapter = HTTPAdapter(pool_connections=50, pool_maxsize=50)
             self.session.mount('http://', adapter)
             self.session.mount('https://', adapter)
+            try:
+                if verify is not None:
+                    self.session.verify = verify  # bool ou caminho CA
+                    if verify is False:
+                        # Evita warnings ruidosos quando opta por ignorar validação
+                        try:
+                            import urllib3
+                            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
         except Exception:
             # Fallback: direct requests if session fails
             self.session = requests
@@ -78,7 +92,7 @@ class CentralClient:
         except Exception:
             return None
 
-    def session_update(self, tc_id: int, session_db_id: int, increment: int, total: int):
+    def session_update(self, tc_id: int, session_db_id: int, increment: int, total: int, event_id: str | None = None):
         url = f"{self.base_url}/api/agent/v1/session/update"
         payload = {
             "agent_id": self.agent_id,
@@ -87,6 +101,8 @@ class CentralClient:
             "increment": increment,
             "total": total,
         }
+        if event_id:
+            payload["event_id"] = event_id
         try:
             self.session.post(url, json=payload, headers=self._headers(), timeout=5)
         except Exception:
@@ -146,6 +162,17 @@ class AgentService:
         self.tc_id = a.getint("tc_id", fallback=1)
         self.central_url = a.get("central_url", "http://localhost:8080")
         self.token = a.get("token", "dev-token")
+        # TLS/HTTPS do Central
+        try:
+            v = (a.get("central_verify", fallback="true") or "true").strip().lower()
+            self.central_verify = (v in ("1", "true", "yes", "on"))
+        except Exception:
+            self.central_verify = True
+        try:
+            ca = (a.get("central_ca", fallback="") or "").strip()
+            self.central_ca = str(Path(ca)) if ca else None
+        except Exception:
+            self.central_ca = None
         self.cp = None
         self.thread = None
         self.stop_event = threading.Event()
@@ -181,6 +208,24 @@ class AgentService:
             )
         except Exception:
             pass
+        # Fila local durável
+        try:
+            self.local_queue = LocalQueue(LOGS_DIR / "agent_queue.db")
+        except Exception:
+            self.local_queue = None
+        # Thresholds de severidade (health)
+        def _getint(key: str, default: int) -> int:
+            try:
+                return int(a.get(key, fallback=str(default)))
+            except Exception:
+                return default
+        self.sev_warn_events = _getint("severity_warn_events", 1)
+        self.sev_crit_events = _getint("severity_crit_events", 100)
+        self.sev_warn_sessions = _getint("severity_warn_sessions", 1)
+        self.sev_crit_sessions = _getint("severity_crit_sessions", 3)
+        self.sev_crit_last_sync_ms = _getint("severity_crit_last_sync_ms", 15*60*1000)
+        # Shadow local_id para journaling da sessão atual
+        self._shadow_local_id: int | None = None
 
     def _parse_roi(self, roi_val):
         if not roi_val:
@@ -204,7 +249,8 @@ class AgentService:
 
     def start_loop(self, lote: str = None, contagem_alvo: int | None = None, source_type: str | None = None, file_path: str | None = None):
         # Busca configuração da TC no servidor central
-        central = CentralClient(self.central_url, self.token, agent_id=self.agent_id)
+        verify_opt = (self.central_ca or self.central_verify)
+        central = CentralClient(self.central_url, self.token, agent_id=self.agent_id, verify=verify_opt)
         cfg = central.get_config(self.tc_id) or {}
         ct_info = {"id": self.tc_id, "name": cfg.get("name") or f"TC{self.tc_id}"}
         # adapta ROI
@@ -257,16 +303,65 @@ class AgentService:
                 pass
 
         self.cp = CapturePoint(ct_info, capture_cfg)
-        # callbacks para enviar ao servidor central
+        # callbacks para persistir e/ou enviar ao servidor central
 
         def _on_create_session(ct_id, lote_val, alvo):
-            return central.session_start(tc_id=ct_id, lote=lote_val, contagem_alvo=alvo)
+            # Tenta criar no central; se falhar e houver fila local, cria sessão local negativa
+            sid = central.session_start(tc_id=ct_id, lote=lote_val, contagem_alvo=alvo)
+            if sid:
+                # Journaling: cria sombra local apontando para a sessão remota
+                if self.local_queue:
+                    try:
+                        self._shadow_local_id = self.local_queue.ensure_shadow_session_remote(ct_id, lote_val or "", alvo, int(sid))
+                    except Exception:
+                        self._shadow_local_id = None
+                return sid
+            if self.local_queue:
+                try:
+                    self._shadow_local_id = self.local_queue.create_local_session(ct_id, lote_val or "", alvo)
+                    return self._shadow_local_id
+                except Exception:
+                    self._shadow_local_id = None
+                    return None
+            return None
 
         def _on_insert_log(session_id, ct_id, delta, total):
-            central.session_update(tc_id=ct_id, session_db_id=session_id, increment=delta, total=total)
+            online = False
+            try:
+                online = bool(isinstance(session_id, int) and session_id >= 0)
+            except Exception:
+                online = False
+            # Journaling local (sempre que possível)
+            try:
+                if self.local_queue and self._shadow_local_id is not None:
+                    self.local_queue.enqueue_event(self._shadow_local_id, delta, total, mark_sent=online)
+            except Exception:
+                pass
+            # Envio online (idempotente) quando houver sessão remota
+            if online:
+                try:
+                    central.session_update(tc_id=ct_id, session_db_id=int(session_id), increment=delta, total=total, event_id=str(uuid4()))
+                except Exception:
+                    pass
 
         def _on_finish_session(session_id, total, status='finalizado', observacao=None):
-            central.session_finish(tc_id=self.tc_id, session_db_id=session_id, total=total, observacao=observacao)
+            online = False
+            try:
+                online = bool(isinstance(session_id, int) and session_id >= 0)
+            except Exception:
+                online = False
+            # Journaling local
+            try:
+                if self.local_queue and self._shadow_local_id is not None:
+                    self.local_queue.mark_finish(self._shadow_local_id, total, observacao, mark_sent=online)
+            except Exception:
+                pass
+            # Envio online
+            if online:
+                try:
+                    central.session_finish(tc_id=self.tc_id, session_db_id=int(session_id), total=total, observacao=observacao)
+                except Exception:
+                    pass
 
         self.cp.on_create_session = _on_create_session
         self.cp.on_insert_log = _on_insert_log
@@ -276,6 +371,12 @@ class AgentService:
             while not self.stop_event.is_set():
                 try:
                     # processamento ocorre dentro do CapturePoint (thread interna)
+                    # Worker de replicação: reenvia pendências quando possível
+                    try:
+                        if self.local_queue:
+                            self.local_queue.sync_to_central(central)
+                    except Exception:
+                        pass
                     time.sleep(0.5)
                 except Exception:
                     time.sleep(1)
@@ -293,6 +394,10 @@ class AgentService:
                 with self._jpeg_lock:
                     self._last_jpeg = None
                     self._last_jpeg_ts = 0.0
+            except Exception:
+                pass
+            try:
+                self._shadow_local_id = None
             except Exception:
                 pass
 
@@ -348,7 +453,8 @@ def create_agent_app(cfg_path: str | None = None):
 
     # thread de heartbeat
     def _hb():
-        central = CentralClient(service.central_url, service.token, agent_id=service.agent_id)
+        verify_opt = (service.central_ca or service.central_verify)
+        central = CentralClient(service.central_url, service.token, agent_id=service.agent_id, verify=verify_opt)
         while True:
             try:
                 host_for_central = _best_host() or socket.gethostname()
@@ -443,7 +549,7 @@ def create_agent_app(cfg_path: str | None = None):
         # 2) Fallback: abre fonte rapidamente para um snapshot mesmo sem sessão
         if frame is None:
             try:
-                central = CentralClient(service.central_url, service.token, agent_id=service.agent_id)
+                central = CentralClient(service.central_url, service.token, agent_id=service.agent_id, verify=(service.central_ca or service.central_verify))
                 cfg = central.get_config(service.tc_id) or {}
                 src = cfg.get("path") or ""
                 if src:
@@ -526,6 +632,127 @@ def create_agent_app(cfg_path: str | None = None):
                 except Exception:
                     time.sleep(interval)
         return app.response_class(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    @app.route("/api/agent/v1/health")
+    def agent_health():
+        stats = {}
+        try:
+            if service.local_queue:
+                stats = service.local_queue.count_pending()
+                stats["last_sync_ms"] = service.local_queue.last_sync_ms
+                stats["last_compact_ms"] = service.local_queue.last_compact_ms
+        except Exception:
+            stats = {"error": "queue_unavailable"}
+        # Severidade (heurística simples)
+        try:
+            now_ms = int(time.time() * 1000)
+            last_sync_age_ms = None
+            if isinstance(stats.get("last_sync_ms"), int):
+                last_sync_age_ms = max(0, now_ms - int(stats.get("last_sync_ms")))
+            last_compact_age_ms = None
+            if isinstance(stats.get("last_compact_ms"), int):
+                last_compact_age_ms = max(0, now_ms - int(stats.get("last_compact_ms")))
+            # ISO helpers
+            try:
+                from datetime import datetime
+                if isinstance(stats.get("last_sync_ms"), int):
+                    stats["last_sync_iso"] = datetime.fromtimestamp(int(stats.get("last_sync_ms"))/1000.0).isoformat()
+                else:
+                    stats["last_sync_iso"] = None
+                if isinstance(stats.get("last_compact_ms"), int):
+                    stats["last_compact_iso"] = datetime.fromtimestamp(int(stats.get("last_compact_ms"))/1000.0).isoformat()
+                else:
+                    stats["last_compact_iso"] = None
+            except Exception:
+                stats["last_sync_iso"] = None
+                stats["last_compact_iso"] = None
+            ev = int(stats.get("events_pending", 0))
+            sess_no_remote = int(stats.get("sessions_without_remote", 0))
+            sess_finish = int(stats.get("sessions_finish_pending", 0))
+            severity = "ok"
+            if ev > 0 or sess_no_remote > 0 or sess_finish > 0:
+                severity = "atencao"
+            if (ev >= self.sev_crit_events or
+                sess_no_remote >= self.sev_crit_sessions or
+                sess_finish >= self.sev_crit_sessions):
+                severity = "critico"
+            if last_sync_age_ms is not None and last_sync_age_ms > self.sev_crit_last_sync_ms:
+                severity = "critico"
+            # Anexa idades ao payload
+            stats["last_sync_age_ms"] = last_sync_age_ms
+            stats["last_compact_age_ms"] = last_compact_age_ms
+        except Exception:
+            severity = "desconhecido"
+
+        # Sessão atual
+        current = {}
+        try:
+            cp = service.cp
+            if cp and getattr(cp, "session_active", False):
+                current = {
+                    "online": bool(getattr(cp, "session_db_id", None)),
+                    "remote_session_id": getattr(cp, "session_db_id", None),
+                    "local_shadow_id": service._shadow_local_id,
+                    "count": getattr(cp, "current_session_count", None),
+                    "lote": getattr(cp, "session_lote", None),
+                }
+            else:
+                current = {"online": False, "remote_session_id": None, "local_shadow_id": None}
+        except Exception:
+            current = {"error": "unavailable"}
+
+        return {
+            "ok": True,
+            "tc_id": service.tc_id,
+            "pending": stats,
+            "severity": severity,
+            "current_session": current,
+        }, 200
+
+    @app.route("/api/agent/v1/sync", methods=["POST"])
+    def sync_now():
+        if not service.local_queue:
+            return {"ok": False, "error": "queue_unavailable"}, 503
+        # Snapshot antes
+        before = service.local_queue.count_pending()
+        # Usa um cliente fresco para garantir sessão HTTP válida
+        central = CentralClient(service.central_url, service.token, agent_id=service.agent_id, verify=(service.central_ca or service.central_verify))
+        try:
+            service.local_queue.sync_to_central(central)
+        except Exception as e:
+            return {"ok": False, "error": str(e), "before": before}, 500
+        after = service.local_queue.count_pending()
+        return {"ok": True, "before": before, "after": after, "last_sync_ms": service.local_queue.last_sync_ms}, 200
+
+    @app.route("/api/agent/v1/pending")
+    def list_pending():
+        if not service.local_queue:
+            return {"ok": False, "error": "queue_unavailable"}, 503
+        try:
+            limit = int(request.args.get("limit", "50"))
+        except Exception:
+            limit = 50
+        try:
+            data = service.local_queue.list_pending(events_limit=limit)
+            return {"ok": True, "data": data}, 200
+        except Exception as e:
+            return {"ok": False, "error": str(e)}, 500
+
+    @app.route("/api/agent/v1/compact", methods=["POST"])
+    def compact_queue():
+        if not service.local_queue:
+            return {"ok": False, "error": "queue_unavailable"}, 503
+        payload = request.get_json(silent=True) or {}
+        hard = False
+        try:
+            hard = bool(payload.get("hard") in (True, 1, "1", "true", "yes", "on"))
+        except Exception:
+            hard = False
+        try:
+            result = service.local_queue.compact(hard=hard)
+            return {"ok": True, **result}, 200
+        except Exception as e:
+            return {"ok": False, "error": str(e)}, 500
 
     return app
 

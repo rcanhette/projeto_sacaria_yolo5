@@ -7,3 +7,7 @@ tc_id=1
 central_url=http://localhost:8080
 # Token opcional (autenticação desativada por padrão)
 token=
+# TLS do Central (quando usar HTTPS em central_url)
+central_verify=true
+# Opcional: caminho para CA/servidor em PEM para validar o certificado
+central_ca=

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Calibração de TC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --border:#e5e7eb; --muted:#6B7280; --accent:#22c55e; --danger:#ef4444; }
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; background:#f8fafc; color:#0b3d66; }
+    .wrap{ max-width:1200px; margin:0 auto; padding:16px; }
+    .title{ font-weight:800; font-size:18px; margin:8px 0 16px; }
+    .row{ display:flex; gap:16px; flex-wrap:wrap; }
+    .panel{ background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .preview{ position:relative; flex:1 1 720px; display:flex; justify-content:center; align-items:center; min-height:420px; }
+    .controls{ flex:1 1 360px; min-width:320px; }
+    .field{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:6px 0; }
+    .label{ font-size:12px; color:var(--muted); }
+    .input{ width:140px; padding:8px; border-radius:8px; border:1px solid var(--border); }
+    .select{ padding:8px; border-radius:8px; border:1px solid var(--border); }
+    .btn{ appearance:none; border:1px solid var(--border); background:#fff; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer; }
+    .btn-primary{ background:var(--accent); color:#062b16; border-color:transparent; }
+    .canvas-wrap{ position:relative; display:inline-block; }
+    #video{ display:block; max-width:100%; border-radius:10px; border:1px solid var(--border); }
+    #overlay{ position:absolute; inset:0; pointer-events:auto; }
+    .hud{ position:absolute; top:10px; left:10px; background:rgba(255,255,255,0.88); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:12px; color:#0b3d66; box-shadow:0 4px 12px rgba(0,0,0,.08); }
+    .hud b{ font-weight:700; }
+    .hint{ font-size:12px; color:var(--muted); margin-top:6px; }
+  </style>
+  <script>
+    // Helpers de ROI <-> string
+    function parseRoi(str){
+      try{
+        if(!str) return null;
+        const parts = String(str).split(',').map(s=>parseInt(s.trim(),10));
+        if(parts.length!==4 || parts.some(isNaN)) return null;
+        return {x:parts[0], y:parts[1], w:parts[2], h:parts[3]};
+      }catch(_){ return null; }
+    }
+    function roiToString(roi){ return `${Math.round(roi.x)},${Math.round(roi.y)},${Math.round(roi.w)},${Math.round(roi.h)}`; }
+  </script>
+  </head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <div class="title">Calibração — {{ ct.name }} (TC {{ ct.id }})</div>
+    <div class="row">
+      <section class="panel preview">
+        <div class="canvas-wrap">
+          <img id="video" alt="preview" src="/tc/{{ ct.id }}/snapshot.jpg" />
+          <canvas id="overlay"></canvas>
+          <div id="hud" class="hud"></div>
+        </div>
+      </section>
+      <section class="panel controls">
+        <form method="POST" action="{{ url_for('tc_admin.tc_admin_calibrate', tc_id=ct.id) }}" id="form-calib">
+          <div class="field">
+            <div class="label">Exibir grade e eixos</div>
+            <input type="checkbox" id="grid-toggle" checked />
+          </div>
+          <div class="field">
+            <div class="label">Snap das linhas (terços/bordas)</div>
+            <input type="checkbox" id="snap-toggle" checked />
+          </div>
+          <div class="field">
+            <div class="label">ROI</div>
+            <input class="input" type="text" name="roi" id="roi-input" value="{{ ct.roi or '' }}" />
+          </div>
+          <div class="field">
+            <div class="label">Linha vermelha offset</div>
+            <input class="input" type="number" step="1" name="line_offset_red" id="red-input" value="{{ ct.line_offset_red or 40 }}" />
+          </div>
+          <div class="field">
+            <div class="label">Linha azul offset</div>
+            <input class="input" type="number" step="1" name="line_offset_blue" id="blue-input" value="{{ ct.line_offset_blue or -40 }}" />
+          </div>
+          <div class="field">
+            <div class="label">Fluxo</div>
+            <select class="select" name="flow_mode" id="flow-input">
+              {% set flow = (ct.flow_mode or 'cima')|lower %}
+              <option value="cima" {{ 'selected' if flow=='cima' else '' }}>cima</option>
+              <option value="baixo" {{ 'selected' if flow=='baixo' else '' }}>baixo</option>
+              <option value="sem_fluxo" {{ 'selected' if flow=='sem_fluxo' else '' }}>sem_fluxo</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="label">max_lost</div>
+            <input class="input" type="number" step="1" name="max_lost" id="lost-input" value="{{ ct.max_lost or 2 }}" />
+          </div>
+          <div class="field">
+            <div class="label">match_dist</div>
+            <input class="input" type="number" step="1" name="match_dist" id="match-input" value="{{ ct.match_dist or 150 }}" />
+          </div>
+          <div class="field">
+            <div class="label">min_conf</div>
+            <input class="input" type="number" step="0.01" min="0" max="1" name="min_conf" id="conf-input" value="{{ '%.2f'|format(ct.min_conf or 0.8) }}" />
+          </div>
+          <div class="hint">Dica: arraste o retângulo (ROI) e as linhas no vídeo. Ao salvar, os offsets são recalculados conforme o ROI.</div>
+          <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn" type="button" id="btn-back">Voltar</button>
+            <button class="btn" type="button" id="btn-snapshot">Atualizar snapshot</button>
+            <button class="btn" type="button" id="btn-center-roi">ROI central</button>
+            <button class="btn" type="button" id="btn-revert">Reverter alterações</button>
+            <button class="btn btn-primary" type="submit">Salvar calibração</button>
+          </div>
+          <!-- Persistência de streaming por TC -->
+          <input type="hidden" name="stream_fps" id="stream-fps-hidden" value="{{ ct.stream_fps if ct.stream_fps is not none else '' }}" />
+          <input type="hidden" name="stream_quality" id="stream-quality-hidden" value="{{ ct.stream_quality if ct.stream_quality is not none else '' }}" />
+        </form>
+        <div style="height:12px"></div>
+        <div class="panel" style="padding:12px;">
+          <div class="label" style="margin-bottom:6px;">Central (modo local) — vídeo</div>
+          <div class="field">
+            <div class="label">FPS</div>
+            <input class="input" type="number" id="central-fps" min="1" max="60" value="{{ ct.stream_fps or 25 }}" />
+          </div>
+          <div class="field">
+            <div class="label">Qualidade JPEG</div>
+            <input class="input" type="number" id="central-quality" min="30" max="95" value="{{ ct.stream_quality or 80 }}" />
+          </div>
+          <div style="margin-top:8px; display:flex; gap:8px;">
+            <button class="btn" type="button" id="central-apply">Aplicar (runtime)</button>
+          </div>
+          <div class="hint">Aplica no processo atual (não persiste em banco). Útil para ajustar CPU/banda.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const tcId = {{ ct.id }};
+    const img = document.getElementById('video');
+    const canvas = document.getElementById('overlay');
+    const ctx = canvas.getContext('2d');
+    const roiInput = document.getElementById('roi-input');
+    const redInput = document.getElementById('red-input');
+    const blueInput = document.getElementById('blue-input');
+    const flowInput = document.getElementById('flow-input');
+    const btnSnap = document.getElementById('btn-snapshot');
+    const btnCenter = document.getElementById('btn-center-roi');
+    const btnRevert = document.getElementById('btn-revert');
+    const gridToggle = document.getElementById('grid-toggle');
+    const snapToggle = document.getElementById('snap-toggle');
+    const hud = document.getElementById('hud');
+
+    let baseW = 1280, baseH = 720; // resol. base do snapshot
+    let roi = parseRoi(roiInput.value) || {x: Math.round(baseW*0.2), y: Math.round(baseH*0.2), w: Math.round(baseW*0.6), h: Math.round(baseH*0.6)};
+    const initial = {
+      roi: parseRoi("{{ ct.roi or '' }}") || {x: roi.x, y: roi.y, w: roi.w, h: roi.h},
+      red: {{ ct.line_offset_red or 40 }},
+      blue: {{ ct.line_offset_blue or -40 }},
+      flow: "{{ (ct.flow_mode or 'cima')|lower }}",
+      max_lost: {{ ct.max_lost or 2 }},
+      match_dist: {{ ct.match_dist or 150 }},
+      min_conf: {{ (ct.min_conf or 0.8) }}
+    };
+    let drag = null; // {type: 'roi'|'red'|'blue'|'edge', startX, startY}
+
+    function setCanvasSize(){
+      const r = img.getBoundingClientRect();
+      canvas.width = Math.max(10, Math.floor(r.width));
+      canvas.height = Math.max(10, Math.floor(r.height));
+    }
+    function scaleX(x){ return x * (canvas.width / baseW); }
+    function scaleY(y){ return y * (canvas.height / baseH); }
+    function unscaleX(x){ return x * (baseW / canvas.width); }
+    function unscaleY(y){ return y * (baseH / canvas.height); }
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // GRID opcional
+      if(gridToggle && gridToggle.checked){
+        ctx.save();
+        // linhas a cada 10%
+        ctx.strokeStyle = 'rgba(14, 165, 233, .25)';
+        ctx.lineWidth = 1;
+        for(let i=1;i<10;i++){
+          const x = i/10*canvas.width;
+          const y = i/10*canvas.height;
+          ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+        }
+        // guias de terços
+        ctx.strokeStyle = 'rgba(14, 165, 233, .5)';
+        const x1=canvas.width/3, x2=2*canvas.width/3, y1g=canvas.height/3, y2g=2*canvas.height/3;
+        ctx.beginPath(); ctx.moveTo(x1,0); ctx.lineTo(x1,canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x2,0); ctx.lineTo(x2,canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,y1g); ctx.lineTo(canvas.width,y1g); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,y2g); ctx.lineTo(canvas.width,y2g); ctx.stroke();
+        // eixo central
+        ctx.strokeStyle = 'rgba(15, 23, 42, .35)';
+        ctx.beginPath(); ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2,canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,canvas.height/2); ctx.lineTo(canvas.width,canvas.height/2); ctx.stroke();
+        ctx.restore();
+      }
+      // ROI
+      ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 2;
+      ctx.strokeRect(scaleX(roi.x), scaleY(roi.y), scaleX(roi.w), scaleY(roi.h));
+      // Handles
+      const handles = [
+        {x: roi.x, y: roi.y}, {x: roi.x+roi.w, y: roi.y}, {x: roi.x, y: roi.y+roi.h}, {x: roi.x+roi.w, y: roi.y+roi.h}
+      ];
+      ctx.fillStyle = '#16a34a';
+      handles.forEach(h=>{ ctx.fillRect(scaleX(h.x)-4, scaleY(h.y)-4, 8, 8); });
+      // Lines (compute absolute Y positions)
+      const redOff = parseInt(redInput.value||0,10);
+      const blueOff = parseInt(blueInput.value||0,10);
+      const y1 = roi.y + (roi.h/3) + redOff;
+      const y2 = roi.y + (2*roi.h/3) + blueOff;
+      ctx.strokeStyle = '#ef4444'; ctx.beginPath(); ctx.moveTo(scaleX(roi.x), scaleY(y1)); ctx.lineTo(scaleX(roi.x+roi.w), scaleY(y1)); ctx.stroke();
+      ctx.strokeStyle = '#3b82f6'; ctx.beginPath(); ctx.moveTo(scaleX(roi.x), scaleY(y2)); ctx.lineTo(scaleX(roi.x+roi.w), scaleY(y2)); ctx.stroke();
+      updateHud(redOff, blueOff, y1, y2);
+    }
+
+    function updateHud(redOff, blueOff, y1, y2){
+      if(!hud) return;
+      const rx = Math.round(roi.x), ry = Math.round(roi.y), rw = Math.round(roi.w), rh = Math.round(roi.h);
+      const absRed = Math.round(y1), absBlue = Math.round(y2);
+      hud.innerHTML = `
+        <div><b>ROI</b> x:${rx} y:${ry} w:${rw} h:${rh}</div>
+        <div><b>Red Y</b> abs:${absRed} (offset:${redOff})</div>
+        <div><b>Blue Y</b> abs:${absBlue} (offset:${blueOff})</div>
+        <div><b>Flow</b> ${flowInput.value}</div>
+        <div class="hint">base: ${baseW}x${baseH}</div>
+      `;
+    }
+
+    function hitTest(px, py){
+      const x = unscaleX(px), y = unscaleY(py);
+      // corners
+      const corners = [
+        {id:'nw',x:roi.x,y:roi.y}, {id:'ne',x:roi.x+roi.w,y:roi.y},
+        {id:'sw',x:roi.x,y:roi.y+roi.h}, {id:'se',x:roi.x+roi.w,y:roi.y+roi.h}
+      ];
+      for(const c of corners){ if(Math.abs(x-c.x)<10 && Math.abs(y-c.y)<10) return {type:'corner', id:c.id}; }
+      // edges (simplificado)
+      if(Math.abs(x - roi.x) < 6 && y>=roi.y && y<=roi.y+roi.h) return {type:'edge', edge:'left'};
+      if(Math.abs(x - (roi.x+roi.w)) < 6 && y>=roi.y && y<=roi.y+roi.h) return {type:'edge', edge:'right'};
+      if(Math.abs(y - roi.y) < 6 && x>=roi.x && x<=roi.x+roi.w) return {type:'edge', edge:'top'};
+      if(Math.abs(y - (roi.y+roi.h)) < 6 && x>=roi.x && x<=roi.x+roi.w) return {type:'edge', edge:'bottom'};
+      // inside ROI => move
+      if(x>=roi.x && x<=roi.x+roi.w && y>=roi.y && y<=roi.y+roi.h) return {type:'roi'};
+      // lines
+      const redY = roi.y + (roi.h/3) + parseInt(redInput.value||0,10);
+      const blueY= roi.y + (2*roi.h/3) + parseInt(blueInput.value||0,10);
+      if(Math.abs(y - redY) < 6 && x>=roi.x && x<=roi.x+roi.w) return {type:'red'};
+      if(Math.abs(y - blueY) < 6 && x>=roi.x && x<=roi.x+roi.w) return {type:'blue'};
+      return null;
+    }
+
+    canvas.addEventListener('mousedown', (e)=>{
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      const hit = hitTest(x,y);
+      if(hit){ drag = { ...hit, startX: unscaleX(x), startY: unscaleY(y), orig: {...roi} }; }
+    });
+    window.addEventListener('mouseup', ()=>{ drag=null; });
+    window.addEventListener('mousemove', (e)=>{
+      if(!drag) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = unscaleX(e.clientX - rect.left), y = unscaleY(e.clientY - rect.top);
+      const dx = x - drag.startX, dy = y - drag.startY;
+      if(drag.type==='roi'){
+        roi.x = Math.max(0, Math.min(baseW-10, drag.orig.x + dx));
+        roi.y = Math.max(0, Math.min(baseH-10, drag.orig.y + dy));
+      } else if(drag.type==='edge'){
+        if(drag.edge==='left'){ const nx = Math.min(drag.orig.x+drag.orig.w-10, Math.max(0, drag.orig.x+dx)); roi.w = (drag.orig.x+drag.orig.w) - nx; roi.x = nx; }
+        if(drag.edge==='right'){ const nx = Math.max(drag.orig.x+10, Math.min(baseW, drag.orig.x+drag.orig.w+dx)); roi.w = nx - drag.orig.x; }
+        if(drag.edge==='top'){ const ny = Math.min(drag.orig.y+drag.orig.h-10, Math.max(0, drag.orig.y+dy)); roi.h = (drag.orig.y+drag.orig.h) - ny; roi.y = ny; }
+        if(drag.edge==='bottom'){ const ny = Math.max(drag.orig.y+10, Math.min(baseH, drag.orig.y+drag.orig.h+dy)); roi.h = ny - drag.orig.y; }
+      } else if(drag.type==='corner'){
+        let nx1 = drag.orig.x, ny1 = drag.orig.y, nx2 = drag.orig.x+drag.orig.w, ny2 = drag.orig.y+drag.orig.h;
+        if(drag.id==='nw'){ nx1 = Math.max(0, Math.min(nx2-10, drag.orig.x+dx)); ny1 = Math.max(0, Math.min(ny2-10, drag.orig.y+dy)); }
+        if(drag.id==='ne'){ nx2 = Math.max(nx1+10, Math.min(baseW, drag.orig.x+drag.orig.w+dx)); ny1 = Math.max(0, Math.min(ny2-10, drag.orig.y+dy)); }
+        if(drag.id==='sw'){ nx1 = Math.max(0, Math.min(nx2-10, drag.orig.x+dx)); ny2 = Math.max(ny1+10, Math.min(baseH, drag.orig.y+drag.orig.h+dy)); }
+        if(drag.id==='se'){ nx2 = Math.max(nx1+10, Math.min(baseW, drag.orig.x+drag.orig.w+dx)); ny2 = Math.max(ny1+10, Math.min(baseH, drag.orig.y+drag.orig.h+dy)); }
+        roi.x=nx1; roi.y=ny1; roi.w=nx2-nx1; roi.h=ny2-ny1;
+      } else if(drag.type==='red'){
+        // reposiciona offset baseado na linha relativa
+        let base = roi.y + (roi.h/3);
+        let yNew = y;
+        if(snapToggle && snapToggle.checked){
+          const targets = [roi.y, base, roi.y + (2*roi.h/3), roi.y + roi.h];
+          const tol = 8; // px em base
+          let best = null, bestd = Infinity;
+          for(const t of targets){ const d = Math.abs(y - t); if(d < bestd){ bestd = d; best = t; } }
+          if(best !== null && bestd <= tol){ yNew = best; }
+        }
+        redInput.value = Math.round(yNew - base);
+      } else if(drag.type==='blue'){
+        let base = roi.y + (2*roi.h/3);
+        let yNew = y;
+        if(snapToggle && snapToggle.checked){
+          const targets = [roi.y, roi.y + (roi.h/3), base, roi.y + roi.h];
+          const tol = 8;
+          let best = null, bestd = Infinity;
+          for(const t of targets){ const d = Math.abs(y - t); if(d < bestd){ bestd = d; best = t; } }
+          if(best !== null && bestd <= tol){ yNew = best; }
+        }
+        blueInput.value = Math.round(yNew - base);
+      }
+      roiInput.value = roiToString(roi);
+      draw();
+    });
+
+    function refreshSnapshot(){
+      // carrega snapshot real para obter baseW/baseH corretos
+      const probe = new Image();
+      probe.onload = () => {
+        baseW = probe.naturalWidth || probe.width || baseW;
+        baseH = probe.naturalHeight || probe.height || baseH;
+        setCanvasSize(); draw();
+      };
+      probe.src = `/tc/${tcId}/snapshot.jpg?ts=${Date.now()}`;
+    }
+
+    img.addEventListener('load', ()=>{ setCanvasSize(); draw(); });
+    img.addEventListener('error', ()=>{
+      // auto-retry snapshot a cada 1.5s quando indisponível
+      setTimeout(()=>{ img.src = `/tc/${tcId}/snapshot.jpg?ts=${Date.now()}`; }, 1500);
+    });
+    window.addEventListener('resize', ()=>{ setCanvasSize(); draw(); });
+    btnSnap.addEventListener('click', (e)=>{ e.preventDefault(); refreshSnapshot(); });
+    if(btnCenter){
+      btnCenter.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const w = Math.round(baseW*0.6), h = Math.round(baseH*0.6);
+        roi = { x: Math.round((baseW-w)/2), y: Math.round((baseH-h)/2), w, h };
+        roiInput.value = roiToString(roi);
+        draw();
+      });
+    }
+    if(gridToggle){ gridToggle.addEventListener('change', ()=> draw()); }
+    if(snapToggle){ snapToggle.addEventListener('change', ()=> {/* no-op, só afeta drag */}); }
+    redInput.addEventListener('input', ()=> draw());
+    blueInput.addEventListener('input', ()=> draw());
+    flowInput.addEventListener('change', ()=> draw());
+    roiInput.addEventListener('change', ()=>{ const r=parseRoi(roiInput.value); if(r){ roi=r; draw(); } });
+    if(btnRevert){
+      btnRevert.addEventListener('click', (e)=>{
+        e.preventDefault();
+        roi = { x: initial.roi.x, y: initial.roi.y, w: initial.roi.w, h: initial.roi.h };
+        roiInput.value = roiToString(roi);
+        redInput.value = String(initial.red);
+        blueInput.value = String(initial.blue);
+        flowInput.value = initial.flow;
+        const lost = document.getElementById('lost-input'); if(lost) lost.value = String(initial.max_lost);
+        const match = document.getElementById('match-input'); if(match) match.value = String(initial.match_dist);
+        const conf = document.getElementById('conf-input'); if(conf) conf.value = String(initial.min_conf);
+        draw();
+      });
+    }
+
+    // Botão Voltar
+    (function(){
+      const b = document.getElementById('btn-back');
+      if(b){ b.addEventListener('click', ()=>{ try{ history.back(); }catch(_){ window.location.href = '{{ url_for('tc_admin.tc_admin_list') }}'; } }); }
+    })();
+
+    // Aplicar FPS/Qualidade da Central (modo local)
+    (function(){
+      const btn = document.getElementById('central-apply');
+      const fps = document.getElementById('central-fps');
+      const qual = document.getElementById('central-quality');
+      if(btn && fps && qual){
+        btn.addEventListener('click', async ()=>{
+          try{
+            const params = new URLSearchParams();
+            if(fps.value) params.set('fps', String(parseInt(fps.value,10)));
+            if(qual.value) params.set('quality', String(parseInt(qual.value,10)));
+            const resp = await fetch(`/tc/${tcId}/stream-settings`, {
+              method:'POST',
+              headers:{ 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+              body: params.toString(),
+            });
+            if(!resp.ok){ alert('Falha ao aplicar'); }
+          }catch(_){ alert('Falha ao aplicar'); }
+        });
+      }
+    })();
+
+    // Copia FPS/Qualidade para persistir ao salvar calibração
+    (function(){
+      const form = document.getElementById('form-calib');
+      const fps = document.getElementById('central-fps');
+      const qual = document.getElementById('central-quality');
+      const hfps = document.getElementById('stream-fps-hidden');
+      const hq = document.getElementById('stream-quality-hidden');
+      if(form && fps && qual && hfps && hq){
+        form.addEventListener('submit', ()=>{
+          const f = parseInt(fps.value||'',10); const q = parseInt(qual.value||'',10);
+          if(Number.isFinite(f)) hfps.value = String(f);
+          if(Number.isFinite(q)) hq.value = String(q);
+        });
+      }
+    })();
+
+    // init
+    setCanvasSize();
+    roiInput.value = roiToString(roi);
+    refreshSnapshot();
+  </script>
+</body>
+</html>

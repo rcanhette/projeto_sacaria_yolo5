@@ -1,0 +1,74 @@
+{% include '_navbar.html' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ 'Novo usuário' if mode=='new' else 'Editar usuário' }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff;
+      --primary:#002F54; --primary-weak:#0f3d68;
+    }
+    *{box-sizing:border-box}
+    body{ margin:0; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui; }
+    .wrap{ padding:16px; max-width:900px; margin:0 auto; }
+    h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .grid{ display:grid; gap:12px; }
+    label{ display:block; font-weight:600; margin-bottom:6px; }
+    input[type="text"], input[type="password"], select{
+      width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; background:#fff;
+    }
+    .checkline{ display:flex; align-items:center; gap:8px; }
+    .actions{ display:flex; gap:8px; justify-content:flex-end; }
+    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer; text-decoration:none; color:#0b1220; font-weight:800;}
+    .btn:hover{ border-color:#94a3b8; }
+    .btn-primary{ background:var(--primary); color:#fff; border-color:transparent; }
+    .btn-primary:hover{ background:var(--primary-weak); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <h1>{{ 'Novo usuário' if mode=='new' else 'Editar usuário' }}</h1>
+
+    <form method="post" class="card grid">
+      <div>
+        <label>Usuário</label>
+        <input name="username" type="text" value="{{ '' if not user else user.username }}" required />
+      </div>
+
+      <div>
+        <label>Papel</label>
+        <select name="role" required>
+          {% set current = '' if not user else user.role %}
+          {% for r in ['admin','supervisor','operator','viewer'] %}
+            <option value="{{ r }}" {{ 'selected' if r==current else '' }}>{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="checkline">
+        <input type="checkbox" id="active" name="active" value="1" {{ 'checked' if (not user or user.active) else '' }}>
+        <label for="active" style="margin:0;font-weight:500;">Ativo</label>
+      </div>
+
+      <div>
+        <label>{{ 'Senha' if mode=='new' else 'Nova senha (opcional)' }}</label>
+        <input name="password" type="password" {{ 'required' if mode=='new' else '' }} />
+        {% if mode!='new' %}
+          <div class="muted" style="margin-top:4px;">Deixe em branco para manter a senha atual.</div>
+        {% endif %}
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="{{ url_for('user_admin.users_list') }}">Cancelar</a>
+        <button class="btn btn-primary" type="submit">
+          {{ 'Criar usuário' if mode=='new' else 'Salvar alterações' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% set _u = current_user() %}
+<nav style="background:#002F54; color:#fff; padding:10px 16px; display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+  <a href="{{ url_for('acompanhamento') }}" style="color:#fff; text-decoration:none; font-weight:800; padding:6px 10px;">Acompanhamento</a>
+  <span style="flex:1"></span>
+
+  {% if _u %}
+    <a href="{{ url_for('logs.logs_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Sessões</a>
+
+    {% if _u.role == 'admin' %}
+      <a href="{{ url_for('tc_admin.tc_admin_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Cadastro de TCs</a>
+      <a href="{{ url_for('user_admin.user_access_by_tc_panel') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acessos</a>
+      <a href="{{ url_for('user_admin.users_list') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Usuários</a>
+      <a href="{{ url_for('tc.tc_multi') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Operações TCs</a>
+    {% endif %}
+
+    <span style="opacity:.8;">|</span>
+    <span style="opacity:.8;">{{ _u.username }} ({{ _u.role }})</span>
+    <a href="{{ url_for('auth.logout') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Sair</a>
+  {% else %}
+    <a href="{{ url_for('auth.login') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Entrar</a>
+  {% endif %}
+</nav>
+
