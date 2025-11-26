@@ -1,9 +1,0 @@
-[agent]
-# Identificador amigável do agente (livre)
-id=pc1-ct1
-# ID da TC no servidor central
-tc_id=1
-# URL do servidor central acessível a partir deste PC
-central_url=http://localhost:8080
-# Token opcional (autenticação desativada por padrão)
-token=

@@ -60,7 +60,9 @@
     </div>
 
     <div class="row-actions">
-      <a class="link" href="{{ url_for('logs.log_export_xlsx', session_id=sess.id) }}">Baixar XLSX</a>
+      <a class="link" href="{{ url_for('logs.log_export_xlsx', session_id=sess.id) }}">Baixar Planilha</a>
+      &nbsp;|&nbsp;
+      <a class="link" href="{{ url_for('logs.log_export_pdf', session_id=sess.id) }}">Baixar Romaneio</a>
       &nbsp;|&nbsp;
       <a class="link" href="{{ url_for('logs.logs_panel', ct_id=sess.ct_id) }}">Voltar às sessões</a>
       &nbsp;|&nbsp;

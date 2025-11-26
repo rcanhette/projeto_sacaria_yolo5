@@ -69,7 +69,7 @@ Central (Servidor)
 4. NSSM (GUI: `nssm edit ProjetoSacaria_v1` ou via comandos):
    - `Application`: `C:\projeto_sacaria\central\venv\Scripts\waitress-serve.exe`
    - `Startup directory`: `C:\projeto_sacaria\central`
-   - `Arguments`: `--host 0.0.0.0 --port 80 --threads 16 --backlog 2048 --connection-limit 200 --channel-timeout 90 --call app:create_app`
+   - `Arguments`: `--host 0.0.0.0 --port 80 --threads 128 --backlog 2048 --connection-limit 200 --channel-timeout 90 --call app:create_app`
    - Aba I/O: `AppStdout=logs\service.out.log`, `AppStderr=logs\service.err.log`, rotação ativada
    - Aba Environment (opcional se já no ini): `PYTHONIOENCODING=utf-8`, `PYTHONUNBUFFERED=1`, `PGPASSFILE=NUL`
 5. Inicie: `nssm start ProjetoSacaria_v1`. Se aparecer `PAUSED`, verifique porta/permissão e os logs em `logs\service.err.log`.

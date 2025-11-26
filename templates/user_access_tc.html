@@ -5,7 +5,10 @@
   <title>Acesso por TC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root{ --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff; --accent:#22c55e; --accent-weak:#16a34a;}
+    :root{
+      --border:#e5e7eb; --muted:#6B7280; --text:#002F54; --bg:#f8fafc; --card:#fff;
+      --primary:#002F54; --primary-weak:#0f3d68;
+    }
     body{ margin:0; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui; }
     .wrap{ padding:16px; max-width:1100px; margin:0 auto; }
     h1{ font-size:20px; font-weight:800; margin:8px 4px 16px; }
@@ -16,8 +19,24 @@
     .box{ border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff; }
     .list{ display:flex; flex-direction:column; gap:8px; max-height:260px; overflow:auto; }
     .row{ display:flex; align-items:center; gap:8px; }
-    .btn{ appearance:none; padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:var(--accent); color:#062b16; font-weight:800; cursor:pointer; }
-    .btn:hover{ background:var(--accent-weak); }
+    .btn{
+      appearance:none;
+      padding:10px 14px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:#fff;
+      color:#0b1220;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+    }
+    .btn:hover{ border-color:#94a3b8; }
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+      border-color:transparent;
+    }
+    .btn-primary:hover{ background:var(--primary-weak); }
   </style>
 </head>
 <body>
@@ -60,7 +79,7 @@
           </div>
         </div>
         <div style="margin-top:12px; display:flex; justify-content:flex-end;">
-          <button class="btn" type="submit">Salvar TC {{ ct.id }}</button>
+          <button class="btn btn-primary" type="submit">Salvar TC {{ ct.id }}</button>
         </div>
       </form>
     </div>

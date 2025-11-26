@@ -8,12 +8,13 @@ from flask import Blueprint, render_template, Response, request, redirect, url_f
 # Lazy import de CapturePoint dentro de _ensure_cp para evitar carregar Torch
 from services.tc_repository import get_tc, list_tcs
 from services.session_repository import get_active_session_by_ct
+from services.auth_repository import list_user_tc_ids, user_can_view_tc, user_can_control_tc
 from services.db import query_one
 from services.agent_repository import get_host_for_tc
 from services.runtime import tc_runtime, get_or_create_shadow
 from routes.auth import current_user, login_required
-from services.auth_repository import user_can_view_tc, user_can_control_tc
 from services.session_repository import get_active_session_by_ct
+from services.tc_wall_repository import list_layouts, get_layout, create_layout, delete_layout, update_layout
 
 tc_bp = Blueprint("tc", __name__)
 log = logging.getLogger(__name__)
@@ -117,6 +118,202 @@ def tc_multi():
     tcs = list_tcs()
     return render_template("tc_multi.html", tcs=tcs)
 
+
+@tc_bp.route("/tc-wall")
+@login_required
+def tc_wall():
+    """
+    Tela de acompanhamento em painel grande, exibindo duas TCs (esquerda/direita)
+    com fundo verde/vermelho conforme estado de operação.
+    """
+    u = current_user()
+    all_cts = list_tcs()
+    if u["role"] in ("admin", "supervisor"):
+        allowed = all_cts
+    else:
+        try:
+            ids = set(list_user_tc_ids(u["id"]))
+            allowed = [ct for ct in all_cts if ct["id"] in ids]
+        except Exception:
+            allowed = []
+    return render_template("tc_wall.html", cts=allowed)
+
+
+@tc_bp.route("/tc-wall-config", methods=["GET", "POST"])
+@login_required
+def tc_wall_config():
+    """
+    Tela de configuração das telas do painel grande (apenas admin/supervisor).
+    Permite criar/remover telas, definindo qual TC aparece em cada lado.
+    """
+    u = current_user()
+    if u["role"] != "admin":
+        flash("Acesso negado.", "error")
+        return redirect(url_for("index"))
+
+    if request.method == "POST":
+        action = (request.form.get("action") or "").strip().lower()
+        if action == "delete":
+            layout_id_raw = request.form.get("layout_id")
+            try:
+                layout_id = int(layout_id_raw)
+                delete_layout(layout_id)
+                flash("Tela removida.", "info")
+            except Exception:
+                flash("Falha ao remover tela.", "error")
+            return redirect(url_for("tc.tc_wall_config"))
+
+        # Criação simples de nova tela
+        name = (request.form.get("name") or "").strip()
+        left_raw = (request.form.get("left_tc_id") or "").strip()
+        right_raw = (request.form.get("right_tc_id") or "").strip()
+
+        if not name:
+            flash("Nome da tela é obrigatório.", "error")
+            return redirect(url_for("tc.tc_wall_config"))
+
+        left_tc_id = None
+        right_tc_id = None
+        try:
+            if left_raw:
+                left_tc_id = int(left_raw)
+        except Exception:
+            flash("TC da esquerda inválida.", "error")
+            return redirect(url_for("tc.tc_wall_config"))
+        try:
+            if right_raw:
+                right_tc_id = int(right_raw)
+        except Exception:
+            flash("TC da direita inválida.", "error")
+            return redirect(url_for("tc.tc_wall_config"))
+
+        if left_tc_id is None and right_tc_id is None:
+            flash("Selecione ao menos uma TC (esquerda ou direita).", "error")
+            return redirect(url_for("tc.tc_wall_config"))
+
+        try:
+            new_id = create_layout(name=name, left_tc_id=left_tc_id, right_tc_id=right_tc_id)
+            flash("Tela criada com sucesso.", "success")
+            return redirect(url_for("tc.tc_wall_screen", layout_id=new_id))
+        except Exception:
+            flash("Falha ao criar tela (nome duplicado ou erro de banco).", "error")
+            return redirect(url_for("tc.tc_wall_config"))
+
+    all_cts = list_tcs()
+    layouts = list_layouts()
+    return render_template("tc_wall_config.html", tcs=all_cts, layouts=layouts)
+
+
+@tc_bp.route("/tc-wall-view")
+@login_required
+def tc_wall_view_default():
+    """
+    Lista de painéis disponíveis para o usuário atual.
+    - Admin vê todos os painéis.
+    - Operador vê apenas painéis que contenham ao menos uma TC à qual ele tem acesso.
+    - Viewer não tem acesso.
+    """
+    u = current_user()
+    if u["role"] == "viewer":
+        flash("Acesso negado.", "error")
+        return redirect(url_for("index"))
+
+    layouts = list_layouts()
+    if not layouts:
+        flash("Nenhum painel configurado.", "error")
+        return redirect(url_for("index"))
+
+    # Admin vê todos; operadores só veem paineis com TCs às quais têm acesso
+    if u["role"] in ("admin", "supervisor"):
+        allowed = layouts
+    else:
+        allowed = []
+        for lay in layouts:
+            left_id = lay.get("left_tc_id")
+            right_id = lay.get("right_tc_id")
+            can_left = bool(left_id and user_can_view_tc(u, left_id))
+            can_right = bool(right_id and user_can_view_tc(u, right_id))
+            if can_left or can_right:
+                allowed.append(lay)
+
+    if not allowed:
+        flash("Você não tem acesso a nenhum painel.", "error")
+        return redirect(url_for("index"))
+
+    return render_template("tc_wall_list.html", layouts=allowed)
+
+
+@tc_bp.route("/tc-wall-edit/<int:layout_id>", methods=["GET", "POST"])
+@login_required
+def tc_wall_edit(layout_id: int):
+    """
+    Tela para editar uma configuração específica de painel grande.
+    Permite trocar o nome e as TCs de cada lado.
+    """
+    u = current_user()
+    if u["role"] not in ("admin", "supervisor"):
+        flash("Acesso negado.", "error")
+        return redirect(url_for("index"))
+
+    layout = get_layout(layout_id)
+    if not layout:
+        flash("Tela não encontrada.", "error")
+        return redirect(url_for("tc.tc_wall_config"))
+
+    if request.method == "POST":
+        action = (request.form.get("action") or "").strip().lower()
+        if action == "update":
+            name = (request.form.get("name") or "").strip()
+            left_raw = (request.form.get("left_tc_id") or "").strip()
+            right_raw = (request.form.get("right_tc_id") or "").strip()
+
+            if not name:
+                flash("Nome da tela é obrigatório.", "error")
+                return redirect(url_for("tc.tc_wall_edit", layout_id=layout_id))
+
+            left_tc_id = None
+            right_tc_id = None
+            try:
+                if left_raw:
+                    left_tc_id = int(left_raw)
+            except Exception:
+                flash("TC da esquerda inválida.", "error")
+                return redirect(url_for("tc.tc_wall_edit", layout_id=layout_id))
+            try:
+                if right_raw:
+                    right_tc_id = int(right_raw)
+            except Exception:
+                flash("TC da direita inválida.", "error")
+                return redirect(url_for("tc.tc_wall_edit", layout_id=layout_id))
+
+            if left_tc_id is None and right_tc_id is None:
+                flash("Selecione ao menos uma TC (esquerda ou direita).", "error")
+                return redirect(url_for("tc.tc_wall_edit", layout_id=layout_id))
+
+            try:
+                update_layout(layout_id=layout_id, name=name, left_tc_id=left_tc_id, right_tc_id=right_tc_id)
+                flash("Tela atualizada com sucesso.", "success")
+                return redirect(url_for("tc.tc_wall_config"))
+            except Exception:
+                flash("Falha ao atualizar tela.", "error")
+                return redirect(url_for("tc.tc_wall_edit", layout_id=layout_id))
+
+    all_cts = list_tcs()
+    return render_template("tc_wall_edit.html", layout=layout, tcs=all_cts)
+
+
+@tc_bp.route("/tc-wall-screen/<int:layout_id>")
+@login_required
+def tc_wall_screen(layout_id: int):
+    """
+    Tela de visualização do painel grande baseada em uma configuração salva.
+    Não exibe controles de seleção; apenas as TCs definidas para cada lado.
+    """
+    layout = get_layout(layout_id)
+    if not layout:
+        return "Tela não encontrada.", 404
+    return render_template("tc_wall_screen.html", layout=layout)
+
 @tc_bp.route("/tc/<int:tc_id>/start", methods=["POST"])
 @login_required
 def tc_start(tc_id):
@@ -160,7 +357,7 @@ def tc_start(tc_id):
     except Exception:
         host = None
     if host:
-        base = f"http://{host}:9090"
+        base = f"http://{host}" if ":" in str(host) else f"http://{host}:9090"
         try:
             r = _agent_http.post(
                 f"{base}/api/agent/v1/command/start",
@@ -257,7 +454,7 @@ def tc_start_ajax(tc_id):
     except Exception:
         host = None
     if host:
-        base = f"http://{host}:9090"
+        base = f"http://{host}" if ":" in str(host) else f"http://{host}:9090"
         try:
             r = requests.post(
                 f"{base}/api/agent/v1/command/start",
@@ -311,11 +508,37 @@ def tc_stop(tc_id):
         cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
 
     observacao = (request.form.get("observacao") or "").strip()
+
+    # Alvo da sessão (preferir runtime; fallback DB)
     try:
         alvo = cp.session_contagem_alvo
     except Exception:
         alvo = None
-    qtd = int(cp.current_session_count)
+
+    # Quantidade atual: quando operando via agente remoto o shadow local
+    # pode estar com 0. Fallback para o último total registrado no DB.
+    qtd = int(getattr(cp, "current_session_count", 0) or 0)
+    try:
+        db_row = get_active_session_by_ct(tc_id)
+        if db_row:
+            if alvo is None:
+                try:
+                    alvo = db_row.get("contagem_alvo")
+                except Exception:
+                    pass
+            if (qtd or 0) <= 0:
+                try:
+                    s_id = int(db_row.get("id"))
+                    r = query_one(
+                        "SELECT total_atual FROM session_log WHERE session_id = %s ORDER BY ts DESC LIMIT 1",
+                        [s_id],
+                    )
+                    if r and r.get("total_atual") is not None:
+                        qtd = int(r.get("total_atual"))
+                except Exception:
+                    pass
+    except Exception:
+        pass
     require_obs = alvo is not None and qtd != int(alvo)
     if require_obs and len(observacao) < 10:
         message = "Observacao (min. 10 caracteres) e obrigatoria quando total != contagem alvo."
@@ -344,7 +567,7 @@ def tc_stop(tc_id):
     except Exception:
         host = None
     if host:
-        base = f"http://{host}:9090"
+        base = f"http://{host}" if ":" in str(host) else f"http://{host}:9090"
         try:
             r = _agent_http.post(
                 f"{base}/api/agent/v1/command/stop",
@@ -625,7 +848,8 @@ def tc_video_proxy(tc_id):
             host = None
         if not host:
             return "Agente offline ou não identificado.", 503
-        url = f"http://{host}:9090/api/agent/v1/video"
+        base = f"http://{host}" if ":" in str(host) else f"http://{host}:9090"
+        url = f"{base}/api/agent/v1/video"
         try:
             r = _agent_http.get(url, stream=True, timeout=(3, 30))
         except Exception as e:
@@ -704,7 +928,8 @@ def tc_snapshot(tc_id):
         if not host:
             return ("Agente offline", 503)
         try:
-            r = _agent_http.get(f"http://{host}:9090/api/agent/v1/snapshot.jpg", timeout=5)
+            base = f"http://{host}" if ":" in str(host) else f"http://{host}:9090"
+            r = _agent_http.get(f"{base}/api/agent/v1/snapshot.jpg", timeout=5)
         except Exception as e:
             return (f"Falha ao obter snapshot do agente: {e}", 502)
         if not r.ok:

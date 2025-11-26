@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Painéis disponíveis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#002F54; --card:#ffffff; --muted:#6B7280; --text:#002F54;
+      --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background:#f8fafc;
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{
+      padding:16px;
+      max-width:1000px;
+      margin:0 auto;
+    }
+    .title-page{
+      font-weight:800;
+      font-size:20px;
+      letter-spacing:.02em;
+      margin:10px 4px 16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 4px 16px rgba(0,0,0,.08);
+      padding:16px 20px;
+      margin-bottom:16px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    th, td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 6px;
+      text-align:left;
+    }
+    th{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+    }
+    tbody tr:hover{
+      background:#f9fafb;
+    }
+    .btn{
+      appearance:none;
+      border-radius:10px;
+      border:1px solid var(--border);
+      padding:6px 10px;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      background:#fff;
+      color:#111827;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .btn:hover{
+      border-color:#94a3b8;
+    }
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <div class="title-page">Painéis disponíveis</div>
+
+    <section class="card">
+      {% if layouts %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Esquerda</th>
+            <th>Direita</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lay in layouts %}
+          <tr>
+            <td>{{ lay.id }}</td>
+            <td>{{ lay.name }}</td>
+            <td>{{ lay.left_name or (lay.left_tc_id and ('TC ' ~ lay.left_tc_id)) or '-' }}</td>
+            <td>{{ lay.right_name or (lay.right_tc_id and ('TC ' ~ lay.right_tc_id)) or '-' }}</td>
+            <td>
+              <a class="btn" href="{{ url_for('tc.tc_wall_screen', layout_id=lay.id) }}" target="_blank">Abrir painel</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div style="font-size:14px; color:var(--muted);">
+        Nenhum painel disponível para o seu usuário.
+      </div>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>
+

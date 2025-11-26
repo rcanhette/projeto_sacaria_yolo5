@@ -176,6 +176,13 @@ class AgentService:
         self.cp = None
         self.thread = None
         self.stop_event = threading.Event()
+        # Porta HTTP do agente (informada no heartbeat como IP:porta)
+        try:
+            import os as _os
+            self.http_port = int(a.get('port', fallback=_os.getenv('AGENT_PORT') or '9090'))
+        except Exception:
+            self.http_port = 9090
+
         # Optional streaming parameters
         try:
             self.stream_fps = max(1, int(a.get("stream_fps", fallback="12")))
@@ -226,6 +233,8 @@ class AgentService:
         self.sev_crit_last_sync_ms = _getint("severity_crit_last_sync_ms", 15*60*1000)
         # Shadow local_id para journaling da sessão atual
         self._shadow_local_id: int | None = None
+        # Estado de conectividade com o Central
+        self._central_online: bool = False
 
     def _parse_roi(self, roi_val):
         if not roi_val:
@@ -458,7 +467,8 @@ def create_agent_app(cfg_path: str | None = None):
         while True:
             try:
                 host_for_central = _best_host() or socket.gethostname()
-                central.heartbeat(tc_id=service.tc_id, hostname=host_for_central, status="running", version="agent-1")
+                central.heartbeat(tc_id=service.tc_id, hostname=f'{host_for_central}:{service.http_port}', status='running', version='agent-1')
+                service._central_online = True
             except Exception as e:
                 try:
                     logging.getLogger("agent").warning(
@@ -466,6 +476,7 @@ def create_agent_app(cfg_path: str | None = None):
                     )
                 except Exception:
                     pass
+                service._central_online = False
             time.sleep(10)
 
     threading.Thread(target=_hb, daemon=True).start()
@@ -760,3 +771,6 @@ def create_agent_app(cfg_path: str | None = None):
 if __name__ == "__main__":
     app = create_agent_app()
     app.run(host="0.0.0.0", port=9090, debug=True, use_reloader=False, threaded=True)
+
+
+

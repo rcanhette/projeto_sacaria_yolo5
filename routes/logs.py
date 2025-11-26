@@ -528,3 +528,299 @@ def legacy_logs_index():
     base = url_for('logs.logs_panel')
     qs = request.query_string.decode() if hasattr(request, 'query_string') else ''
     return redirect(base + (('?' + qs) if qs else ''), code=302)
+
+
+# ----------------------------------------------------------------------
+# EXPORT PDF — layout com múltiplas colunas (Hora | I | **)
+# ----------------------------------------------------------------------
+@logs_bp.get("/log/<int:session_id>/export.pdf")
+@login_required
+def log_export_pdf(session_id: int):
+    sess = _get_session_or_404(session_id)
+    rows = _get_session_logs(session_id) or []
+
+    # Importa sob demanda e falha de modo amigável se não instalado
+    try:
+        from io import BytesIO
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib import colors
+    except ModuleNotFoundError:
+        return (
+            "Dependência ausente para gerar PDF (reportlab). "
+            "Instale no servidor central com: pip install -r requirements-central.txt",
+            500,
+            {"Content-Type": "text/plain; charset=utf-8"},
+        )
+
+    total_final = sess.get("total_final") if sess.get("total_final") is not None else (rows[-1]["total_atual"] if rows else 0)
+
+    buf = BytesIO()
+    # Página em retrato (A4)
+    pw, ph = A4
+    c = canvas.Canvas(buf, pagesize=(pw, ph))
+
+    # Layout base
+    margin_l, margin_r, margin_t, margin_b = 18, 18, 22, 26
+    header_h1, header_h2, header_gap = 22, 18, 8
+    footer_h = 80
+    body_top = ph - margin_t - header_h1 - header_h2 - header_gap
+    body_bottom = margin_b + footer_h
+    usable_w = pw - margin_l - margin_r
+    usable_h = body_top - body_bottom
+
+    # Grupos de colunas em retrato: 11 grupos ("Hora | I | **")
+    groups = 11
+    gap = 4
+    group_w = (usable_w - gap * (groups - 1)) / groups
+    sub_w_hora = group_w * 0.55
+    sub_w_delta = group_w * 0.17
+    sub_w_total = group_w * 0.28
+
+    # Alturas menores para caber mais linhas (retrato)
+    row_h = 7
+    header_row_h = 10
+    rows_per_col_geom = int((usable_h - header_row_h) // row_h) or 1
+    total_rows = len(rows)
+    # 90 linhas POR COLUNA; calcula capacidade por página = 90 * ncol (limitada pela geometria)
+    lines_per_col_target = 90
+    rows_per_col_target = min(rows_per_col_geom, lines_per_col_target)
+    page_capacity_total = rows_per_col_target * groups
+    total_pages = max(1, (total_rows + page_capacity_total - 1) // page_capacity_total)
+
+    def draw_header(page_no: int):
+        c.setFont("Helvetica-Bold", 10)
+        c.setFillColor(colors.HexColor("#002F54"))
+        c.drawString(margin_l, ph - margin_t, "Coonagro")
+        title = f"RELATÓRIO DE CONTAGEM DE SACARIA" + (f" - {sess.get('ct_name')}" if sess.get('ct_name') else "")
+        c.setFillColor(colors.black)
+        c.setFont("Helvetica-Bold", 10)
+        c.drawCentredString(pw/2, ph - margin_t, title)
+        # Página em fonte menor
+        c.setFont("Helvetica", 6)
+        c.drawRightString(pw - margin_r, ph - margin_t, f"PÁGINA {page_no}/{total_pages}")
+        # Linha abaixo do título
+        c.setStrokeColor(colors.HexColor("#004A80"))
+        c.setLineWidth(0.8)
+        c.line(margin_l, ph - margin_t - 4, pw - margin_r, ph - margin_t - 4)
+
+        lote = (sess.get("lote") or "-")
+        qtde_alvo = (str(sess.get("contagem_alvo")) if sess.get("contagem_alvo") is not None else "-")
+        inicio = sess["data_inicio"].strftime("%d/%m/%Y %H:%M:%S") if sess.get("data_inicio") else "-"
+        fim = sess["data_fim"].strftime("%d/%m/%Y %H:%M:%S") if sess.get("data_fim") else "-"
+        line2 = f"LOTE: {lote}  |  QTDE {qtde_alvo}  |  INÍCIO: {inicio} - FIM: {fim}  |  TOTAL CONTADO: {total_final}"
+        c.setFont("Helvetica", 10)
+        c.drawCentredString(pw/2, ph - margin_t - header_h1 - 2, line2)
+
+    def draw_footer_if_last(page_no: int):
+        if page_no != total_pages:
+            return
+        # Caixa de observação
+        y0 = margin_b + 60
+        c.setLineWidth(1)
+        c.setStrokeColor(colors.black)
+        c.rect(margin_l, y0, pw - margin_l - margin_r, 45, stroke=1, fill=0)
+        obs = (sess.get("observacao") or "").strip()
+        if obs:
+            c.setFont("Helvetica-Bold", 10)
+            c.drawCentredString(pw/2, y0 + 15, obs[:3000])
+        # Assinaturas
+        c.setLineWidth(0.8)
+        left_x = margin_l + 60
+        right_x = pw - margin_r - 200
+        base_y = margin_b + 20
+        c.line(left_x, base_y, left_x + 240, base_y)
+        c.line(right_x, base_y, right_x + 240, base_y)
+        c.setFont("Helvetica", 9)
+        c.drawCentredString(left_x + 120, base_y - 12, "NOME DO RESPONSÁVEL")
+        c.drawCentredString(right_x + 120, base_y - 12, "ASSINATURA DO RESPONSÁVEL")
+
+    def draw_table_page(start_index: int, page_no: int, remaining: int):
+        draw_header_custom(page_no)
+        # Cabeçalho dos grupos
+        x = margin_l
+        y_header = body_top
+        c.setFillColor(colors.HexColor("#004A80"))
+        c.setStrokeColor(colors.HexColor("#004A80"))
+        for _g in range(groups):
+            c.rect(x, y_header - header_row_h, group_w, header_row_h, fill=1, stroke=1)
+            c.setFillColor(colors.white)
+            c.setFont("Helvetica-Bold", 7)
+            c.drawString(x + 4, y_header - header_row_h + 3, "Hora")
+            c.drawRightString(x + sub_w_hora + sub_w_delta - 4, y_header - header_row_h + 3, "I")
+            c.drawRightString(x + group_w - 4, y_header - header_row_h + 3, "**")
+            c.setFillColor(colors.HexColor("#004A80"))
+            x += group_w + gap
+
+        # Grade
+        c.setStrokeColor(colors.HexColor("#D1D5DB"))
+        c.setLineWidth(0.5)
+        y0 = y_header - header_row_h
+        # Linhas por coluna desta página: distribui o restante pelas colunas
+        from math import ceil
+        # Limita para distribuir no máximo 90 linhas por página
+        eff_rows_per_col = min(
+            rows_per_col_geom,
+            ceil(min(remaining, page_capacity_target) / groups)
+        ) or 1
+
+        for r in range(eff_rows_per_col + 1):
+            yy = y0 - r * row_h
+            x = margin_l
+            for _g in range(groups):
+                c.line(x, yy, x + group_w, yy)
+                x += group_w + gap
+        x = margin_l
+        for _g in range(groups):
+            c.line(x, y0, x, y0 - eff_rows_per_col * row_h)
+            c.line(x + group_w, y0, x + group_w, y0 - eff_rows_per_col * row_h)
+            c.line(x + sub_w_hora, y0, x + sub_w_hora, y0 - eff_rows_per_col * row_h)
+            c.line(x + sub_w_hora + sub_w_delta, y0, x + sub_w_hora + sub_w_delta, y0 - eff_rows_per_col * row_h)
+            x += group_w + gap
+
+        # Dados
+        c.setFont("Helvetica", 7)
+        c.setFillColor(colors.black)
+        for g in range(groups):
+            for r in range(eff_rows_per_col):
+                idx = start_index + g * eff_rows_per_col + r
+                if idx >= total_rows:
+                    continue
+                item = rows[idx]
+                ts_txt = item.get("ts").strftime("%H:%M:%S") if item.get("ts") else ""
+                delta_txt = f"{item.get('delta', 0)}"
+                total_txt = f"{item.get('total_atual', 0)}"
+                base_x = margin_l + g * (group_w + gap)
+                base_y = y0 - r * row_h
+                c.drawString(base_x + 3, base_y - row_h + 3, ts_txt)
+                c.drawRightString(base_x + sub_w_hora + sub_w_delta - 3, base_y - row_h + 3, delta_txt)
+                c.drawRightString(base_x + group_w - 3, base_y - row_h + 3, total_txt)
+
+        draw_footer_if_last(page_no)
+        c.showPage()
+
+    # Cabeçalho novo: título fixo, depois nome da TC, depois linha de LOTE
+    def draw_header_custom(page_no: int):
+        c.setFont("Helvetica-Bold", 10)
+        c.setFillColor(colors.HexColor("#002F54"))
+        c.drawString(margin_l, ph - margin_t, "Coonagro")
+        # Título fixo
+        title = "RELATORIO DE CONTAGEM DE SACARIA"
+        c.setFillColor(colors.black)
+        c.setFont("Helvetica-Bold", 10)
+        c.drawCentredString(pw/2, ph - margin_t, title)
+        # Página (menor)
+        c.setFont("Helvetica", 6)
+        c.drawRightString(pw - margin_r, ph - margin_t, f"PAGINA {page_no}/{total_pages}")
+        # Linha abaixo do título
+        c.setStrokeColor(colors.HexColor("#004A80"))
+        c.setLineWidth(0.8)
+        c.line(margin_l, ph - margin_t - 4, pw - margin_r, ph - margin_t - 4)
+
+        # Nome da TC em linha dedicada
+        ct_txt = (sess.get("ct_name") or f"TC {sess['ct_id']}")
+        c.setFont("Helvetica-Bold", 9)
+        y_ct = ph - margin_t - header_h1 - 6
+        c.drawCentredString(pw/2, y_ct, ct_txt)
+
+        # Linha com LOTE/INICIO/FIM/TOTAL
+        lote = (sess.get("lote") or "-")
+        qtde_alvo = (str(sess.get("contagem_alvo")) if sess.get("contagem_alvo") is not None else "-")
+        inicio = sess["data_inicio"].strftime("%d/%m/%Y %H:%M:%S") if sess.get("data_inicio") else "-"
+        fim = sess["data_fim"].strftime("%d/%m/%Y %H:%M:%S") if sess.get("data_fim") else "-"
+        line2 = f"LOTE: {lote}  |  QTDE {qtde_alvo}  |  INICIO: {inicio} - FIM: {fim}  |  TOTAL CONTADO: {total_final}"
+        c.setFont("Helvetica", 9)
+        y_line2 = y_ct - 10
+        c.drawCentredString(pw/2, y_line2, line2)
+
+    # Versão v2: distribui exatamente 90 itens por página entre 11 colunas,
+    # com algumas colunas recebendo +1 linha quando necessário. Fonte menor nos dados.
+    def draw_table_page_v2(start_index: int, page_no: int, remaining: int):
+        draw_header(page_no)
+        # Cabeçalho dos grupos
+        x = margin_l
+        y_header = body_top
+        c.setFillColor(colors.HexColor("#004A80"))
+        c.setStrokeColor(colors.HexColor("#004A80"))
+        for _g in range(groups):
+            c.rect(x, y_header - header_row_h, group_w, header_row_h, fill=1, stroke=1)
+            c.setFillColor(colors.white)
+            c.setFont("Helvetica-Bold", 7)
+            c.drawString(x + 2, y_header - header_row_h + 2, "Hora")
+            c.drawRightString(x + sub_w_hora + sub_w_delta - 2, y_header - header_row_h + 2, "I")
+            c.drawRightString(x + group_w - 2, y_header - header_row_h + 2, "**")
+            c.setFillColor(colors.HexColor("#004A80"))
+            x += group_w + gap
+
+        # Grade com colunas de alturas variáveis (balanceado: round-robin entre colunas)
+        c.setStrokeColor(colors.HexColor("#D1D5DB"))
+        c.setLineWidth(0.5)
+        y0 = y_header - header_row_h
+        # Quantos itens vamos renderizar nesta página ao todo
+        target_this_page = min(remaining, page_capacity_total)
+        # Distribuição round-robin: base + 1 nas primeiras 'rem' colunas
+        base = target_this_page // groups
+        rem = target_this_page % groups
+        col_rows = [min(rows_per_col_target, base + (1 if g < rem else 0)) for g in range(groups)]
+
+        x = margin_l
+        for g in range(groups):
+            rows_g = col_rows[g]
+            for r in range(rows_g + 1):
+                yy = y0 - r * row_h
+                c.line(x, yy, x + group_w, yy)
+            c.line(x, y0, x, y0 - rows_g * row_h)
+            c.line(x + group_w, y0, x + group_w, y0 - rows_g * row_h)
+            c.line(x + sub_w_hora, y0, x + sub_w_hora, y0 - rows_g * row_h)
+            c.line(x + sub_w_hora + sub_w_delta, y0, x + sub_w_hora + sub_w_delta, y0 - rows_g * row_h)
+            x += group_w + gap
+
+        # Dados com fonte menor
+        c.setFont("Helvetica", 5)
+        c.setFillColor(colors.black)
+        offsets = []
+        _acc = 0
+        for g in range(groups):
+            offsets.append(_acc)
+            _acc += col_rows[g]
+        for g in range(groups):
+            rows_g = col_rows[g]
+            for r in range(rows_g):
+                idx = start_index + offsets[g] + r
+                if idx >= total_rows:
+                    continue
+                item = rows[idx]
+                ts_txt = item.get("ts").strftime("%H:%M:%S") if item.get("ts") else ""
+                delta_txt = f"{item.get('delta', 0)}"
+                total_txt = f"{item.get('total_atual', 0)}"
+                base_x = margin_l + g * (group_w + gap)
+                base_y = y0 - r * row_h
+                c.drawString(base_x + 2, base_y - row_h + 2, ts_txt)
+                c.drawRightString(base_x + sub_w_hora + sub_w_delta - 2, base_y - row_h + 2, delta_txt)
+                c.drawRightString(base_x + group_w - 2, base_y - row_h + 2, total_txt)
+
+        draw_footer_if_last(page_no)
+        c.showPage()
+
+    if total_rows == 0:
+        draw_header_custom(1)
+        draw_footer_if_last(1)
+        c.showPage()
+    else:
+        start = 0
+        page_no = 1
+        while start < total_rows:
+            remaining = total_rows - start
+            draw_table_page_v2(start, page_no, remaining)
+            # Avança respeitando o limite de 90 linhas por página
+            step = min(remaining, page_capacity_total)
+            start += step
+            page_no += 1
+
+    c.save()
+    buf.seek(0)
+
+    ct_id = sess["ct_id"]
+    lote = _safe_filename_piece(sess.get("lote") or "")
+    filename = f"session_tc{ct_id}" + (f"_{lote}" if lote else "") + ".pdf"
+    return send_file(buf, as_attachment=True, download_name=filename, mimetype="application/pdf")

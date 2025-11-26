@@ -48,7 +48,8 @@ $centralServices = @(
   'services/agent_repository.py',
   'services/tc_repository.py',
   'services/runtime.py',
-  'services/local_queue.py'
+  'services/local_queue.py',
+  'services/tc_wall_repository.py'
 )
 foreach ($s in $centralServices) {
   if (Test-Path $s) {
@@ -99,3 +100,4 @@ if (Test-Path 'scripts/install_nssm_agent.ps1') {
 }
 
 "Pacotes montados em: $OutDir"
+

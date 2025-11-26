@@ -2,25 +2,90 @@
 import os
 import time
 import hashlib
+import configparser
+from pathlib import Path
 import psycopg2
 import psycopg2.extras
 from psycopg2.pool import SimpleConnectionPool
 from contextlib import contextmanager
 
 PG_ENV_KEYS = (
-    "PGHOST", "PGPORT", "PGDATABASE", "PGUSER", "PGPASSWORD",
-    "PGSERVICE", "PGSERVICEFILE", "PGPASSFILE", "PGCONNECT_TIMEOUT",
-    "PGOPTIONS", "PGAPPNAME", "PGSSLMODE", "PGSSLCERT", "PGSSLKEY",
-    "PGSSLROOTCERT", "PGREQUIRESSL"
+    "PGHOST",
+    "PGPORT",
+    "PGDATABASE",
+    "PGUSER",
+    "PGPASSWORD",
+    "PGSERVICE",
+    "PGSERVICEFILE",
+    "PGPASSFILE",
+    "PGCONNECT_TIMEOUT",
+    "PGOPTIONS",
+    "PGAPPNAME",
+    "PGSSLMODE",
+    "PGSSLCERT",
+    "PGSSLKEY",
+    "PGSSLROOTCERT",
+    "PGREQUIRESSL",
 )
 
+
 def _read_db_config():
-    host = os.getenv("PGHOST", "localhost")
-    port = int(os.getenv("PGPORT", "5432"))
-    db   = os.getenv("PGDATABASE", "contagem_sacaria")
-    usr  = os.getenv("PGUSER", "postgres")
-    pwd  = os.getenv("PGPASSWORD", "C00nagr0@2025")
-    return host, port, db, usr, pwd
+    """
+    Resolve a configuração de conexão com o PostgreSQL com a seguinte
+    prioridade:
+      1) Variáveis de ambiente PG* (PGHOST, PGPORT, etc.)
+      2) Arquivo central.ini (se existir) na seção [database]
+      3) Defaults seguros para ambiente de desenvolvimento.
+    """
+    # Defaults de desenvolvimento
+    host = "localhost"
+    port = 5432
+    db = "contagem_sacaria"
+    usr = "postgres"
+    pwd = "Coop@2025"
+
+    # 1) Variáveis de ambiente têm prioridade máxima
+    env_host = os.getenv("PGHOST")
+    env_port = os.getenv("PGPORT")
+    env_db = os.getenv("PGDATABASE")
+    env_user = os.getenv("PGUSER")
+    env_pwd = os.getenv("PGPASSWORD")
+    if env_host or env_port or env_db or env_user or env_pwd:
+        host = env_host or host
+        try:
+            port = int(env_port) if env_port is not None else port
+        except Exception:
+            pass
+        db = env_db or db
+        usr = env_user or usr
+        pwd = env_pwd or pwd
+        return host, port, db, usr, pwd
+
+    # 2) central.ini (ou arquivo apontado por CENTRAL_INI)
+    try:
+        ini_candidate = os.getenv("CENTRAL_INI", "central.ini")
+        ini_path = Path(ini_candidate)
+        if ini_path.is_file():
+            cfg = configparser.ConfigParser()
+            try:
+                cfg.read(ini_path, encoding="utf-8-sig")
+            except Exception:
+                # Fallback para encoding padrão do sistema (ex.: CP1252)
+                cfg.read(ini_path)
+            if cfg.has_section("database"):
+                host = cfg.get("database", "host", fallback=host)
+                try:
+                    port = cfg.getint("database", "port", fallback=port)
+                except Exception:
+                    pass
+                db = cfg.get("database", "database", fallback=db)
+                usr = cfg.get("database", "user", fallback=usr)
+                pwd = cfg.get("database", "password", fallback=pwd)
+    except Exception:
+        # Em caso de erro de leitura, mantém defaults/ambiente
+        pass
+
+    return host, int(port), db, usr, pwd
 
 def _strip_pg_env():
     removed = {}
@@ -444,6 +509,23 @@ def ensure_schema() -> None:
     )
     execute("CREATE INDEX IF NOT EXISTS idx_tc_agent_status_last_seen ON tc_agent_status(last_seen DESC);")
     #
+
+    # #
+    # Layouts de paineis grandes (tc-wall)
+    execute(
+        """
+        CREATE TABLE IF NOT EXISTS tc_wall_layout (
+          id SERIAL PRIMARY KEY,
+          name TEXT NOT NULL,
+          left_tc_id  INTEGER REFERENCES tc(id) ON DELETE SET NULL,
+          right_tc_id INTEGER REFERENCES tc(id) ON DELETE SET NULL,
+          created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+        );
+        """
+    )
+    execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_tc_wall_layout_name ON tc_wall_layout(name);"
+    )
     
     # #
     # Ajusta constraint, default, atualiza registros e recria Ã­ndice Ãºnico parcial

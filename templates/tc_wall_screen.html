@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ layout.name or 'Painel Grande' }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      background: #000;
+      color: #fff;
+    }
+    .top-bar {
+      padding: 6px 12px;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .top-title {
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .top-name {
+      font-weight: 800;
+      margin-left: 8px;
+      font-size: 14px;
+    }
+    .wall {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+    .panel {
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      transition: background-color .2s ease;
+      background: #7f1d1d; /* vermelho parado */
+      position: relative;
+    }
+    .panel + .panel {
+      border-left: 2px solid rgba(15,23,42,0.85);
+    }
+    .panel.on {
+      background: #14532d; /* verde operando */
+    }
+    .panel.off {
+      background: #7f1d1d;
+    }
+    .arrow {
+      position: absolute;
+      top: 1vh;
+      width: 62vw;  /* 30% mais larga que 48vw */
+      height: 13vh;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+    .arrow-left {
+      left: 4vw;
+      justify-content: flex-start;
+    }
+    .arrow-right {
+      right: 4vw;
+      justify-content: flex-end;
+    }
+    .arrow-left::before {
+      content: "";
+      display: block;
+      position: relative;
+      z-index: 2;
+      width: 0;
+      height: 0;
+      border-top: 6.5vh solid transparent;
+      border-bottom: 6.5vh solid transparent;
+      border-right: 8.5vw solid #ffffff;     /* seta apontando para a esquerda */
+    }
+    .arrow-left::after {
+      content: "";
+      display: block;
+      position: relative;
+      z-index: 1;
+      width: 19vw;   /* 30% mais largo que 14.5vw */
+      height: 2.9vh;   /* 1.8vh * 1.6 */
+      margin-left: -4.2vw; /* ajustado proporcional ao novo corpo */
+      background: #ffffff;
+      box-shadow: 0 0 6px rgba(0,0,0,0.7);
+    }
+    .arrow-right::before {
+      content: "";
+      display: block;
+      position: relative;
+      z-index: 1;
+      width: 19vw;
+      height: 2.9vh;
+      margin-right: -4.2vw; /* corpo passa por baixo da ponta */
+      background: #ffffff;
+      box-shadow: 0 0 6px rgba(0,0,0,0.7);
+    }
+    .arrow-right::after {
+      content: "";
+      display: block;
+      position: relative;
+      z-index: 2;
+      width: 0;
+      height: 0;
+      border-top: 6.5vh solid transparent;
+      border-bottom: 6.5vh solid transparent;
+      border-left: 8.5vw solid #ffffff; /* seta apontando para a direita */
+    }
+    .tc-name {
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: clamp(72px, 13.5vh, 208px); /* +30% */
+      margin-bottom: 8px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 40%;
+      position: absolute;
+      top: 5vh;
+    }
+    #panel-left .tc-name {
+      left: calc(50% + 80px);
+      text-align: left;
+    }
+    #panel-right .tc-name {
+      right: calc(50% + 80px);
+      text-align: right;
+    }
+    .tc-status {
+      display: none; /* cor do painel já indica status */
+    }
+    .tc-count {
+      font-weight: 700;
+      font-size: clamp(156px, 35.9vh, 506px); /* +15% */
+      line-height: 1;
+      letter-spacing: .06em;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.9);
+    }
+    .tc-extra {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: clamp(32px, 5.5vh, 90px);
+      color: #e5e7eb;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .tc-extra-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .tc-extra-label {
+      font-size: 0.5em;
+      opacity: 0.9;
+    }
+    .tc-extra-value {
+      font-size: 1.2em;
+      font-weight: 800;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+    }
+    @media (max-width: 900px) {
+      .wall {
+        flex-direction: column;
+      }
+      .panel + .panel {
+        border-left: none;
+        border-top: 2px solid rgba(15,23,42,0.85);
+      }
+      .tc-name {
+        font-size: 18px;
+      }
+      .tc-count {
+        font-size: 96px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <span class="top-title">Painel</span>
+      <span class="top-name">{{ layout.name }}</span>
+    </div>
+  </div>
+  <div class="wall">
+    <section class="panel off" id="panel-left" data-side="left" data-tc-id="{{ layout.left_tc_id or '' }}">
+      <div class="arrow arrow-left"></div>
+      <div class="tc-name" data-role="name">
+        {{ layout.left_name or (layout.left_tc_id and ('TC ' ~ layout.left_tc_id)) or 'TC -' }}
+      </div>
+      <div class="tc-status" data-role="status">Parada</div>
+      <div class="tc-count" data-role="count">0</div>
+      <div class="tc-extra">
+        <div class="tc-extra-block">
+          <div class="tc-extra-label">Lote</div>
+          <div class="tc-extra-value" data-role="lote"></div>
+        </div>
+        <div class="tc-extra-block" style="align-items:flex-end; text-align:right;">
+          <div class="tc-extra-label">Alvo</div>
+          <div class="tc-extra-value" data-role="alvo"></div>
+        </div>
+      </div>
+    </section>
+    <section class="panel off" id="panel-right" data-side="right" data-tc-id="{{ layout.right_tc_id or '' }}">
+      <div class="arrow arrow-right"></div>
+      <div class="tc-name" data-role="name">
+        {{ layout.right_name or (layout.right_tc_id and ('TC ' ~ layout.right_tc_id)) or 'TC -' }}
+      </div>
+      <div class="tc-status" data-role="status">Parada</div>
+      <div class="tc-count" data-role="count">0</div>
+      <div class="tc-extra">
+        <div class="tc-extra-block">
+          <div class="tc-extra-label">Lote</div>
+          <div class="tc-extra-value" data-role="lote"></div>
+        </div>
+        <div class="tc-extra-block" style="align-items:flex-end; text-align:right;">
+          <div class="tc-extra-label">Alvo</div>
+          <div class="tc-extra-value" data-role="alvo"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+    (function(){
+      const panels = {
+        left: document.getElementById('panel-left'),
+        right: document.getElementById('panel-right'),
+      };
+      const sources = { left: null, right: null };
+
+      function formatInt(v){
+        if (v == null || isNaN(v)) return '0';
+        try {
+          return parseInt(v, 10).toLocaleString('pt-BR');
+        } catch(e){
+          return String(parseInt(v, 10) || 0);
+        }
+      }
+
+      function updatePanel(side, payload){
+        const panel = panels[side];
+        if (!panel) return;
+        const nameEl = panel.querySelector('[data-role=\"name\"]');
+        const statusEl = panel.querySelector('[data-role=\"status\"]');
+        const countEl = panel.querySelector('[data-role=\"count\"]');
+        const loteEl = panel.querySelector('[data-role=\"lote\"]');
+        const alvoEl = panel.querySelector('[data-role=\"alvo\"]');
+
+        const active = !!payload.session_active || (String(payload.db_status || '').toLowerCase() === 'operando' || String(payload.db_status || '').toLowerCase() === 'ativo');
+        panel.classList.toggle('on', active);
+        panel.classList.toggle('off', !active);
+        if (statusEl){
+          statusEl.textContent = active ? 'Operando' : 'Parada';
+        }
+        if (countEl){
+          countEl.textContent = formatInt(payload.count);
+        }
+        if (loteEl){
+          const lote = (payload.lote || '').trim();
+          loteEl.textContent = lote || '-';
+        }
+        if (alvoEl){
+          const alvo = payload.contagem_alvo;
+          if (alvo != null && !isNaN(alvo)){
+            alvoEl.textContent = formatInt(alvo);
+          } else {
+            alvoEl.textContent = '-';
+          }
+        }
+      }
+
+      function clearPanel(side){
+        const panel = panels[side];
+        if (!panel) return;
+        panel.classList.remove('on');
+        panel.classList.add('off');
+        const statusEl = panel.querySelector('[data-role=\"status\"]');
+        const countEl = panel.querySelector('[data-role=\"count\"]');
+        const loteEl = panel.querySelector('[data-role=\"lote\"]');
+        const alvoEl = panel.querySelector('[data-role=\"alvo\"]');
+        if (statusEl) statusEl.textContent = 'Parada';
+        if (countEl) countEl.textContent = '0';
+        if (loteEl) loteEl.textContent = '';
+        if (alvoEl) alvoEl.textContent = '';
+      }
+
+      function attachSSE(side){
+        const panel = panels[side];
+        if (!panel) return;
+        const tcId = panel.dataset.tcId;
+        if (sources[side]){
+          try { sources[side].close(); } catch(e){}
+          sources[side] = null;
+        }
+        if (!tcId){
+          clearPanel(side);
+          return;
+        }
+        try {
+          const es = new EventSource('/sse/tc/' + encodeURIComponent(tcId));
+          sources[side] = es;
+          es.onmessage = function(ev){
+            try {
+              const data = JSON.parse(ev.data || '{}');
+              updatePanel(side, data);
+            } catch(e){}
+          };
+          es.onerror = function(){
+            clearPanel(side);
+          };
+        } catch(e){
+          clearPanel(side);
+        }
+      }
+
+      attachSSE('left');
+      attachSSE('right');
+    })();
+  </script>
+</body>
+</html>

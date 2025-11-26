@@ -1,6 +1,0 @@
-# Dependências mínimas para o Servidor Central (sem visão computacional)
-Flask>=2.3
-psycopg2-binary>=2.9
-waitress>=2.1
-requests>=2.31
-openpyxl>=3.1

@@ -13,6 +13,12 @@
       <a href="{{ url_for('tc.tc_multi') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Operações TCs</a>
     {% endif %}
 
+    {% if _u.role == 'admin' %}
+      <a href="{{ url_for('tc.tc_wall_config') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acesso painéis</a>
+    {% elif _u.role == 'operator' %}
+      <a href="{{ url_for('tc.tc_wall_view_default') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Acesso painéis</a>
+    {% endif %}
+
     <span style="opacity:.8;">|</span>
     <span style="opacity:.8;">{{ _u.username }} ({{ _u.role }})</span>
     <a href="{{ url_for('auth.logout') }}" style="color:#fff; text-decoration:none; padding:6px 10px;">Sair</a>

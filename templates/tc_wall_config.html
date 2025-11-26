@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Configuração Painéis Grandes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#002F54; --card:#ffffff; --muted:#6B7280; --text:#002F54;
+      --primary:#002F54; --primary-weak:#0f3d68; --border:#e5e7eb;
+      --danger:#ef4444; --danger-weak:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background:#f8fafc;
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{
+      padding:16px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .title-page{
+      font-weight:800;
+      font-size:20px;
+      letter-spacing:.02em;
+      margin:10px 4px 16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 4px 16px rgba(0,0,0,.08);
+      padding:16px 20px;
+      margin-bottom:16px;
+    }
+    .card-title{
+      font-weight:700;
+      margin-bottom:12px;
+      font-size:16px;
+    }
+    .form-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:10px;
+      align-items:center;
+    }
+    .label{
+      font-size:13px;
+      color:var(--muted);
+      min-width:80px;
+    }
+    .input, .select{
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      font-size:14px;
+      min-width:140px;
+    }
+    .btn{
+      appearance:none;
+      border-radius:10px;
+      border:1px solid var(--border);
+      padding:8px 12px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      background:#fff;
+      color:#111827;
+      transition:.15s ease;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+      border-color:transparent;
+    }
+    .btn-primary:hover{ background:var(--primary-weak); }
+    .btn-danger{
+      background:var(--danger);
+      color:#fff;
+      border-color:transparent;
+    }
+    .btn-danger:hover{ background:var(--danger-weak); }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+      margin-top:8px;
+    }
+    th, td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 6px;
+      text-align:left;
+    }
+    th{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+    }
+    tbody tr:hover{
+      background:#f9fafb;
+    }
+  </style>
+</head>
+<body>
+  {% include '_navbar.html' %}
+  <div class="wrap">
+    {% include '_flash.html' %}
+    <div class="title-page">Configuração dos painéis grandes</div>
+
+    <section class="card">
+      <div class="card-title">Nova tela</div>
+      <form method="post" action="{{ url_for('tc.tc_wall_config') }}">
+        <input type="hidden" name="action" value="create" />
+        <div class="form-row">
+          <label class="label" for="name">Nome da tela</label>
+          <input class="input" id="name" name="name" placeholder="Ex.: Tela 1, Tela 2" required />
+        </div>
+        <div class="form-row">
+          <label class="label" for="left_tc_id">Lado esquerdo</label>
+          <select class="select" id="left_tc_id" name="left_tc_id">
+            <option value="">(nenhuma)</option>
+            {% for ct in tcs %}
+            <option value="{{ ct.id }}">{{ ct.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="right_tc_id">Lado direito</label>
+          <select class="select" id="right_tc_id" name="right_tc_id">
+            <option value="">(nenhuma)</option>
+            {% for ct in tcs %}
+            <option value="{{ ct.id }}">{{ ct.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="hint">
+          Você pode deixar um dos lados vazio. Pelo menos um lado deve ter uma TC.
+        </div>
+        <div style="margin-top:10px;">
+          <button type="submit" class="btn btn-primary">Criar tela</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-title">Telas configuradas</div>
+      {% if layouts %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Esquerda</th>
+            <th>Direita</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lay in layouts %}
+          <tr>
+            <td>{{ lay.id }}</td>
+            <td>{{ lay.name }}</td>
+            <td>{{ lay.left_name or (lay.left_tc_id and ('TC ' ~ lay.left_tc_id)) or '-' }}</td>
+            <td>{{ lay.right_name or (lay.right_tc_id and ('TC ' ~ lay.right_tc_id)) or '-' }}</td>
+            <td>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <a class="btn" href="{{ url_for('tc.tc_wall_edit', layout_id=lay.id) }}">Editar</a>
+                <a class="btn" href="{{ url_for('tc.tc_wall_screen', layout_id=lay.id) }}" target="_blank">Visualizar</a>
+                <form method="post" action="{{ url_for('tc.tc_wall_config') }}" onsubmit="return confirm('Remover esta tela?');">
+                  <input type="hidden" name="action" value="delete" />
+                  <input type="hidden" name="layout_id" value="{{ lay.id }}" />
+                  <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="hint">
+        Dica: abra cada tela em um monitor diferente usando o link Visualizar, e ative o modo tela cheia (F11).
+      </div>
+      {% else %}
+      <div class="hint">Nenhuma tela configurada ainda.</div>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>
