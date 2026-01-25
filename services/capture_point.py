@@ -8,11 +8,13 @@ import threading
 
 import logging
 
+import os
+
 from datetime import datetime
 
 from services.industrial_tag_detector import IndustrialTagDetector
-
 from services.video_source import VideoSource
+from services.session_repository import pause_session as _pause_session_db, resume_session as _resume_session_db
 
 # Em ambientes "agente" o módulo de repositório de sessão (que depende de DB)
 # pode não estar disponível. Fazemos import tolerante e definimos stubs que
@@ -139,21 +141,42 @@ class CapturePoint:
 
         self.session_lock = threading.Lock()
 
-        # estado de sesso
-
+        # estado de sessao
         self.session_active = False
-
+        # novo estado de pausa (sessao aberta, mas sem contar)
+        self.session_paused = False
         self.session_lote = None
-
         self.session_data = None
-
         self.session_hora_inicio = None
-
         self.session_hora_fim = None
-
         self.session_db_id = None   # <<< ID na tabela session
-
         self.session_contagem_alvo = None
+
+        # monitoramento de camera
+        try:
+            self.camera_lost_timeout = float(os.getenv("CAMERA_LOST_TIMEOUT_SEC", "2.5"))
+        except Exception:
+            self.camera_lost_timeout = 5.0
+        if self.camera_lost_timeout < 1.0:
+            self.camera_lost_timeout = 1.0
+        self.camera_lost = False
+        self.camera_alert = None
+        self._last_camera_ok_ts = None
+        try:
+            self.camera_idle_check_interval = float(os.getenv("CAMERA_IDLE_CHECK_SEC", "5"))
+        except Exception:
+            self.camera_idle_check_interval = 5.0
+        if self.camera_idle_check_interval < 2.0:
+            self.camera_idle_check_interval = 2.0
+        self._last_camera_probe_ts = 0.0
+
+        try:
+            self.camera_reopen_interval = float(os.getenv("CAMERA_REOPEN_INTERVAL_SEC", "5"))
+        except Exception:
+            self.camera_reopen_interval = 5.0
+        if self.camera_reopen_interval < 1.0:
+            self.camera_reopen_interval = 1.0
+        self._last_camera_reopen_ts = 0.0
 
         # contadores
 
@@ -189,11 +212,12 @@ class CapturePoint:
 
             log.info("[CT%s] Fonte de vÃ­deo pronta: %s", self.ct.get('id'), self.source_path)
 
+        roi_val = self.roi_cfg if self.roi_cfg is not None else (0, 0, 0, 0)
         self.detector = IndustrialTagDetector(
 
             self.model_path,
 
-            roi=self.roi_cfg,
+            roi=roi_val,
 
             cross_point_mode='meio',
 
@@ -245,9 +269,11 @@ class CapturePoint:
 
         if self.thread and self.thread.is_alive():
 
+            if self.camera_lost:
+                self._maybe_reopen_camera(time.time(), reason="camera_lost")
             return
 
-        if not self.camera or not self.detector:
+        if not self.camera or not self.detector or self.camera_lost:
 
             self._open_sources()
 
@@ -261,6 +287,13 @@ class CapturePoint:
 
                         self._open_sources()
 
+                        if self.camera is None and self.session_active:
+                            try:
+                                now = time.monotonic()
+                            except Exception:
+                                now = time.time()
+                            self._check_camera_timeout(now, has_frame=False)
+
                         time.sleep(0.05)
 
                         continue
@@ -269,15 +302,27 @@ class CapturePoint:
 
                     if not ret or frame is None:
 
+                        try:
+                            now = time.monotonic()
+                        except Exception:
+                            now = time.time()
+                        self._check_camera_timeout(now, has_frame=False)
                         time.sleep(0.01)
 
                         continue
+
+                    try:
+                        now = time.monotonic()
+                    except Exception:
+                        now = time.time()
+                    self._check_camera_timeout(now, has_frame=True)
 
                     vis, total_counter_abs = self.detector.detect_and_tag(frame)
 
                     self.last_vis_frame = vis
 
-                    if self.session_active:
+                    # Quando em pausa, mantemos a sessao mas nao geramos novos logs
+                    if self.session_active and not getattr(self, "session_paused", False):
 
                         total_abs = getattr(self.detector, "counter", total_counter_abs)
 
@@ -388,16 +433,18 @@ class CapturePoint:
                     self.session_db_id = None
 
             self.session_active = True
-
+            self.session_paused = False
             self.session_lote = lote
-
             self.session_data = agora.strftime("%d/%m/%Y")
-
             self.session_hora_inicio = agora.strftime("%H:%M:%S")
-
             self.session_hora_fim = None
-
             self.session_contagem_alvo = int(contagem_alvo) if contagem_alvo is not None else None
+            try:
+                self._last_camera_ok_ts = time.monotonic()
+            except Exception:
+                self._last_camera_ok_ts = None
+            self.camera_lost = False
+            self.camera_alert = None
 
             if self.detector:
 
@@ -416,6 +463,45 @@ class CapturePoint:
             self._last_session_logged_total = 0
 
         # (no h mais cabealho em .txt  virou a linha da tabela `session`)
+
+    def attach_session(self, session_db_id: int, lote: str, contagem_alvo: int | None = None, current_total: int | None = None):
+        """Reanexa a uma sessao ja existente (ex.: agent reiniciou)."""
+        with self.session_lock:
+            if self.session_active or self.session_db_id is not None:
+                return
+            self._ensure_thread()
+            try:
+                agora = datetime.now()
+                self.session_data = agora.strftime("%d/%m/%Y")
+                self.session_hora_inicio = agora.strftime("%H:%M:%S")
+            except Exception:
+                pass
+            self.session_db_id = int(session_db_id) if session_db_id is not None else None
+            self.session_active = True
+            self.session_paused = False
+            self.session_lote = lote
+            self.session_contagem_alvo = int(contagem_alvo) if contagem_alvo is not None else None
+            try:
+                self._last_camera_ok_ts = time.monotonic()
+            except Exception:
+                self._last_camera_ok_ts = None
+            self.camera_lost = False
+            self.camera_alert = None
+            if self.detector:
+                try:
+                    self.detector.set_session_context(lote)
+                except Exception as log_err:
+                    log.warning("[CT%s] Falha ao definir contexto da sessao para snapshots (%s)", self.ct.get('id'), log_err)
+            base_total = 0
+            try:
+                if current_total is not None:
+                    base_total = int(current_total)
+            except Exception:
+                base_total = 0
+            self._base_counter_snapshot = -base_total
+            self.current_session_count = base_total
+            self._last_session_logged_total = base_total
+            log.info("[CT%s] Sessao reanexada (db_id=%s, lote=%s, total=%s)", self.ct.get('id'), self.session_db_id, lote, base_total)
 
     def _log_deltas(self, current_rel_total: int):
 
@@ -491,7 +577,7 @@ class CapturePoint:
 
             log.error("[CT%s] Falha ao registrar delta no banco: %s", self.ct.get('id'), e, exc_info=True)
 
-    def stop_session(self, observacao: str | None = None):
+    def stop_session(self, observacao: str | None = None, status: str = "finalizado"):
         """Finaliza a sessao corrente e libera recursos."""
         agora = datetime.now()
         lote_atual = self.session_lote
@@ -504,19 +590,20 @@ class CapturePoint:
                 total_final = quantidade
                 try:
                     if self.session_db_id is not None:
-                        finish_session(self.session_db_id, quantidade, status='finalizado', observacao=observacao)
+                        finish_session(self.session_db_id, quantidade, status=status, observacao=observacao)
                 except Exception as exc:
                     # fallback via hook
                     cb = getattr(self, "on_finish_session", None)
                     if callable(cb):
                         try:
-                            cb(self.session_db_id, quantidade, status='finalizado', observacao=observacao)
+                            cb(self.session_db_id, quantidade, status=status, observacao=observacao)
                         except Exception:
                             log.error("[CT%s] Erro no callback on_finish_session: %s", self.ct.get('id'), exc, exc_info=True)
                     else:
                         log.error("[CT%s] Erro ao finalizar sessao no banco: %s", self.ct.get('id'), exc, exc_info=True)
         finally:
             self.session_active = False
+            self.session_paused = False
             self.session_lote = None
             self.session_data = None
             self.session_hora_inicio = None
@@ -534,7 +621,7 @@ class CapturePoint:
                 except Exception:
                     pass
             self.stop_event.set()
-            if self.thread and self.thread.is_alive():
+            if self.thread and self.thread.is_alive() and threading.current_thread() is not self.thread:
                 self.thread.join(timeout=1.5)
         except Exception:
             pass
@@ -555,6 +642,143 @@ class CapturePoint:
 
         # Prepara um novo evento para a proxima sessao
         self.stop_event = threading.Event()
+
+    # ---------- pausa / retomada ----------
+
+    def pause_session(self, motivo: str | None = None):
+        """Pausa a sessao atual (nao cria nova sessao no banco)."""
+        with self.session_lock:
+            if not self.session_active or self.session_db_id is None:
+                log.warning("[CT%s] PAUSE ignorado: sem sessao ativa (db_id=%s)", self.ct.get('id'), self.session_db_id)
+                return
+            self.session_paused = True
+            log.info("[CT%s] PAUSE aplicado (db_id=%s, total_atual=%s)", self.ct.get('id'), self.session_db_id, self.current_session_count)
+            try:
+                _pause_session_db(self.session_db_id)
+            except Exception:
+                # Em modo agente sem DB, tentamos callback
+                try:
+                    cb = getattr(self, "on_pause_session", None)
+                    if callable(cb):
+                        cb(self.session_db_id, motivo)
+                    else:
+                        raise RuntimeError("callback ausente")
+                except Exception:
+                    log.debug("[CT%s] PAUSE: DB indisponivel/ignorado", self.ct.get('id'))
+
+    def resume_session(self):
+        """Retoma a sessao pausada, voltando a contar a partir do total atual."""
+        with self.session_lock:
+            if not self.session_active or self.session_db_id is None:
+                log.warning("[CT%s] RESUME ignorado: sem sessao ativa (db_id=%s)", self.ct.get('id'), self.session_db_id)
+                return
+            if getattr(self, "camera_lost", False):
+                log.warning("[CT%s] RESUME bloqueado: camera offline", self.ct.get('id'))
+                return
+            # ajusta baseline para manter a contagem relativa
+            try:
+                total_abs = int(getattr(self.detector, "counter", 0))
+            except Exception:
+                total_abs = 0
+            try:
+                rel_atual = int(self.current_session_count or 0)
+            except Exception:
+                rel_atual = 0
+            self._base_counter_snapshot = total_abs - rel_atual
+            self.session_paused = False
+            log.info("[CT%s] RESUME aplicado (db_id=%s, base=%s, total_abs=%s, rel_atual=%s)", self.ct.get('id'), self.session_db_id, self._base_counter_snapshot, total_abs, rel_atual)
+            try:
+                _resume_session_db(self.session_db_id)
+            except Exception:
+                # Em modo agente sem DB, ignoramos
+                log.debug("[CT%s] RESUME: DB indisponivel/ignorado", self.ct.get('id'))
+
+    # ---------- camera ----------
+
+    def _check_camera_timeout(self, now: float, has_frame: bool) -> None:
+        if self.source_type != "rtsp":
+            return
+        if has_frame:
+            self._last_camera_ok_ts = now
+            if self.camera_lost:
+                self.camera_lost = False
+                self.camera_alert = None
+                log.info("[CT%s] Fonte de video recuperada.", self.ct.get('id'))
+            return
+        if not self.session_active:
+            return
+        last_ok = self._last_camera_ok_ts if self._last_camera_ok_ts is not None else now
+        if (now - last_ok) < self.camera_lost_timeout:
+            return
+        if self.camera_lost:
+            self._maybe_reopen_camera(now, reason="timeout_reconnect")
+            return
+        self._handle_camera_lost()
+        self._maybe_reopen_camera(now, reason="timeout_reconnect")
+
+    def _maybe_reopen_camera(self, now: float, reason: str) -> None:
+        if (now - self._last_camera_reopen_ts) < self.camera_reopen_interval:
+            return
+        self._last_camera_reopen_ts = now
+        log.info("[CT%s] Reabrindo fonte de video (%s).", self.ct.get('id'), reason)
+        self._open_sources()
+
+    def _handle_camera_lost(self) -> None:
+        self.camera_lost = True
+        msg = "Perda de conexao com a camera. Sessao pausada automaticamente."
+        self.camera_alert = msg
+        log.warning("[CT%s] %s", self.ct.get('id'), msg)
+        try:
+            self.pause_session(motivo=msg)
+        except Exception as e:
+            log.error("[CT%s] Falha ao pausar sessao apos perda de camera: %s", self.ct.get('id'), e, exc_info=True)
+
+    def probe_camera_idle(self) -> None:
+        if self.session_active or self.source_type != "rtsp":
+            return
+        try:
+            now = time.monotonic()
+        except Exception:
+            now = time.time()
+        if (now - self._last_camera_probe_ts) < self.camera_idle_check_interval:
+            return
+        self._last_camera_probe_ts = now
+        path = self.source_path or self.default_source_path
+        if not path:
+            return
+        cap = None
+        ok = False
+        try:
+            try:
+                timeout_us = int(os.getenv("CAMERA_FFMPEG_STIMEOUT_US", str(int(os.getenv("CAMERA_OPEN_TIMEOUT_MS", "2000")) * 1000)))
+                if timeout_us > 0:
+                    os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = f"stimeout;{timeout_us}"
+            except Exception:
+                pass
+            cap = cv2.VideoCapture(path, cv2.CAP_FFMPEG)
+            try:
+                cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, int(os.getenv("CAMERA_OPEN_TIMEOUT_MS", "2000")))
+                cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, int(os.getenv("CAMERA_READ_TIMEOUT_MS", "2000")))
+            except Exception:
+                pass
+            if cap and cap.isOpened():
+                ret, frame = cap.read()
+                ok = bool(ret and frame is not None)
+        except Exception:
+            ok = False
+        finally:
+            try:
+                if cap:
+                    cap.release()
+            except Exception:
+                pass
+        if ok:
+            self.camera_lost = False
+            self.camera_alert = None
+            self._last_camera_ok_ts = now
+        else:
+            self.camera_lost = True
+            self.camera_alert = "Camera offline"
 
     # ---------- fonte ----------
 

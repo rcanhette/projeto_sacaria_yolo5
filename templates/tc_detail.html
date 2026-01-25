@@ -42,7 +42,7 @@
     .count-wrap{ display:flex; align-items:center; justify-content:center; min-height: 220px; border-radius:14px; background: #f1f5f9; border:1px dashed var(--border); }
     .count-label{ text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-weight:700; font-size:12px; }
     .count-num{ font-size: clamp(64px, 11vw, 108px); font-weight: 800; line-height: .9; margin-top: 8px; color: var(--text); }
-    .info{ display:grid; gap:10px; margin-top:16px; grid-template-columns: repeat(3, 1fr); }
+    .info{ display:grid; gap:10px; margin-top:16px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
     @media (max-width: 640px){ .info{ grid-template-columns: 1fr; } }
     .info .item{ background: #f9fafb; border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
     .info .label{ color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
@@ -85,8 +85,19 @@
         document.getElementById("lote_val").textContent = d.lote || "-";
         document.getElementById("data").textContent = d.data || "-";
         document.getElementById("hora").textContent = d.hora_inicio || "-";
-        document.getElementById("count").textContent = d.count ?? 0;
+        const countVal = Number(d.count);
+        document.getElementById("count").textContent = Number.isFinite(countVal) ? countVal : 0;
         const alvoEl = document.getElementById('alvo_val'); if (alvoEl) alvoEl.textContent = (d.contagem_alvo ?? '-');
+        const restanteEl = document.getElementById('restante_val');
+        if (restanteEl){
+          const alvoNum = Number(d.contagem_alvo);
+          if (Number.isFinite(alvoNum) && Number.isFinite(countVal)){
+            const restante = Math.max(alvoNum - countVal, 0);
+            restanteEl.textContent = restante;
+          } else {
+            restanteEl.textContent = '-';
+          }
+        }
         document.getElementById("startBtn").disabled = isOp;
         document.getElementById("stopBtn").disabled = !isOp;
         document.getElementById("videoLink").style.display = isOp ? "inline-block" : "none";
@@ -111,11 +122,7 @@
   {% include '_navbar.html' %}
   <div class="wrap">
     <header>
-      <div class="title">Ponto de Captura – <span style="opacity:.9">{{ ct.name }}</span></div>
- <div class=\item\>
- <div class=\label\>Contagem alvo</div>
- <div id=\alvo_val\ class=\value\>-</div>
- </div>
+      <div class="title">Ponto de Captura - <span style="opacity:.9">{{ ct.name }}</span></div>
       <div id="statusPill" class="status-pill"><span class="status-dot"></span><span id="statusText">Parado</span></div>
     </header>
     <div class="grid">
@@ -132,11 +139,19 @@
             <div id="lote_val" class="value">-</div>
           </div>
           <div class="item">
+            <div class="label">Contagem alvo</div>
+            <div id="alvo_val" class="value">-</div>
+          </div>
+          <div class="item">
+            <div class="label">Restante</div>
+            <div id="restante_val" class="value">-</div>
+          </div>
+          <div class="item">
             <div class="label">Data</div>
             <div id="data" class="value">-</div>
           </div>
           <div class="item">
-            <div class="label">Hora Início</div>
+            <div class="label">Hora inicio</div>
             <div id="hora" class="value">-</div>
           </div>
         </div>

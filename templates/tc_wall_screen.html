@@ -61,11 +61,14 @@
     .panel + .panel {
       border-left: 2px solid rgba(15,23,42,0.85);
     }
-    .panel.on {
-      background: #14532d; /* verde operando */
-    }
-    .panel.off {
-      background: #7f1d1d;
+    .panel.on { background: #14532d; }      /* verde operando */
+    .panel.off { background: #7f1d1d; }     /* vermelho parada */
+    .panel.pause { background: #a16207; }   /* amarelo pausa */
+    .panel.alert-blink { animation: blink-alert 0.9s steps(2, end) infinite; }
+    @keyframes blink-alert {
+      0% { filter: brightness(1); box-shadow: inset 0 0 0 rgba(0,0,0,0); }
+      50% { filter: brightness(1.35); box-shadow: inset 0 0 0 rgba(0,0,0,0); }
+      100% { filter: brightness(1); box-shadow: inset 0 0 0 rgba(0,0,0,0); }
     }
     .arrow {
       position: absolute;
@@ -100,9 +103,9 @@
       display: block;
       position: relative;
       z-index: 1;
-      width: 19vw;   /* 30% mais largo que 14.5vw */
+      width: 9.5vw;  /* corpo da seta encurtado */
       height: 2.9vh;   /* 1.8vh * 1.6 */
-      margin-left: -4.2vw; /* ajustado proporcional ao novo corpo */
+      margin-left: -2.1vw; /* ajustado proporcional ao novo corpo */
       background: #ffffff;
       box-shadow: 0 0 6px rgba(0,0,0,0.7);
     }
@@ -111,9 +114,9 @@
       display: block;
       position: relative;
       z-index: 1;
-      width: 19vw;
+      width: 9.5vw;
       height: 2.9vh;
-      margin-right: -4.2vw; /* corpo passa por baixo da ponta */
+      margin-right: -2.1vw; /* corpo passa por baixo da ponta */
       background: #ffffff;
       box-shadow: 0 0 6px rgba(0,0,0,0.7);
     }
@@ -133,25 +136,50 @@
       letter-spacing: .08em;
       text-transform: uppercase;
       font-size: clamp(72px, 13.5vh, 208px); /* +30% */
-      margin-bottom: 8px;
+      margin-bottom: 0;
       text-shadow: 0 1px 4px rgba(0,0,0,0.6);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 40%;
       position: absolute;
-      top: 5vh;
+      top: 1vh;          /* alinha verticalmente com o corpo das setas */
+      height: 13vh;      /* mesma altura dos retângulos brancos */
+      display: flex;
+      align-items: center;
+      z-index: 3;
     }
     #panel-left .tc-name {
       left: calc(50% + 80px);
       text-align: left;
+      justify-content: flex-start;
     }
     #panel-right .tc-name {
       right: calc(50% + 80px);
       text-align: right;
+      justify-content: flex-end;
     }
     .tc-status {
-      display: none; /* cor do painel já indica status */
+      display: none; /* cor do painel ja indica status */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-shadow: 0 3px 18px rgba(0,0,0,0.95);
+      background: rgba(0,0,0,0.45);
+      padding: 1.2vh 3vw;
+      border: 3px solid rgba(255,255,255,0.7);
+      border-radius: 18px;
+      font-size: clamp(48px, 7.5vh, 160px);
+    }
+    .tc-status.alert {
+      font-size: clamp(72px, 10vh, 220px);
+      background: rgba(0,0,0,0.65);
+      border-color: rgba(255,255,255,0.95);
+      box-shadow: 0 0 36px rgba(0,0,0,0.6);
     }
     .tc-count {
       font-weight: 700;
@@ -179,6 +207,10 @@
       flex-direction: column;
       align-items: flex-start;
     }
+    .tc-extra-block.align-end {
+      align-items: flex-end;
+      text-align: right;
+    }
     .tc-extra-label {
       font-size: 0.5em;
       opacity: 0.9;
@@ -187,6 +219,31 @@
       font-size: 1.2em;
       font-weight: 800;
       text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+    }
+    .tc-rate {
+      position: absolute;
+      top: 17vh;          /* entre a seta e o total */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      text-align: center;
+      color: #fff;
+      font-size: clamp(32px, 5vh, 96px);
+      font-weight: 800;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+    .tc-rate-label {
+      font-size: 0.45em;
+      opacity: 0.85;
+      letter-spacing: .04em;
+    }
+    .tc-rate-value {
+      font-size: 0.95em;
     }
     @media (max-width: 900px) {
       .wall {
@@ -215,6 +272,10 @@
   <div class="wall">
     <section class="panel off" id="panel-left" data-side="left" data-tc-id="{{ layout.left_tc_id or '' }}">
       <div class="arrow arrow-left"></div>
+      <div class="tc-rate">
+        <div class="tc-rate-label">Carregamento Hora</div>
+        <div class="tc-rate-value" data-role="rate"></div>
+      </div>
       <div class="tc-name" data-role="name">
         {{ layout.left_name or (layout.left_tc_id and ('TC ' ~ layout.left_tc_id)) or 'TC -' }}
       </div>
@@ -225,14 +286,22 @@
           <div class="tc-extra-label">Lote</div>
           <div class="tc-extra-value" data-role="lote"></div>
         </div>
-        <div class="tc-extra-block" style="align-items:flex-end; text-align:right;">
+        <div class="tc-extra-block align-end">
           <div class="tc-extra-label">Alvo</div>
           <div class="tc-extra-value" data-role="alvo"></div>
+        </div>
+        <div class="tc-extra-block align-end">
+          <div class="tc-extra-label">Restante</div>
+          <div class="tc-extra-value" data-role="restante"></div>
         </div>
       </div>
     </section>
     <section class="panel off" id="panel-right" data-side="right" data-tc-id="{{ layout.right_tc_id or '' }}">
       <div class="arrow arrow-right"></div>
+      <div class="tc-rate">
+        <div class="tc-rate-label">Carregamento Hora</div>
+        <div class="tc-rate-value" data-role="rate"></div>
+      </div>
       <div class="tc-name" data-role="name">
         {{ layout.right_name or (layout.right_tc_id and ('TC ' ~ layout.right_tc_id)) or 'TC -' }}
       </div>
@@ -243,9 +312,13 @@
           <div class="tc-extra-label">Lote</div>
           <div class="tc-extra-value" data-role="lote"></div>
         </div>
-        <div class="tc-extra-block" style="align-items:flex-end; text-align:right;">
+        <div class="tc-extra-block align-end">
           <div class="tc-extra-label">Alvo</div>
           <div class="tc-extra-value" data-role="alvo"></div>
+        </div>
+        <div class="tc-extra-block align-end">
+          <div class="tc-extra-label">Restante</div>
+          <div class="tc-extra-value" data-role="restante"></div>
         </div>
       </div>
     </section>
@@ -275,12 +348,29 @@
         const countEl = panel.querySelector('[data-role=\"count\"]');
         const loteEl = panel.querySelector('[data-role=\"lote\"]');
         const alvoEl = panel.querySelector('[data-role=\"alvo\"]');
+        const rateEl = panel.querySelector('[data-role=\"rate\"]');
+        const restEl = panel.querySelector('[data-role=\"restante\"]');
 
-        const active = !!payload.session_active || (String(payload.db_status || '').toLowerCase() === 'operando' || String(payload.db_status || '').toLowerCase() === 'ativo');
-        panel.classList.toggle('on', active);
-        panel.classList.toggle('off', !active);
+        const status = String(payload.db_status || '').toLowerCase();
+        const paused = !!payload.session_paused || status === 'pausado' || status === 'pause';
+        const active = (!!payload.session_active || status === 'operando' || status === 'ativo') && !paused;
+        const cameraAlert = payload.camera_alert || (payload.camera_lost ? 'Camera offline' : '');
+        const activeEff = active && !cameraAlert;
+        const pausedEff = paused && !cameraAlert;
+        panel.classList.toggle('on', activeEff && !pausedEff);
+        panel.classList.toggle('off', !activeEff && !pausedEff);
+        panel.classList.toggle('pause', pausedEff);
+        panel.classList.toggle('alert-blink', !!cameraAlert);
         if (statusEl){
-          statusEl.textContent = active ? 'Operando' : 'Parada';
+          if (cameraAlert){
+            statusEl.style.display = 'block';
+            statusEl.textContent = cameraAlert;
+            statusEl.classList.add('alert');
+          } else {
+            statusEl.style.display = '';
+            statusEl.textContent = paused ? 'Pausado' : (active ? 'Operando' : 'Parada');
+            statusEl.classList.remove('alert');
+          }
         }
         if (countEl){
           countEl.textContent = formatInt(payload.count);
@@ -289,12 +379,34 @@
           const lote = (payload.lote || '').trim();
           loteEl.textContent = lote || '-';
         }
+        const alvo = payload.contagem_alvo;
         if (alvoEl){
-          const alvo = payload.contagem_alvo;
           if (alvo != null && !isNaN(alvo)){
             alvoEl.textContent = formatInt(alvo);
           } else {
             alvoEl.textContent = '-';
+          }
+        }
+        if (restEl){
+          const countVal = Number(payload.count);
+          if (alvo != null && !isNaN(alvo) && !isNaN(countVal)){
+            const restante = Math.max(Number(alvo) - Number(countVal), 0);
+            restEl.textContent = formatInt(restante);
+          } else {
+            restEl.textContent = '-';
+          }
+        }
+        if (rateEl){
+          const sacks = payload.sacks_per_hour;
+          const ton = payload.tph;
+          if (sacks != null && ton != null){
+            rateEl.textContent = `${formatInt(sacks)} Unidade   ${ton} TON`;
+          } else if (sacks != null){
+            rateEl.textContent = `${formatInt(sacks)} Unidade`;
+          } else if (ton != null){
+            rateEl.textContent = `${ton} TON`;
+          } else {
+            rateEl.textContent = '';
           }
         }
       }
@@ -302,19 +414,23 @@
       function clearPanel(side){
         const panel = panels[side];
         if (!panel) return;
-        panel.classList.remove('on');
+        panel.classList.remove('on', 'pause', 'alert-blink');
         panel.classList.add('off');
         const statusEl = panel.querySelector('[data-role=\"status\"]');
         const countEl = panel.querySelector('[data-role=\"count\"]');
         const loteEl = panel.querySelector('[data-role=\"lote\"]');
         const alvoEl = panel.querySelector('[data-role=\"alvo\"]');
+        const rateEl = panel.querySelector('[data-role=\"rate\"]');
+        const restEl = panel.querySelector('[data-role=\"restante\"]');
         if (statusEl) statusEl.textContent = 'Parada';
         if (countEl) countEl.textContent = '0';
         if (loteEl) loteEl.textContent = '';
         if (alvoEl) alvoEl.textContent = '';
+        if (restEl) restEl.textContent = '';
+        if (rateEl) rateEl.textContent = '';
       }
 
-      function attachSSE(side){
+      function attachSSE(side, retryMs = 2000){
         const panel = panels[side];
         if (!panel) return;
         const tcId = panel.dataset.tcId;
@@ -337,9 +453,13 @@
           };
           es.onerror = function(){
             clearPanel(side);
+            try { es.close(); } catch(_){}
+            sources[side] = null;
+            setTimeout(() => attachSSE(side, Math.min(retryMs * 1.5, 10000)), retryMs);
           };
         } catch(e){
           clearPanel(side);
+          setTimeout(() => attachSSE(side, Math.min(retryMs * 1.5, 10000)), retryMs);
         }
       }
 

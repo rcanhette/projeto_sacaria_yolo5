@@ -60,6 +60,7 @@
           {% set st = (current_status or 'operando') %}
           <option value="all" {{ 'selected' if st=='all' else '' }}>Todos</option>
           <option value="operando" {{ 'selected' if st=='operando' else '' }}>Operando</option>
+          <option value="pausado" {{ 'selected' if st=='pausado' else '' }}>Pause</option>
           <option value="finalizado" {{ 'selected' if st=='finalizado' else '' }}>Finalizado</option>
           <option value="cancelado" {{ 'selected' if st=='cancelado' else '' }}>Cancelado</option>
         </select>
@@ -89,6 +90,7 @@
               <th>Status</th>
               <th>Alvo</th>
               <th>Total</th>
+              <th>Restante</th>
               <!--<th>Observação</th>-->
               <th style="text-align:right;">Ações</th>
             </tr>
@@ -104,6 +106,13 @@
                 <td><span id="st-{{ s.id }}" class="status-badge {{ 'status-on' if (s.status or '').lower()=='operando' else '' }}">{{ s.status }}</span></td>
                 <td>{{ s.contagem_alvo if s.contagem_alvo is not none else '-' }}</td>
                 <td id="tot-{{ s.id }}">{{ s.total_final }}</td>
+                <td>
+                  {% if s.contagem_alvo is not none %}
+                    {{ (s.contagem_alvo - (s.total_final or 0)) if (s.contagem_alvo - (s.total_final or 0)) > 0 else 0 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
                <!-- <td id="obs-{{ s.id }}">{{ s.observacao or '-' }}</td> -->
                 <td>
                   <div class="actions">
@@ -370,27 +379,18 @@
                 sessIds.forEach(id => {
                   const totEl = document.getElementById(`tot-${id}`);
                   if (totEl && totTxt!==undefined) totEl.textContent = totTxt;
-                  const stEl  = document.getElementById(`st-${id}`);
-                  if (stEl){
-                    if (active){
-                      stEl.textContent = 'operando';
-                      stEl.classList.add('status-on');
-                    } else {
-                      stEl.textContent = 'finalizado';
-                      stEl.classList.remove('status-on');
-                    }
-                  }
                   const tr = document.querySelector(`tr[data-session-id="${id}"]`);
-                  if (tr) tr.dataset.status = active ? 'operando' : 'finalizado';
                   const btn = document.getElementById(`btn-obs-${id}`);
                   if (btn){
                     if (active){
+                      // Sessao ativa: desabilita edicao de observacao em tempo real
                       btn.disabled = true;
                       btn.dataset.deadline = '';
                       syncDeadlineAttr(btn);
                       btn.classList.remove('btn-danger');
                       if (tr) tr.dataset.obsDeadline = '';
                     } else {
+                      // Sessao encerrada: reabilita janela de edicao de observacao, se ainda nao expirada
                       if (!btn.dataset.deadline){
                         const deadline = new Date(Date.now() + 600000).toISOString();
                         btn.dataset.deadline = deadline;

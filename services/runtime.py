@@ -22,10 +22,14 @@ class RemoteCaptureShadow:
         self.session_hora_fim = None
         self.session_db_id = None
         self.session_contagem_alvo = None
+        self.session_paused = False
         # contagem
         self.current_session_count = 0
         self._last_session_logged_total = None
         self._base_counter_snapshot = 0
+        # alerta de câmera
+        self.camera_lost = False
+        self.camera_alert = None
 
     # Mantém interface semelhante ao CapturePoint para chamadas existentes
     def release(self):

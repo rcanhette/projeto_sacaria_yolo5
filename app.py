@@ -15,7 +15,7 @@ import atexit
 from services.db import ensure_schema
 from services.session_repository import close_all_active_sessions_on_boot
 from services.auth_repository import list_user_tc_ids, user_can_control_tc
-from services.agent_repository import get_tc_status
+from services.agent_repository import get_effective_tc_status
 from datetime import datetime, timedelta
 
 
@@ -142,7 +142,7 @@ def create_app():
             online = False
             hostname = None
             try:
-                st = get_tc_status(ct["id"])
+                st = get_effective_tc_status(ct["id"])
                 if st:
                     hostname = st.get("hostname")
                     last_seen = st.get("last_seen")

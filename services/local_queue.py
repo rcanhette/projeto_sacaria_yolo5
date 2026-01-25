@@ -116,18 +116,18 @@ class LocalQueue:
             con.commit()
         return ev_id
 
-    def mark_finish(self, local_id: int, total_final: int, observacao: Optional[str], mark_sent: bool = False) -> None:
+    def mark_finish(self, local_id: int, total_final: int, observacao: Optional[str], status: str = "finalizado", mark_sent: bool = False) -> None:
         with self._lock, self._connect() as con:
             con.execute(
                 """
                 UPDATE local_session
-                   SET status = 'finalizado',
+                   SET status = ?,
                        total_final = ?,
                        observacao = COALESCE(?, observacao),
                        finished_at_ms = COALESCE(finished_at_ms, ?)
                  WHERE local_id = ?
                 """,
-                (int(total_final), observacao, self._now_ms(), local_id),
+                (status, int(total_final), observacao, self._now_ms(), local_id),
             )
             if mark_sent:
                 con.execute("UPDATE local_session SET sent_finish = 1 WHERE local_id = ?", (local_id,))
@@ -181,7 +181,9 @@ class LocalQueue:
             ev = cur.execute("SELECT COUNT(*) FROM local_event WHERE sent = 0").fetchone()[0]
             # sessões sem remote id ou com finish não enviado
             sess_remote_missing = cur.execute("SELECT COUNT(*) FROM local_session WHERE remote_session_id IS NULL").fetchone()[0]
-            sess_finish_pending = cur.execute("SELECT COUNT(*) FROM local_session WHERE status='finalizado' AND sent_finish = 0").fetchone()[0]
+            sess_finish_pending = cur.execute(
+                "SELECT COUNT(*) FROM local_session WHERE status NOT IN ('operando','ativo','pausado') AND sent_finish = 0"
+            ).fetchone()[0]
         return {
             "events_pending": int(ev),
             "sessions_without_remote": int(sess_remote_missing),
@@ -211,7 +213,7 @@ class LocalQueue:
             ]
             # Sessões finalizadas com finish pendente
             cur.execute(
-                "SELECT local_id, tc_id, lote, total_final, finished_at_ms FROM local_session WHERE status='finalizado' AND sent_finish = 0 ORDER BY finished_at_ms ASC"
+                "SELECT local_id, tc_id, lote, total_final, finished_at_ms FROM local_session WHERE status NOT IN ('operando','ativo','pausado') AND sent_finish = 0 ORDER BY finished_at_ms ASC"
             )
             sess_finish = [
                 {
@@ -342,7 +344,7 @@ class LocalQueue:
                     break  # aguarda próxima rodada
 
             # 3) Finalizar sessão se necessário
-            if status == 'finalizado':
+            if status and status not in ('operando', 'ativo', 'pausado'):
                 try:
                     # se já tem finish enviado, não envia novamente
                     # usamos sent_finish flag
@@ -350,7 +352,7 @@ class LocalQueue:
                         row = con.execute("SELECT sent_finish FROM local_session WHERE local_id = ?", (local_id,)).fetchone()
                         sent_finish = (row[0] == 1) if row else False
                     if not sent_finish:
-                        central_client.session_finish(tc_id=tc_id, session_db_id=int(remote_id), total=int(total_final or 0), observacao=observacao)
+                        central_client.session_finish(tc_id=tc_id, session_db_id=int(remote_id), total=int(total_final or 0), observacao=observacao, status=status)
                         self._mark_finish_sent(local_id)
                 except Exception:
                     pass

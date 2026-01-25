@@ -76,7 +76,7 @@
             <div class="row"><div class="label">Lote</div><div id="lote-{{ ct.id }}" class="pill off">-</div></div>
             <div class="row"><div class="label">Contagem alvo</div><div id="alvo-{{ ct.id }}" class="pill off">-</div></div>
             <div class="row"><div class="label">Horário início</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
-            <div class="row"><div class="label">Sessão operando</div><div id="ativa-{{ ct.id }}" class="pill off">nÃ£o</div></div>
+            <div class="row"><div class="label">Carregamento hora</div><div id="rate-{{ ct.id }}" class="pill off">-</div></div>
           </aside>
           <div class="content">
             <div class="form" onsubmit="return true;">
@@ -264,9 +264,12 @@
       const elLote = get('lote'); if(elLote){ elLote.textContent = data.lote || '-'; elLote.className='pill '+((data.lote&&data.lote!=='-')?'on':'off'); }
       const elInicio = get('inicio'); if(elInicio){ elInicio.textContent = data.hora_inicio || '-'; elInicio.className='pill '+((data.hora_inicio&&data.hora_inicio!=='-')?'on':'off'); }
       const elAlvo = get('alvo'); if(elAlvo){ const alvo=(data.contagem_alvo ?? '-'); elAlvo.textContent = alvo; elAlvo.className='pill '+((alvo&&alvo!=='-')?'on':'off'); }
-      const elAtiva = get('ativa'); if(elAtiva){ elAtiva.textContent = active ? 'sim' : 'não'; elAtiva.className='pill '+(active?'on':'off'); }
+      const elRate = get('rate'); if(elRate){ const tph = data.tph; elRate.textContent = (tph != null) ? `${tph} TON/h` : '-'; elRate.className='pill '+((tph!=null)?'on':'off'); }
       const pill=document.getElementById('status-'+id), pillText=document.getElementById('status-text-'+id);
       if(pill&&pillText){ pill.className='status-pill '+(active?'status-on':'status-off'); pillText.textContent=active?'Operando':'Parada'; }
+      if(!active){
+        if(elRate){ elRate.textContent='-'; elRate.className='pill off'; }
+      }
       setVisibility(id, active);
     }
     function connectSSE(id){
@@ -366,4 +369,7 @@
   </script>
 </body>
 </html>
+
+
+
 

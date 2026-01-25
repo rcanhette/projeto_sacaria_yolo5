@@ -76,6 +76,7 @@ Central (Servidor)
 
 Instalação automatizada (Central):
 
+
 ```
 powershell -ExecutionPolicy Bypass -File scripts\install_nssm_central.ps1 -ServiceName ProjetoSacaria_v1 -Root C:\projeto_sacaria_central -Port 80
 ```
@@ -89,6 +90,12 @@ Agente (PC/TC)
    python -m pip install --upgrade pip
    pip install -r requirements-agent.txt
    ```
+
+  INstalação PyTorch com o CUDA (Para usar placa de video)
+   pip uninstall -y torch torchvision torchaudio
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+
 3. Crie/edite `agent.ini` (UTF-8):
    - `[agent]`: `id`, `tc_id`, `central_url` (ex.: `http://SEU_SERVIDOR:80`), `token` (se aplicável)
    - HTTPS e certificado self-signed:
@@ -112,6 +119,10 @@ Instalação automatizada (Agente):
 ```
 powershell -ExecutionPolicy Bypass -File scripts\install_nssm_agent.ps1 -ServiceName ProjetoSacaria_Agent -Root C:\projeto_sacaria_agent -Mode waitress -Port 9090
 ```
+powershell -ExecutionPolicy Bypass -File scripts\install_nssm_agent.ps1 -ServiceName ProjetoSacariaAgent_M4-TC2 -Root "C:\Projeto Sacaria\agent_M4-TC2" -Mode waitress -Port 9093
+
+
+
 
 ## Preparacao do ambiente (desenvolvimento/homologacao)
 

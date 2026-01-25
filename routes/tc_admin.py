@@ -1,6 +1,6 @@
 ﻿from flask import Blueprint, render_template, request, redirect, url_for, flash
 from services.tc_repository import list_tcs, get_tc, create_tc, update_tc, delete_tc
-from services.agent_repository import get_tc_status, get_host_for_tc
+from services.agent_repository import get_effective_tc_status, get_host_for_tc
 from services.runtime import drop_tc_runtime
 from routes.auth import role_required
 import requests
@@ -39,7 +39,7 @@ def tc_admin_list():
         hostname = None
         last_seen = None
         try:
-            st = get_tc_status(ct["id"])  # {tc_id, last_seen, hostname, status}
+            st = get_effective_tc_status(ct["id"])  # {tc_id, last_seen, hostname, status}
             if st:
                 hostname = st.get("hostname")
                 last_seen = st.get("last_seen")
@@ -67,7 +67,7 @@ def tc_admin_edit(tc_id):
         # status do agente (ultima conexao) quando houver
         st = None
         try:
-            st = get_tc_status(tc_id)
+            st = get_effective_tc_status(tc_id)
         except Exception:
             st = None
         return render_template("tc_admin_edit.html", ct=tc, agent_status=st)
@@ -143,7 +143,7 @@ def tc_admin_calibrate(tc_id):
     if request.method == "GET":
         st = None
         try:
-            st = get_tc_status(tc_id)
+            st = get_effective_tc_status(tc_id)
         except Exception:
             st = None
         return render_template("tc_admin_calibrate.html", ct=tc, agent_status=st)

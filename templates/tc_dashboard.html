@@ -43,6 +43,7 @@
     .btn-danger{ background:var(--danger); color:#fff; border-color:transparent; } .btn-danger:hover{ background:var(--danger-weak); }
     .btn[disabled]{ opacity:.6; cursor:not-allowed; }
     .muted{ color:var(--muted); font-size:12px; } .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; }
+    .camera-alert{ background:#fee2e2; color:#991b1b; border:1px solid #fecaca; padding:6px 10px; border-radius:10px; font-size:12px; font-weight:700; }
     .hide{ display:none !important; }
     .modal-backdrop{ position:fixed; inset:0; background:rgba(15,23,42,0.45); z-index:200; display:none; }
     .modal{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 24px 56px rgba(15,23,42,0.3); width:min(90vw,420px); padding:24px; display:none; flex-direction:column; gap:16px; z-index:210; }
@@ -66,9 +67,6 @@
         <header>
           <div class="h-title">{{ ct.name }}</div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <div class="status-pill {{ 'status-on' if ct.agent_online else 'status-off' }}" title="{{ ct.agent_hostname or '' }}">
-              <span class="status-dot"></span><span>{{ 'Agente Online' if ct.agent_online else 'Agente Offline' }}</span>
-            </div>
             <div id="status-{{ ct.id }}" class="status-pill status-off">
               <span class="status-dot"></span><span id="status-text-{{ ct.id }}">Parada</span>
             </div>
@@ -76,11 +74,13 @@
         </header>
         <div class="body">
           <aside class="side">
+            <div id="camera-alert-{{ ct.id }}" class="camera-alert hide">Camera offline</div>
             <div class="row"><div class="label">Total da contagem</div><div class="kpi" id="count-{{ ct.id }}">0</div></div>
             <div class="row"><div class="label">Lote</div><div id="lote-{{ ct.id }}" class="pill off">-</div></div>
             <div class="row"><div class="label">Contagem alvo</div><div id="alvo-{{ ct.id }}" class="pill off">-</div></div>
-            <div class="row"><div class="label">Hora inÃ­cio</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
-            <div class="row"><div class="label">SessÃ£o ativa</div><div id="ativa-{{ ct.id }}" class="pill off">nÃ£o</div></div>
+            <div class="row"><div class="label">Restante</div><div id="restante-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Hora ini­cio</div><div id="inicio-{{ ct.id }}" class="pill off">-</div></div>
+            <div class="row"><div class="label">Carregamento hora</div><div id="rate-{{ ct.id }}" class="pill off">-</div></div>
           </aside>
           <div class="content">
             {% if ct.can_control %}
@@ -97,6 +97,8 @@
                 <!-- STOP (aparece sÃ³ quando ativo) -->
                 <form id="stop-wrap-{{ ct.id }}" class="actions hide" method="post" action="{{ url_for('tc.tc_stop', tc_id=ct.id) }}">
                   <button id="btn-stop-{{ ct.id }}" class="btn btn-danger" type="submit">Parar contagem</button>
+                  <button id="btn-pause-{{ ct.id }}" class="btn" type="button">Pausar</button>
+                  <button id="btn-resume-{{ ct.id }}" class="btn hide" type="button">Retomar</button>
                 </form>
               </div>
             {% else %}
@@ -120,6 +122,14 @@
       <button type="button" id="obs-ok" class="btn btn-primary" disabled>OK</button>
     </div>
   </div>
+  <div id="camera-popup-backdrop" class="modal-backdrop"></div>
+  <div id="camera-popup" class="modal" role="dialog" aria-modal="true" aria-labelledby="camera-popup-title">
+    <div id="camera-popup-title" class="modal-title">Camera offline</div>
+    <div id="camera-popup-msg" class="muted">A conexao com a camera foi perdida.</div>
+    <div class="modal-actions">
+      <button type="button" id="camera-popup-ok" class="btn btn-primary">OK</button>
+    </div>
+  </div>
 
   <script>
     const OBS_MIN_CHARS = 10;
@@ -134,6 +144,36 @@
         hint: document.getElementById('obs-hint'),
       };
     })();
+    const cameraPopup = (() => {
+      return {
+        backdrop: document.getElementById('camera-popup-backdrop'),
+        modal: document.getElementById('camera-popup'),
+        msg: document.getElementById('camera-popup-msg'),
+        ok: document.getElementById('camera-popup-ok'),
+      };
+    })();
+    const lastCameraAlert = {};
+    function closeCameraPopup(){
+      if (!cameraPopup.modal || !cameraPopup.backdrop) return;
+      cameraPopup.modal.classList.remove('open');
+      cameraPopup.backdrop.classList.remove('open');
+    }
+    function showCameraPopup(ctId, msg){
+      if (!msg || !cameraPopup.modal || !cameraPopup.backdrop) return;
+      if (lastCameraAlert[ctId] === msg) return;
+      lastCameraAlert[ctId] = msg;
+      if (cameraPopup.msg){
+        cameraPopup.msg.textContent = `TC ${ctId}: ${msg}`;
+      }
+      cameraPopup.modal.classList.add('open');
+      cameraPopup.backdrop.classList.add('open');
+    }
+    if (cameraPopup.ok){
+      cameraPopup.ok.addEventListener('click', closeCameraPopup);
+    }
+    if (cameraPopup.backdrop){
+      cameraPopup.backdrop.addEventListener('click', closeCameraPopup);
+    }
 
     function askObservationModal(message, initialValue){
       return new Promise((resolve) => {
@@ -260,9 +300,28 @@
       const elLote = get("lote"); if(elLote){ elLote.textContent = data.lote || "-"; elLote.className="pill "+(data.lote&&data.lote!=="-"?"on":"off");}
       const elInicio = get("inicio"); if(elInicio){ elInicio.textContent = data.hora_inicio || "-"; elInicio.className="pill "+(data.hora_inicio&&data.hora_inicio!=="-"?"on":"off");}
       const elAlvo = get("alvo"); if(elAlvo){ const alvo = (data.contagem_alvo ?? '-'); elAlvo.textContent = alvo; elAlvo.className="pill "+(alvo&&alvo!=='-'?"on":"off");}
-      const elAtiva = get("ativa"); if(elAtiva){ elAtiva.textContent = active?"sim":"nÃ£o"; elAtiva.className="pill "+(active?"on":"off");}
+      const elRest = get("restante"); if(elRest){ const alvoVal=data.contagem_alvo; const countVal=Number(data.count); const restante=(alvoVal!=null&&!isNaN(alvoVal)&&!isNaN(countVal))?Math.max(Number(alvoVal)-Number(countVal),0):null; elRest.textContent = (restante!=null)?restante:'-'; elRest.className = "pill "+((restante!=null)?"on":"off");}
+      const elRate = get("rate"); if(elRate){ const tph = data.tph; elRate.textContent = (tph != null) ? `${tph} TON` : "-"; elRate.className="pill "+((tph!=null)?"on":"off");}
       const pill=document.getElementById("status-"+ctId), pillText=document.getElementById("status-text-"+ctId);
-      if(pill&&pillText){ pill.className="status-pill "+(active?"status-on":"status-off"); pillText.textContent=active?"Operando":"Parada";}
+      if(pill&&pillText){
+        const agentOnline = data.agent_online;
+        const agentTxt = (agentOnline === false) ? "Linha Offline" : "Agente Online";
+        const statusTxt = active ? "Operando" : "Parada";
+        pill.className="status-pill "+(active?"status-on":"status-off");
+        pillText.textContent = `${agentTxt} \u2022 ${statusTxt}`;
+      }
+      const camAlert = document.getElementById("camera-alert-"+ctId);
+      if (camAlert){
+        const alertMsg = data.camera_alert || (data.camera_lost ? "Camera offline" : "");
+        if (alertMsg){
+          camAlert.textContent = alertMsg;
+          camAlert.classList.remove("hide");
+          showCameraPopup(ctId, alertMsg);
+        } else {
+          camAlert.classList.add("hide");
+          lastCameraAlert[ctId] = null;
+        }
+      }
       setVisibility(ctId, active);
       // Limpa campos quando parar (ativa=false)
       if(!active){
@@ -270,6 +329,8 @@
         if(elLote){ elLote.textContent = '-'; elLote.className = 'pill off'; }
         if(elInicio){ elInicio.textContent = '-'; elInicio.className = 'pill off'; }
         if(elAlvo){ elAlvo.textContent = '-'; elAlvo.className = 'pill off'; }
+        if(elRest){ elRest.textContent = '-'; elRest.className = 'pill off'; }
+        const elRate = get("rate"); if(elRate){ elRate.textContent = '-'; elRate.className = 'pill off'; }
       }
     }
 
@@ -288,6 +349,8 @@
       if (!canControl) return;
       const form = document.getElementById("stop-wrap-" + ctId);
       const btn  = document.getElementById("btn-stop-" + ctId);
+      const btnPause = document.getElementById("btn-pause-" + ctId);
+      const btnResume = document.getElementById("btn-resume-" + ctId);
       if(!form || !btn) return;
       form.addEventListener("submit", async (e)=>{
         e.preventDefault();
@@ -309,6 +372,54 @@
         }catch(_){}
         finally{ btn.disabled = false; }
       });
+      if (btnPause){
+        btnPause.addEventListener("click", async ()=>{
+          btnPause.disabled = true;
+          try{
+            const motivo = await askObservationModal("Informe o motivo da pausa:");
+            const trimmed = (motivo || "").trim();
+            if (!trimmed){
+              btnPause.disabled = false;
+              return;
+            }
+            const body = new URLSearchParams();
+            body.set("motivo", trimmed);
+            await fetch(`/tc/${ctId}/pause`, {
+              method: "POST",
+              headers: { "X-Requested-With":"fetch", "Content-Type":"application/x-www-form-urlencoded" },
+              body: String(body),
+            });
+            if (btnResume){
+              btnPause.classList.add("hide");
+              btnResume.classList.remove("hide");
+            }
+          }catch(_){
+          }finally{
+            btnPause.disabled = false;
+          }
+        });
+      }
+
+      if (btnResume){
+        btnResume.addEventListener("click", async ()=>{
+          btnResume.disabled = true;
+          try{
+            const resp = await fetch(`/tc/${ctId}/resume`, {
+              method: "POST",
+              headers: { "X-Requested-With":"fetch" },
+            });
+            if (resp && resp.status === 409){
+              showCameraPopup(ctId, "Camera offline. Retomada bloqueada.");
+            } else if (btnPause){
+              btnResume.classList.add("hide");
+              btnPause.classList.remove("hide");
+            }
+          }catch(_){
+          }finally{
+            btnResume.disabled = false;
+          }
+        });
+      }
     }
 
     
@@ -318,10 +429,154 @@
     (function(){
       const cts = {{ cts|tojson }};
       const esMap = {};
-      function setVisibility(ctId, active){ const card=document.getElementById('ct-card-'+ctId); const canControl=card?.dataset?.canControl==='1'; if(!canControl) return; const s=document.getElementById('start-wrap-'+ctId); const p=document.getElementById('stop-wrap-'+ctId); if(s) s.classList.toggle('hide',!!active); if(p) p.classList.toggle('hide',!active); }
-      function apply(ctId,data){ const get=(id)=>document.getElementById(id+'-'+ctId); const active=!!data.session_active || String((data.db_status||''))==='operando' || String((data.db_status||'')).toLowerCase()==='operando'; const c=get('count'); if(c) c.textContent=data.count??0; const l=get('lote'); if(l){ l.textContent=data.lote||'-'; l.className='pill '+((data.lote&&data.lote!=='-')?'on':'off'); } const h=get('inicio'); if(h){ h.textContent=data.hora_inicio||'-'; h.className='pill '+((data.hora_inicio&&data.hora_inicio!=='-')?'on':'off'); } const a=get('alvo'); if(a){ const alvo=(data.contagem_alvo??'-'); a.textContent=alvo; a.className='pill '+((alvo&&alvo!=='-')?'on':'off'); } const at=get('ativa'); if(at){ at.textContent=active?'sim':'não'; at.className='pill '+(active?'on':'off'); } const pill=document.getElementById('status-'+ctId), pillText=document.getElementById('status-text-'+ctId); if(pill&&pillText){ pill.className='status-pill '+(active?'status-on':'status-off'); pillText.textContent=active?'Operando':'Parada'; } setVisibility(ctId, active); }
+      function setVisibility(ctId, active){
+        const card=document.getElementById('ct-card-'+ctId);
+        const canControl=card?.dataset?.canControl==='1';
+        if(!canControl) return;
+        const s=document.getElementById('start-wrap-'+ctId);
+        const p=document.getElementById('stop-wrap-'+ctId);
+        if(s) s.classList.toggle('hide',!!active);
+        if(p) p.classList.toggle('hide',!active);
+      }
+      function apply(ctId,data){
+        const get=(id)=>document.getElementById(id+'-'+ctId);
+        const dbStatusRaw = String((data.db_status||'')).toLowerCase();
+        const isPaused = dbStatusRaw === 'pausado';
+        const isOperando = dbStatusRaw === 'operando' || dbStatusRaw === 'ativo' || (!!data.session_active && !isPaused);
+        const hasSession = isOperando || isPaused || !!data.session_active;
+
+        const c=get('count'); if(c) c.textContent=data.count??0;
+        const l=get('lote'); if(l){ l.textContent=data.lote||'-'; l.className='pill '+((data.lote&&data.lote!=='-')?'on':'off'); }
+        const h=get('inicio'); if(h){ h.textContent=data.hora_inicio||'-'; h.className='pill '+((data.hora_inicio&&data.hora_inicio!=='-')?'on':'off'); }
+        const a=get('alvo'); if(a){ const alvo=(data.contagem_alvo??'-'); a.textContent=alvo; a.className='pill '+((alvo&&alvo!=='-')?'on':'off'); }
+        const rest=get('restante'); if(rest){ const alvoVal=data.contagem_alvo; const countVal=Number(data.count); const restante=(alvoVal!=null&&!isNaN(alvoVal)&&!isNaN(countVal))?Math.max(Number(alvoVal)-Number(countVal),0):null; rest.textContent = (restante!=null)?restante:'-'; rest.className='pill '+((restante!=null)?'on':'off'); }
+        const rate=get('rate'); if(rate){ const tph=data.tph; rate.textContent = (tph!=null)?`${tph} TON`:'-'; rate.className='pill '+((tph!=null)?'on':'off'); }
+        const pill=document.getElementById('status-'+ctId), pillText=document.getElementById('status-text-'+ctId);
+        if(pill&&pillText){
+          const agentOnline = data.agent_online;
+          const agentTxt = (agentOnline === false) ? 'Linha Offline' : 'Agente Online';
+          let statusTxt = 'Parada';
+          if (isOperando) statusTxt = 'Operando';
+          else if (isPaused) statusTxt = 'Pause';
+          pill.className = 'status-pill ' + (isOperando ? 'status-on' : 'status-off');
+          pillText.textContent = `${agentTxt} \u2022 ${statusTxt}`;
+        }
+        const camAlert = document.getElementById('camera-alert-'+ctId);
+        if (camAlert){
+          const alertMsg = data.camera_alert || (data.camera_lost ? 'Camera offline' : '');
+          if (alertMsg){
+            camAlert.textContent = alertMsg;
+            camAlert.classList.remove('hide');
+            showCameraPopup(ctId, alertMsg);
+          } else {
+            camAlert.classList.add('hide');
+            lastCameraAlert[ctId] = null;
+          }
+        }
+
+        const btnPause = document.getElementById('btn-pause-'+ctId);
+        const btnResume = document.getElementById('btn-resume-'+ctId);
+        if (btnPause && btnResume){
+          if (isPaused){
+            btnPause.classList.add('hide');
+            btnResume.classList.remove('hide');
+          } else if (hasSession){
+            btnPause.classList.remove('hide');
+            btnResume.classList.add('hide');
+          } else {
+            btnPause.classList.add('hide');
+            btnResume.classList.add('hide');
+          }
+        }
+
+        setVisibility(ctId, hasSession);
+        if(!hasSession){
+          if(c) c.textContent = 0;
+          if(l){ l.textContent = '-'; l.className = 'pill off'; }
+          if(h){ h.textContent = '-'; h.className = 'pill off'; }
+          if(a){ a.textContent = '-'; a.className = 'pill off'; }
+          const rest=get('restante'); if(rest){ rest.textContent='-'; rest.className='pill off'; }
+          const rate=get('rate'); if(rate){ rate.textContent='-'; rate.className='pill off'; }
+        }
+      }
       function connectSSE(ctId){ const es=new EventSource(`/sse/tc/${ctId}`); es.onmessage=(evt)=>{ try{ apply(ctId, JSON.parse(evt.data)); }catch(e){} }; es.onerror=()=>{ setTimeout(()=>{ try{ es.close(); }catch(_){ } ; connectSSE(ctId); },2000); }; esMap[ctId]=es; return es; }
-      function bindStopAjax(ctId){ const card=document.getElementById('ct-card-'+ctId); const canControl=card?.dataset?.canControl==='1'; if(!canControl) return; const form=document.getElementById('stop-wrap-'+ctId); const btn=document.getElementById('btn-stop-'+ctId); if(!form||!btn) return; form.addEventListener('submit', async (e)=>{ e.preventDefault(); btn.disabled=true; try{ const alvoEl=document.getElementById('alvo-'+ctId); const countEl=document.getElementById('count-'+ctId); const alvo=parseInt(alvoEl?.textContent||'0'); const tot=parseInt(countEl?.textContent||'0'); let body; if(Number.isFinite(alvo)&&alvo>0&&tot!==alvo){ const obs=await askObservationModal('Informe uma observação (total diferente do alvo):'); if(!obs){ btn.disabled=false; return;} body=new URLSearchParams(); body.set('observacao', obs); } await fetch(form.action,{ method:'POST', headers:{ 'X-Requested-With':'fetch', 'Content-Type': body?'application/x-www-form-urlencoded':'text/plain' }, body: body? String(body): undefined }); }catch(_){ } finally{ btn.disabled=false; } }); }
+      function bindStopAjax(ctId){
+        const card=document.getElementById('ct-card-'+ctId);
+        const canControl=card?.dataset?.canControl==='1';
+        if(!canControl) return;
+        const form=document.getElementById('stop-wrap-'+ctId);
+        const btn=document.getElementById('btn-stop-'+ctId);
+        const btnPause=document.getElementById('btn-pause-'+ctId);
+        const btnResume=document.getElementById('btn-resume-'+ctId);
+        if(!form||!btn) return;
+        form.addEventListener('submit', async (e)=>{
+          e.preventDefault();
+          btn.disabled=true;
+          try{
+            const alvoEl=document.getElementById('alvo-'+ctId);
+            const countEl=document.getElementById('count-'+ctId);
+            const alvo=parseInt(alvoEl?.textContent||'0');
+            const tot=parseInt(countEl?.textContent||'0');
+            let body;
+            if(Number.isFinite(alvo)&&alvo>0&&tot!==alvo){
+              const obs=await askObservationModal('Informe uma observação (total diferente do alvo):');
+              if(!obs){ btn.disabled=false; return; }
+              body=new URLSearchParams(); body.set('observacao', obs);
+            }
+            await fetch(form.action,{ method:'POST', headers:{ 'X-Requested-With':'fetch', 'Content-Type': body?'application/x-www-form-urlencoded':'text/plain' }, body: body? String(body): undefined });
+          }catch(_){
+          } finally{
+            btn.disabled=false;
+          }
+        });
+        if (btnPause){
+          btnPause.addEventListener('click', async ()=>{
+            btnPause.disabled=true;
+            try{
+              const motivo = await askObservationModal('Informe o motivo da pausa:');
+              const trimmed = (motivo || '').trim();
+              if (!trimmed){
+                btnPause.disabled = false;
+                return;
+              }
+              const body = new URLSearchParams();
+              body.set('motivo', trimmed);
+              await fetch(`/tc/${ctId}/pause`, {
+                method: 'POST',
+                headers: { 'X-Requested-With':'fetch', 'Content-Type':'application/x-www-form-urlencoded' },
+                body: String(body),
+              });
+              if (btnResume){
+                btnPause.classList.add('hide');
+                btnResume.classList.remove('hide');
+              }
+            }catch(_){
+            }finally{
+              btnPause.disabled = false;
+            }
+          });
+        }
+        if (btnResume){
+          btnResume.addEventListener('click', async ()=>{
+            btnResume.disabled = true;
+            try{
+              const resp = await fetch(`/tc/${ctId}/resume`, {
+                method: 'POST',
+                headers: { 'X-Requested-With':'fetch' },
+              });
+              if (resp && resp.status === 409){
+                showCameraPopup(ctId, 'Camera offline. Retomada bloqueada.');
+              } else if (btnPause){
+                btnResume.classList.add('hide');
+                btnPause.classList.remove('hide');
+              }
+            }catch(_){
+            }finally{
+              btnResume.disabled = false;
+            }
+          });
+        }
+      }
       cts.forEach(ct=>{ bindStopAjax(ct.id); connectSSE(ct.id); });
       window.addEventListener('beforeunload', ()=>{ try{ Object.values(esMap).forEach(es=>{ try{ es.close(); }catch(_){ } }); }catch(_){ } });
     })();

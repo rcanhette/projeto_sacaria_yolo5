@@ -14,7 +14,7 @@ def create_session(ct_id: int, lote: str, contagem_alvo: int | None = None) -> i
         """
         SELECT id
           FROM session
-         WHERE ct_id = %s AND status IN ('operando','ativo')
+         WHERE ct_id = %s AND status IN ('operando','ativo','pausado')
          ORDER BY data_inicio DESC
          LIMIT 1
         """,
@@ -65,10 +65,14 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
            SET data_fim   = NOW(),
                total_final = %s,
                status      = %s,
-               observacao  = COALESCE(%s, observacao)
+               observacao  = CASE
+                                WHEN %s IS NULL OR %s = '' THEN observacao
+                                WHEN observacao IS NULL OR observacao = '' THEN %s
+                                ELSE observacao || %s
+                             END
          WHERE id = %s
         """,
-        [total_final, status, observacao, session_id],
+        [total_final, status, observacao, observacao, observacao, observacao, session_id],
     )
 
     # Se o execute() não retorna contagem, tentamos descobrir pela CT do ID dado
@@ -89,17 +93,21 @@ def finish_session(session_id: int, total_final: int, status: str = "finalizado"
                    SET data_fim   = NOW(),
                        total_final = %s,
                        status      = %s,
-                       observacao  = COALESCE(%s, observacao)
+                       observacao  = CASE
+                                        WHEN %s IS NULL OR %s = '' THEN observacao
+                                        WHEN observacao IS NULL OR observacao = '' THEN %s
+                                        ELSE observacao || %s
+                                     END
                  WHERE id = (
                      SELECT id
                        FROM session
                       WHERE ct_id = %s
-                        AND status IN ('operando','ativo')
+                        AND status IN ('operando','ativo','pausado')
                       ORDER BY data_inicio DESC
                       LIMIT 1
                  )
                 """,
-                [total_final, status, observacao, s["ct_id"]],
+                [total_final, status, observacao, observacao, observacao, observacao, s["ct_id"]],
             )
 
 def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "finalizado", observacao: str | None = None) -> None:
@@ -113,17 +121,21 @@ def finish_latest_active_by_ct(ct_id: int, total_final: int, status: str = "fina
            SET data_fim   = NOW(),
                total_final = %s,
                status      = %s,
-               observacao  = COALESCE(%s, observacao)
+               observacao  = CASE
+                                WHEN %s IS NULL OR %s = '' THEN observacao
+                                WHEN observacao IS NULL OR observacao = '' THEN %s
+                                ELSE observacao || %s
+                             END
          WHERE id = (
              SELECT id
                FROM session
               WHERE ct_id = %s
-                AND status IN ('operando','ativo')
+                AND status IN ('operando','ativo','pausado')
               ORDER BY data_inicio DESC
               LIMIT 1
          )
         """,
-        [total_final, status, observacao, ct_id],
+        [total_final, status, observacao, observacao, observacao, observacao, ct_id],
     )
 
 # -----------------------------------------------------------------------------
@@ -163,7 +175,7 @@ def get_active_session_by_ct(ct_id: int) -> Optional[Dict]:
     sql = """
         SELECT id, ct_id, lote, data_inicio, status, total_final, contagem_alvo, observacao
           FROM session
-         WHERE ct_id = %s AND status IN ('operando','ativo')
+         WHERE ct_id = %s AND status IN ('operando','ativo','pausado')
          ORDER BY data_inicio DESC
          LIMIT 1
     """
@@ -195,7 +207,7 @@ def close_all_active_sessions_on_boot(final_status: str = "finalizado") -> int:
                        ), s.total_final
                    ),
                    status = %s
-             WHERE s.status IN ('operando','ativo')
+             WHERE s.status IN ('operando','ativo','pausado')
          RETURNING 1
         )
         SELECT COUNT(*) AS affected FROM upd
@@ -205,3 +217,42 @@ def close_all_active_sessions_on_boot(final_status: str = "finalizado") -> int:
         return int(row["affected"]) if row and "affected" in row else 0
     except Exception:
         return 0
+
+
+def append_observacao(session_id: int, texto: str) -> None:
+    """Acrescenta texto ao campo observacao da sessao (sem sobrescrever)."""
+    execute(
+        """
+        UPDATE session
+           SET observacao = CASE
+                               WHEN observacao IS NULL OR observacao = '' THEN %s
+                               ELSE observacao || %s
+                             END
+         WHERE id = %s
+        """,
+        [texto, texto, session_id],
+    )
+
+
+def pause_session(session_id: int) -> None:
+    """Coloca a sessao em estado 'pausado'."""
+    execute(
+        """
+        UPDATE session
+           SET status = 'pausado'
+         WHERE id = %s
+        """,
+        [session_id],
+    )
+
+
+def resume_session(session_id: int) -> None:
+    """Retoma a sessão pausada, voltando para 'operando'."""
+    execute(
+        """
+        UPDATE session
+           SET status = 'operando'
+         WHERE id = %s
+        """,
+        [session_id],
+    )

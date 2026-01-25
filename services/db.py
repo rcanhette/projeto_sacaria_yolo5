@@ -528,41 +528,25 @@ def ensure_schema() -> None:
     )
     
     # #
-    # Ajusta constraint, default, atualiza registros e recria Ã­ndice Ãºnico parcial
+    # Ajusta constraint e default de status na tabela session.
+    # Agora o status permitido inclui tambÃ©m 'pausado' e 'erro_camera'.
+    # 1) Remove constraint antiga, se existir
+    execute("ALTER TABLE session DROP CONSTRAINT IF EXISTS session_status_check;")
+    execute("ALTER TABLE session DROP CONSTRAINT IF EXISTS chk_session_status;")
+    # 2) Cria/garante nova constraint com enum ampliado
     execute(
         """
-        DO $$
-        DECLARE
-            cname text;
-        BEGIN
-            
-            SELECT conname INTO cname
-              FROM pg_constraint
-             WHERE conrelid = 'session'::regclass
-               AND contype = 'c'
-               AND pg_get_constraintdef(oid) ILIKE '%%status%%IN%%';
-            IF cname IS NOT NULL THEN
-                EXECUTE format('ALTER TABLE session DROP CONSTRAINT %%I', cname);
-            END IF;
-
-            
-            BEGIN
-                ALTER TABLE session
-                  ADD CONSTRAINT chk_session_status
-                  CHECK (status IN ('operando','finalizado','cancelado'));
-            EXCEPTION WHEN duplicate_object THEN
-                
-            END;
-
-            
-            BEGIN
-                ALTER TABLE session ALTER COLUMN status SET DEFAULT 'operando';
-            EXCEPTION WHEN others THEN
-                
-            END;
-        END$$;
+        ALTER TABLE session
+          ADD CONSTRAINT chk_session_status
+          CHECK (status IN ('operando','finalizado','cancelado','pausado','erro_camera'));
         """
     )
+    # 3) Garante default 'operando' para novas linhas
+    try:
+        execute("ALTER TABLE session ALTER COLUMN status SET DEFAULT 'operando';")
+    except Exception:
+        # se falhar, nÃ£o interrompe o boot
+        pass
 
     # Converte valores antigos
     execute("UPDATE session SET status='operando' WHERE status='ativo';")

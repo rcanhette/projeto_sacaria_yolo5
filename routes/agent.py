@@ -2,14 +2,29 @@
 import logging
 from flask import Blueprint, request, jsonify, g
 from services.session_repository import create_session, insert_log, finish_session
+from services.session_repository import pause_session as pause_session_db
+from services.session_repository import append_observacao
+from services.session_repository import get_active_session_by_ct
 from services.tc_repository import get_tc
 from services.runtime import get_or_create_shadow
 from services.agent_repository import get_agent_by_token, upsert_status, upsert_tc_status
+from services.db import query_one
 from datetime import datetime
 
 logs = logging.getLogger(__name__)
 
 agent_bp = Blueprint("agent", __name__, url_prefix="/api/agent/v1")
+
+def _format_obs_with_time(raw: str | None) -> str | None:
+    txt = (raw or "").strip()
+    if not txt:
+        return None
+    try:
+        hora_txt = datetime.now().strftime("%H:%M:%S")
+    except Exception:
+        return txt
+    cleaned = txt.rstrip("* ").rstrip()
+    return f"{hora_txt}: {cleaned}* "
 
 
 def _require_token():
@@ -94,6 +109,40 @@ def heartbeat():
     return jsonify({"ok": True}), 200
 
 
+@agent_bp.route("/session/active/<int:tc_id>", methods=["GET"])
+def session_active(tc_id: int):
+    """Retorna a sessao ativa/pausada para reanexar o agente."""
+    try:
+        sess = get_active_session_by_ct(tc_id)
+        if not sess or sess.get("id") is None:
+            return jsonify({"active": False}), 200
+        sess_id = int(sess.get("id"))
+        total_atual = None
+        try:
+            row = query_one(
+                "SELECT total_atual FROM session_log WHERE session_id = %s ORDER BY ts DESC LIMIT 1",
+                [sess_id],
+            )
+            if row and row.get("total_atual") is not None:
+                total_atual = int(row.get("total_atual"))
+        except Exception:
+            total_atual = None
+        payload = {
+            "active": True,
+            "session": {
+                "id": sess_id,
+                "lote": sess.get("lote"),
+                "contagem_alvo": sess.get("contagem_alvo"),
+                "status": sess.get("status"),
+                "total_atual": total_atual,
+            },
+        }
+        return jsonify(payload), 200
+    except Exception as e:
+        logs.exception("[AGENT] session_active failed: %s", e)
+        return jsonify({"error": "server_error"}), 500
+
+
 @agent_bp.route("/session/start", methods=["POST"])
 def session_start():
     agent = _require_token()  # opcional
@@ -128,6 +177,15 @@ def session_start():
     shadow.session_contagem_alvo = contagem_alvo
     shadow.session_db_id = session_db_id
     shadow.current_session_count = 0
+    try:
+        shadow.session_paused = False
+    except Exception:
+        pass
+    try:
+        shadow.camera_lost = False
+        shadow.camera_alert = None
+    except Exception:
+        pass
     try:
         now = datetime.now()
         shadow.session_data = now.strftime("%d/%m/%Y")
@@ -192,6 +250,10 @@ def session_update():
     except Exception:
         pass
     shadow.session_active = True
+    try:
+        shadow.session_paused = False
+    except Exception:
+        pass
 
     return jsonify({"ok": True}), 200
 
@@ -205,15 +267,27 @@ def session_finish():
     tc_id = int(payload.get("tc_id")) if payload.get("tc_id") is not None else None
     session_id = payload.get("session_db_id")
     total = payload.get("total")
-    observacao = payload.get("observacao")
+    observacao = (payload.get("observacao") or "").strip()
+    camera_alert = (payload.get("camera_alert") or "").strip()
+    status_raw = (payload.get("status") or "").strip().lower() or "finalizado"
     if tc_id is None or session_id is None:
         return jsonify({"error": "missing tc_id or session_db_id"}), 400
     if agent:
         agent_tc = agent.get('tc_id')
         if agent_tc is not None and tc_id != int(agent_tc):
             return jsonify({"error": "forbidden_tc"}), 403
+    # Formata observacao de parada com hora, no mesmo padrao do pause
+    obs_final = None
+    if observacao:
+        try:
+            now = datetime.now()
+            hora_txt = now.strftime("%H:%M:%S")
+            obs_final = f"{hora_txt}: {observacao}*"
+        except Exception:
+            obs_final = observacao
+
     try:
-        finish_session(int(session_id), int(total) if total is not None else 0, status='finalizado', observacao=observacao)
+        finish_session(int(session_id), int(total) if total is not None else 0, status=status_raw, observacao=obs_final)
     except Exception as e:
         logs.exception("[AGENT] fail to finish session: %s", e)
         return jsonify({"error": "db_error"}), 500
@@ -227,5 +301,47 @@ def session_finish():
             pass
     shadow.session_active = False
     shadow.session_db_id = None
+    try:
+        if status_raw == "erro_camera":
+            shadow.camera_lost = True
+            shadow.camera_alert = camera_alert or obs_final or "Perda de conexao com a camera."
+        else:
+            shadow.camera_lost = False
+            shadow.camera_alert = None
+    except Exception:
+        pass
+
+    return jsonify({"ok": True}), 200
+
+
+@agent_bp.route("/session/pause", methods=["POST"])
+def session_pause():
+    agent = _require_token()  # opcional
+    payload = request.get_json(silent=True) or {}
+    logs.info("[AGENT] session_pause: %s", payload)
+    tc_id = int(payload.get("tc_id")) if payload.get("tc_id") is not None else None
+    session_id = payload.get("session_db_id")
+    motivo = (payload.get("motivo") or "").strip()
+    if tc_id is None or session_id is None:
+        return jsonify({"error": "missing tc_id or session_db_id"}), 400
+    if agent:
+        agent_tc = agent.get('tc_id')
+        if agent_tc is not None and tc_id != int(agent_tc):
+            return jsonify({"error": "forbidden_tc"}), 403
+    try:
+        pause_session_db(int(session_id))
+        obs_txt = _format_obs_with_time(motivo)
+        if obs_txt:
+            try:
+                append_observacao(int(session_id), obs_txt)
+            except Exception:
+                pass
+    except Exception as e:
+        logs.exception("[AGENT] fail to pause session: %s", e)
+        return jsonify({"error": "db_error"}), 500
+
+    shadow = get_or_create_shadow(tc_id)
+    shadow.session_active = True
+    shadow.session_paused = True
 
     return jsonify({"ok": True}), 200

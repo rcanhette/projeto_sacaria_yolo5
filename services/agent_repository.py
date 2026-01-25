@@ -47,7 +47,10 @@ def get_active_agent_for_tc(tc_id: int) -> Optional[Dict]:
                a.tc_id,
                a.active,
                s.hostname,
-               s.status as runtime_status
+               s.version,
+               s.last_seen,
+               s.status as runtime_status,
+               EXTRACT(EPOCH FROM (NOW()::timestamp - s.last_seen)) as age_sec
           FROM agent a
           LEFT JOIN agent_status s ON s.agent_id = a.id
          WHERE a.active = TRUE AND a.tc_id = %s
@@ -58,11 +61,34 @@ def get_active_agent_for_tc(tc_id: int) -> Optional[Dict]:
 
 def get_tc_status(tc_id: int) -> Optional[Dict]:
     sql = """
-        SELECT tc_id, last_seen, hostname, version, status
+        SELECT tc_id,
+               last_seen,
+               hostname,
+               version,
+               status,
+               EXTRACT(EPOCH FROM (NOW()::timestamp - last_seen)) as age_sec
           FROM tc_agent_status
          WHERE tc_id = %s
     """
     return query_one(sql, [tc_id])
+
+
+def get_effective_tc_status(tc_id: int) -> Optional[Dict]:
+    """Retorna status de TC usando tc_agent_status ou agent_status quando aplicável."""
+    row = get_tc_status(tc_id)
+    if row:
+        return row
+    agent = get_active_agent_for_tc(tc_id)
+    if not agent:
+        return None
+    return {
+        "tc_id": tc_id,
+        "last_seen": agent.get("last_seen"),
+        "hostname": agent.get("hostname"),
+        "version": agent.get("version"),
+        "status": agent.get("runtime_status"),
+        "age_sec": agent.get("age_sec"),
+    }
 
 
 def get_host_for_tc(tc_id: int) -> Optional[str]:
@@ -76,20 +102,3 @@ def get_host_for_tc(tc_id: int) -> Optional[str]:
     if agent and agent.get("hostname"):
         return agent["hostname"]
     return None
-
-def get_active_agent_for_tc(tc_id: int) -> Optional[Dict]:
-    """Retorna agente ativo vinculado à TC (com hostname/status quando houver)."""
-    sql = """
-        SELECT a.id,
-               a.agent_id,
-               a.token,
-               a.tc_id,
-               a.active,
-               s.hostname,
-               s.status as runtime_status
-          FROM agent a
-          LEFT JOIN agent_status s ON s.agent_id = a.id
-         WHERE a.active = TRUE AND a.tc_id = %s
-         LIMIT 1
-    """
-    return query_one(sql, [tc_id])

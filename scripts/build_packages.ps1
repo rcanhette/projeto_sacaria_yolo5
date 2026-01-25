@@ -43,6 +43,7 @@ if (Test-Path 'scripts/install_nssm_central.ps1') {
 # Serviços necessários ao Central (sem visão/tensor)
 $centralServices = @(
   'services/db.py',
+  'services/__init__.py',
   'services/auth_repository.py',
   'services/session_repository.py',
   'services/agent_repository.py',
@@ -74,11 +75,14 @@ foreach ($f in $agentFiles) {
 
 # Serviços do Agente (visão / detector / captura)
 $agentServices = @(
+  'services/__init__.py',
   'services/capture_point.py',
   'services/video_source.py',
   'services/industrial_tag_detector.py',
   'services/local_queue.py',
-  'services/runtime.py'
+  'services/runtime.py',
+  'services/session_repository.py',
+  'services/db.py'
 )
 foreach ($s in $agentServices) {
   if (Test-Path $s) {
@@ -100,4 +104,3 @@ if (Test-Path 'scripts/install_nssm_agent.ps1') {
 }
 
 "Pacotes montados em: $OutDir"
-

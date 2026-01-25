@@ -101,32 +101,6 @@
     </table>
   </div>
   <script>
-    (function(){
-      try{
-        const es = new EventSource("{{ url_for('tc.sse_tc', tc_id=sess.ct_id) }}");
-        const totalEl = document.getElementById('total_live');
-        const statusEl = document.getElementById('status_live');
-        const finalTotal = {{ effective_total }};
-        es.onmessage = function(e){
-          try{
-            const d = JSON.parse(e.data);
-            if (d.session_active){
-              if (totalEl && typeof d.count === 'number') totalEl.textContent = d.count;
-            } else {
-              if (totalEl && typeof finalTotal !== 'undefined') totalEl.textContent = finalTotal;
-            }
-            if (statusEl){
-              const isOp = !!d.session_active;
-              statusEl.textContent = isOp ? 'operando' : 'finalizado';
-              statusEl.classList.toggle('status-operando', isOp);
-            }
-          }catch(_){ }
-        };
-        es.onerror = function(){ try{ es.close(); }catch(_){ } };
-      }catch(_){ }
-    })();
-  </script>
-  <script>
     // Auto-atualização das linhas do log (polling leve)
     (function(){
       const tbody = document.getElementById('logs_tbody');

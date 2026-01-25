@@ -84,12 +84,9 @@
     .panel + .panel {
       border-left: 2px solid rgba(15,23,42,0.85);
     }
-    .panel.on {
-      background: #14532d; /* verde operando */
-    }
-    .panel.off {
-      background: #7f1d1d;
-    }
+    .panel.on { background: #14532d; }      /* verde operando */
+    .panel.off { background: #7f1d1d; }     /* vermelho parada */
+    .panel.pause { background: #a16207; }   /* amarelo pausa */
     .tc-name {
       font-weight: 800;
       letter-spacing: .08em;
@@ -124,9 +121,7 @@
       color: #e5e7eb;
       opacity: 0.9;
     }
-    .tc-extra span + span {
-      margin-left: 12px;
-    }
+    .tc-extra span + span { margin-left: 12px; }
     @media (max-width: 900px) {
       .wall {
         flex-direction: column;
@@ -179,6 +174,7 @@
       <div class="tc-extra">
         <span data-role="lote"></span>
         <span data-role="alvo"></span>
+        <span data-role="rate"></span>
       </div>
     </section>
     <section class="panel off" id="panel-right" data-side="right">
@@ -188,6 +184,7 @@
       <div class="tc-extra">
         <span data-role="lote"></span>
         <span data-role="alvo"></span>
+        <span data-role="rate"></span>
       </div>
     </section>
   </div>
@@ -218,12 +215,23 @@
         const countEl = panel.querySelector('[data-role=\"count\"]');
         const loteEl = panel.querySelector('[data-role=\"lote\"]');
         const alvoEl = panel.querySelector('[data-role=\"alvo\"]');
+        const rateEl = panel.querySelector('[data-role=\"rate\"]');
 
-        const active = !!payload.session_active || (String(payload.db_status || '').toLowerCase() === 'operando' || String(payload.db_status || '').toLowerCase() === 'ativo');
-        panel.classList.toggle('on', active);
-        panel.classList.toggle('off', !active);
+        const status = String(payload.db_status || '').toLowerCase();
+        const paused = !!payload.session_paused || status === 'pausado' || status === 'pause';
+        const active = (!!payload.session_active || status === 'operando' || status === 'ativo') && !paused;
+        const cameraAlert = payload.camera_alert || (payload.camera_lost ? 'Camera offline' : '');
+        const activeEff = active && !cameraAlert;
+        const pausedEff = paused && !cameraAlert;
+        panel.classList.toggle('on', activeEff && !pausedEff);
+        panel.classList.toggle('off', !activeEff && !pausedEff);
+        panel.classList.toggle('pause', pausedEff);
         if (statusEl){
-          statusEl.textContent = active ? 'Operando' : 'Parada';
+          if (cameraAlert){
+            statusEl.textContent = cameraAlert;
+          } else {
+            statusEl.textContent = paused ? 'Pausado' : (active ? 'Operando' : 'Parada');
+          }
         }
         if (countEl){
           countEl.textContent = formatInt(payload.count);
@@ -235,6 +243,10 @@
         if (alvoEl){
           const alvo = payload.contagem_alvo;
           alvoEl.textContent = (alvo != null) ? ('Alvo: ' + formatInt(alvo)) : '';
+        }
+        if (rateEl){
+          const ton = payload.tph;
+          rateEl.textContent = ton != null ? `Carregamento Hora: ${ton} TON` : '';
         }
       }
 
@@ -258,18 +270,20 @@
       function clearPanel(side){
         const panel = panels[side];
         if (!panel) return;
-        panel.classList.remove('on');
+        panel.classList.remove('on', 'pause');
         panel.classList.add('off');
         const nameEl = panel.querySelector('[data-role=\"name\"]');
-        const statusEl = panel.querySelector('[data-role=\"status\"]');
-        const countEl = panel.querySelector('[data-role=\"count\"]');
-        const loteEl = panel.querySelector('[data-role=\"lote\"]');
-        const alvoEl = panel.querySelector('[data-role=\"alvo\"]');
+        const statusEl = panel.querySelector('[data-role="status"]');
+        const countEl = panel.querySelector('[data-role="count"]');
+        const loteEl = panel.querySelector('[data-role="lote"]');
+        const alvoEl = panel.querySelector('[data-role="alvo"]');
+        const rateEl = panel.querySelector('[data-role="rate"]');
         if (nameEl) nameEl.textContent = 'TC -';
         if (statusEl) statusEl.textContent = 'Parada';
         if (countEl) countEl.textContent = '0';
         if (loteEl) loteEl.textContent = '';
         if (alvoEl) alvoEl.textContent = '';
+        if (rateEl) rateEl.textContent = '';
       }
 
       function attachSSE(side, tcId){

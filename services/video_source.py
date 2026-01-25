@@ -20,6 +20,9 @@ class VideoSource:
         self.lock = threading.Lock()
         self.stop_event = threading.Event()
         self.thread: Optional[threading.Thread] = None
+        self.last_ok_ts: float | None = None
+        self.last_read_ts: float | None = None
+        self.last_error: str | None = None
         self.delay = 0.0
         self.is_file = not source_path.lower().startswith("rtsp")
 
@@ -73,12 +76,19 @@ class VideoSource:
                 ret, frame = self.cap.read()
             except Exception as exc:
                 log.warning("Exceção ao ler frames da fonte %s: %s. Encerrando captura.", self.source_path, exc)
+                with self.lock:
+                    self.ret = False
+                    self.frame = None
+                self.last_read_ts = time.monotonic()
+                self.last_error = str(exc)
                 break
 
+            self.last_read_ts = time.monotonic()
             with self.lock:
                 self.ret = ret
                 if ret:
                     self.frame = frame
+                    self.last_ok_ts = self.last_read_ts
                 elif self.is_file:
                     self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                     log.info("Arquivo de vídeo reiniciado: %s", self.source_path)

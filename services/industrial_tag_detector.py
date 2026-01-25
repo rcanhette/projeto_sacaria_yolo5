@@ -266,6 +266,11 @@ class IndustrialTagDetector:
                 )
 
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            try:
+                self.model.to(self.device)
+                log.info("[Detector] Modelo movido para device='%s'", self.device)
+            except Exception as e:
+                log.warning("[Detector] Nao foi possivel mover modelo para '%s': %s", self.device, e)
             # Thresholds de detecção baseados exatamente no min_conf configurado
             try:
                 self.det_conf_add = float(self.min_conf)
@@ -290,6 +295,21 @@ class IndustrialTagDetector:
                 pass
 
             self.model.eval()
+            # Warmup rapido para reduzir latencia da primeira inferencia
+            # Permite reduzir custo via env: YOLO_WARMUP_ENABLE=0 e YOLO_WARMUP_SIZE=128
+            try:
+                if self.device == 'cuda':
+                    warmup_enabled = os.getenv("YOLO_WARMUP_ENABLE", "1").strip() not in ("0", "false", "False")
+                    try:
+                        warmup_size = int(os.getenv("YOLO_WARMUP_SIZE", "128"))
+                    except Exception:
+                        warmup_size = 128
+                    if warmup_enabled and warmup_size > 0:
+                        _dummy = torch.zeros((1, 3, warmup_size, warmup_size), device=self.device)
+                        _ = self.model(_dummy, size=warmup_size)
+                        log.info("[Detector] Warmup inicial concluido no device '%s'", self.device)
+            except Exception:
+                pass
 
         except Exception as e:
 
@@ -308,6 +328,8 @@ class IndustrialTagDetector:
 
         # 2. Configuraaes do Rastreador (Tracking)
 
+        if roi is None or not isinstance(roi, (tuple, list)) or len(roi) != 4:
+            roi = (0, 0, 0, 0)
         self.roi = roi
 
         self.counter = 0
@@ -485,7 +507,11 @@ class IndustrialTagDetector:
 
         raw_frame = frame.copy() if self.missed_frame_dir else frame
 
-        results = self.model(frame, size=640)
+        try:
+            results = self.model(frame, size=640, device=self.device)
+        except TypeError:
+            # compat: versões antigas não aceitam device no forward
+            results = self.model(frame, size=640)
 
         detections = results.pred[0].cpu().numpy()
 

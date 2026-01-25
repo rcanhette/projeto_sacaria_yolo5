@@ -7,6 +7,7 @@ from logging.config import dictConfig
 from flask import Flask, jsonify, request
 import socket
 import cv2
+import os
 
 # Reuso do CapturePoint local
 from services.capture_point import CapturePoint
@@ -37,11 +38,11 @@ class CentralClient:
             self.session = requests.Session()
             if Retry is not None:
                 retry = Retry(
-                    total=3,
-                    connect=3,
-                    read=3,
-                    status=3,
-                    backoff_factor=0.3,  # ~0.3s, 0.6s, 1.2s
+                    total=1,
+                    connect=1,
+                    read=1,
+                    status=1,
+                    backoff_factor=0.1,  # tempos menores para não travar start/stop
                     status_forcelist=(429, 502, 503, 504),
                     allowed_methods=("GET", "POST"),
                     raise_on_status=False,
@@ -85,7 +86,7 @@ class CentralClient:
         url = f"{self.base_url}/api/agent/v1/session/start"
         payload = {"agent_id": self.agent_id, "tc_id": tc_id, "lote": lote, "contagem_alvo": contagem_alvo}
         try:
-            r = self.session.post(url, json=payload, headers=self._headers(), timeout=10)
+            r = self.session.post(url, json=payload, headers=self._headers(), timeout=5)
             r.raise_for_status()
             data = r.json()
             return data.get("session_db_id")
@@ -108,7 +109,7 @@ class CentralClient:
         except Exception:
             pass
 
-    def session_finish(self, tc_id: int, session_db_id: int, total: int, observacao: str | None = None):
+    def session_finish(self, tc_id: int, session_db_id: int, total: int, observacao: str | None = None, status: str | None = None, camera_alert: str | None = None):
         url = f"{self.base_url}/api/agent/v1/session/finish"
         payload = {
             "agent_id": self.agent_id,
@@ -117,13 +118,40 @@ class CentralClient:
             "total": total,
             "observacao": observacao,
         }
+        if status:
+            payload["status"] = status
+        if camera_alert:
+            payload["camera_alert"] = camera_alert
         try:
-            self.session.post(url, json=payload, headers=self._headers(), timeout=10)
+            self.session.post(url, json=payload, headers=self._headers(), timeout=5)
+        except Exception:
+            pass
+
+    def session_pause(self, tc_id: int, session_db_id: int, motivo: str | None = None):
+        url = f"{self.base_url}/api/agent/v1/session/pause"
+        payload = {
+            "agent_id": self.agent_id,
+            "tc_id": tc_id,
+            "session_db_id": session_db_id,
+            "motivo": motivo,
+        }
+        try:
+            self.session.post(url, json=payload, headers=self._headers(), timeout=5)
         except Exception:
             pass
 
     def get_config(self, tc_id: int):
         url = f"{self.base_url}/api/agent/v1/config/{tc_id}"
+        try:
+            r = self.session.get(url, headers=self._headers(), timeout=10)
+            if r.ok:
+                return r.json()
+        except Exception:
+            return None
+        return None
+
+    def get_active_session(self, tc_id: int):
+        url = f"{self.base_url}/api/agent/v1/session/active/{tc_id}"
         try:
             r = self.session.get(url, headers=self._headers(), timeout=10)
             if r.ok:
@@ -176,6 +204,9 @@ class AgentService:
         self.cp = None
         self.thread = None
         self.stop_event = threading.Event()
+        self._start_lock = threading.Lock()
+        self._start_inflight = False
+        self._last_start_ts = 0.0
         # Porta HTTP do agente (informada no heartbeat como IP:porta)
         try:
             import os as _os
@@ -192,6 +223,10 @@ class AgentService:
             self.jpeg_quality = min(95, max(30, int(a.get("jpeg_quality", fallback="80"))))
         except Exception:
             self.jpeg_quality = 80
+        try:
+            self.start_cooldown_sec = float(a.get("start_cooldown_sec", fallback="2.0"))
+        except Exception:
+            self.start_cooldown_sec = 2.0
         # Shared JPEG buffer for fan-out
         self._jpeg_lock = threading.Lock()
         self._last_jpeg = None
@@ -228,6 +263,11 @@ class AgentService:
                 return default
         self.sev_warn_events = _getint("severity_warn_events", 1)
         self.sev_crit_events = _getint("severity_crit_events", 100)
+        try:
+            # Nome amigável se vier na config (opcional)
+            self.tc_name = a.get("tc_name", fallback=f"TC{self.tc_id}")
+        except Exception:
+            self.tc_name = f"TC{self.tc_id}"
         self.sev_warn_sessions = _getint("severity_warn_sessions", 1)
         self.sev_crit_sessions = _getint("severity_crit_sessions", 3)
         self.sev_crit_last_sync_ms = _getint("severity_crit_last_sync_ms", 15*60*1000)
@@ -235,6 +275,94 @@ class AgentService:
         self._shadow_local_id: int | None = None
         # Estado de conectividade com o Central
         self._central_online: bool = False
+        # Monitoramento de camera quando ocioso
+        try:
+            self._camera_check_interval = float(os.getenv("CAMERA_IDLE_CHECK_SEC", "10"))
+        except Exception:
+            self._camera_check_interval = 10.0
+        if self._camera_check_interval < 2.0:
+            self._camera_check_interval = 2.0
+        try:
+            self._camera_open_timeout_ms = int(os.getenv("CAMERA_OPEN_TIMEOUT_MS", "2000"))
+        except Exception:
+            self._camera_open_timeout_ms = 2000
+        try:
+            self._camera_read_timeout_ms = int(os.getenv("CAMERA_READ_TIMEOUT_MS", "2000"))
+        except Exception:
+            self._camera_read_timeout_ms = 2000
+        self._camera_last_check_ts = 0.0
+        self._camera_status = None
+        self._camera_source_path = None
+        self._probe_lock = threading.Lock()
+        self._probe_inflight = False
+        self._probe_thread = None
+
+    def _probe_camera_idle(self, central_client) -> str | None:
+        try:
+            if self.cp and getattr(self.cp, "session_active", False):
+                return "camera_offline" if getattr(self.cp, "camera_lost", False) else "camera_online"
+        except Exception:
+            pass
+        now = time.time()
+        if (now - self._camera_last_check_ts) < self._camera_check_interval:
+            return self._camera_status
+        with self._probe_lock:
+            if self._probe_inflight:
+                if self._probe_thread and not self._probe_thread.is_alive():
+                    self._probe_inflight = False
+                else:
+                    return self._camera_status
+            self._probe_inflight = True
+            self._camera_last_check_ts = now
+
+        def _worker():
+            path = ""
+            try:
+                cfg = central_client.get_config(self.tc_id) or {}
+                path = (cfg.get("path") or "").strip()
+                if path:
+                    self._camera_source_path = path
+            except Exception:
+                path = self._camera_source_path or ""
+            if not path or not str(path).lower().startswith("rtsp"):
+                self._camera_status = None
+                with self._probe_lock:
+                    self._probe_inflight = False
+                return
+            cap = None
+            ok = False
+            try:
+                try:
+                    timeout_us = int(os.getenv("CAMERA_FFMPEG_STIMEOUT_US", str(int(self._camera_open_timeout_ms) * 1000)))
+                    if timeout_us > 0:
+                        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = f"stimeout;{timeout_us}"
+                except Exception:
+                    pass
+                cap = cv2.VideoCapture(path, cv2.CAP_FFMPEG)
+                try:
+                    cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, int(self._camera_open_timeout_ms))
+                    cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, int(self._camera_read_timeout_ms))
+                except Exception:
+                    pass
+                if cap and cap.isOpened():
+                    ret, frame = cap.read()
+                    ok = bool(ret and frame is not None)
+            except Exception:
+                ok = False
+            finally:
+                try:
+                    if cap:
+                        cap.release()
+                except Exception:
+                    pass
+            self._camera_status = "camera_online" if ok else "camera_offline"
+            with self._probe_lock:
+                self._probe_inflight = False
+
+        t = threading.Thread(target=_worker, daemon=True)
+        self._probe_thread = t
+        t.start()
+        return self._camera_status
 
     def _parse_roi(self, roi_val):
         if not roi_val:
@@ -256,10 +384,7 @@ class AgentService:
         except Exception:
             return None
 
-    def start_loop(self, lote: str = None, contagem_alvo: int | None = None, source_type: str | None = None, file_path: str | None = None):
-        # Busca configuração da TC no servidor central
-        verify_opt = (self.central_ca or self.central_verify)
-        central = CentralClient(self.central_url, self.token, agent_id=self.agent_id, verify=verify_opt)
+    def _init_capture_point(self, central, source_type: str | None = None, file_path: str | None = None):
         cfg = central.get_config(self.tc_id) or {}
         ct_info = {"id": self.tc_id, "name": cfg.get("name") or f"TC{self.tc_id}"}
         # adapta ROI
@@ -316,8 +441,14 @@ class AgentService:
 
         def _on_create_session(ct_id, lote_val, alvo):
             # Tenta criar no central; se falhar e houver fila local, cria sessão local negativa
+            t0_cs = time.time()
             sid = central.session_start(tc_id=ct_id, lote=lote_val, contagem_alvo=alvo)
+            t_cs = time.time() - t0_cs
             if sid:
+                try:
+                    self.log.info("Sessao remota criada: tc=%s (%s) id=%s em %.2fs", ct_id, getattr(self, "tc_name", ""), sid, t_cs)
+                except Exception:
+                    pass
                 # Journaling: cria sombra local apontando para a sessão remota
                 if self.local_queue:
                     try:
@@ -325,6 +456,11 @@ class AgentService:
                     except Exception:
                         self._shadow_local_id = None
                 return sid
+            else:
+                try:
+                    self.log.warning("Sessao remota NAO criada: tc=%s (%s) em %.2fs (offline?)", ct_id, getattr(self, "tc_name", ""), t_cs)
+                except Exception:
+                    pass
             if self.local_queue:
                 try:
                     self._shadow_local_id = self.local_queue.create_local_session(ct_id, lote_val or "", alvo)
@@ -362,20 +498,32 @@ class AgentService:
             # Journaling local
             try:
                 if self.local_queue and self._shadow_local_id is not None:
-                    self.local_queue.mark_finish(self._shadow_local_id, total, observacao, mark_sent=online)
+                    self.local_queue.mark_finish(self._shadow_local_id, total, observacao, status=status, mark_sent=online)
             except Exception:
                 pass
             # Envio online
             if online:
                 try:
-                    central.session_finish(tc_id=self.tc_id, session_db_id=int(session_id), total=total, observacao=observacao)
-                except Exception:
-                    pass
+                    t0_fn = time.time()
+                    camera_alert = observacao if status == "erro_camera" else None
+                    central.session_finish(tc_id=self.tc_id, session_db_id=int(session_id), total=total, observacao=observacao, status=status, camera_alert=camera_alert)
+                    self.log.info("Finish central tc=%s (%s) id=%s total=%s em %.2fs", self.tc_id, getattr(self, "tc_name", ""), session_id, total, time.time()-t0_fn)
+                except Exception as e:
+                    self.log.warning("Finish central falhou tc=%s (%s) id=%s: %s", self.tc_id, getattr(self, "tc_name", ""), session_id, e)
 
         self.cp.on_create_session = _on_create_session
         self.cp.on_insert_log = _on_insert_log
         self.cp.on_finish_session = _on_finish_session
-        self.cp.start_session(lote=lote or "", contagem_alvo=contagem_alvo)
+        def _on_pause_session(session_id, motivo=None):
+            try:
+                if session_id is None:
+                    return
+                central.session_pause(tc_id=self.tc_id, session_db_id=int(session_id), motivo=motivo)
+            except Exception:
+                pass
+        self.cp.on_pause_session = _on_pause_session
+
+    def _start_worker(self, central):
         def run():
             while not self.stop_event.is_set():
                 try:
@@ -389,16 +537,51 @@ class AgentService:
                     time.sleep(0.5)
                 except Exception:
                     time.sleep(1)
+        self.stop_event.clear()
         self.thread = threading.Thread(target=run, daemon=True)
         self.thread.start()
 
+    def start_loop(self, lote: str = None, contagem_alvo: int | None = None, source_type: str | None = None, file_path: str | None = None):
+        # Busca configuração da TC no servidor central
+        verify_opt = (self.central_ca or self.central_verify)
+        central = CentralClient(self.central_url, self.token, agent_id=self.agent_id, verify=verify_opt)
+        self._init_capture_point(central, source_type=source_type, file_path=file_path)
+        t0 = time.time()
+        self.log.info("START loop: preparando sessao tc=%s (%s) lote=%s alvo=%s", self.tc_id, getattr(self, "tc_name", ""), lote, contagem_alvo)
+        self.cp.start_session(lote=lote or "", contagem_alvo=contagem_alvo)
+        self._start_worker(central)
+        self.log.info("START loop concluido tc=%s (%s) em %.2fs", self.tc_id, getattr(self, "tc_name", ""), time.time() - t0)
+
+    def resume_existing_session(self, session_id: int, lote: str, contagem_alvo: int | None = None, total_atual: int | None = None):
+        verify_opt = (self.central_ca or self.central_verify)
+        central = CentralClient(self.central_url, self.token, agent_id=self.agent_id, verify=verify_opt)
+        self._init_capture_point(central)
+        if self.local_queue and session_id is not None:
+            try:
+                self._shadow_local_id = self.local_queue.ensure_shadow_session_remote(self.tc_id, lote or "", contagem_alvo, int(session_id))
+            except Exception:
+                self._shadow_local_id = None
+        self.log.info("RESUME loop: reanexando sessao tc=%s (%s) id=%s lote=%s", self.tc_id, getattr(self, "tc_name", ""), session_id, lote)
+        self.cp.attach_session(session_db_id=session_id, lote=lote or "", contagem_alvo=contagem_alvo, current_total=total_atual)
+        self._start_worker(central)
+
     def stop_loop(self, observacao: str | None = None):
+        t0 = time.time()
         try:
             if self.cp:
+                self.log.info("STOP solicitado (agent) para %s (%s), obs=%s", self.tc_id, getattr(self, "tc_name", ""), bool(observacao))
                 self.cp.stop_session(observacao=observacao)
                 self.cp.release()
+                self.log.info("STOP concluido (agent) para %s (%s)", self.tc_id, getattr(self, "tc_name", ""))
+        except Exception as e:
+            self.log.error("Erro ao finalizar sessao local para %s (%s): %s", self.tc_id, getattr(self, "tc_name", ""), e, exc_info=True)
         finally:
             self.stop_event.set()
+            try:
+                with self._start_lock:
+                    self._start_inflight = False
+            except Exception:
+                pass
             try:
                 with self._jpeg_lock:
                     self._last_jpeg = None
@@ -409,6 +592,7 @@ class AgentService:
                 self._shadow_local_id = None
             except Exception:
                 pass
+        self.log.info("STOP loop tc=%s (%s) finalizado em %.2fs", self.tc_id, getattr(self, "tc_name", ""), time.time() - t0)
 
         # Marca parada também no central se necessário (já feito via callback no stop_session)
 
@@ -467,7 +651,9 @@ def create_agent_app(cfg_path: str | None = None):
         while True:
             try:
                 host_for_central = _best_host() or socket.gethostname()
-                central.heartbeat(tc_id=service.tc_id, hostname=f'{host_for_central}:{service.http_port}', status='running', version='agent-1')
+                cam_status = service._probe_camera_idle(central)
+                hb_status = cam_status or 'running'
+                central.heartbeat(tc_id=service.tc_id, hostname=f'{host_for_central}:{service.http_port}', status=hb_status, version='agent-1')
                 service._central_online = True
             except Exception as e:
                 try:
@@ -477,7 +663,7 @@ def create_agent_app(cfg_path: str | None = None):
                 except Exception:
                     pass
                 service._central_online = False
-            time.sleep(10)
+            time.sleep(5)
 
     threading.Thread(target=_hb, daemon=True).start()
 
@@ -519,20 +705,35 @@ def create_agent_app(cfg_path: str | None = None):
         file_path = data.get("file_path")
         try:
             logging.getLogger("agent").info(
-                "Comando START recebido: lote=%s, alvo=%s, source_type=%s, file_path=%s",
-                lote, contagem_alvo, source_type, file_path
+                "Comando START recebido: tc=%s (%s) lote=%s alvo=%s source_type=%s file_path=%s",
+                service.tc_id, getattr(service, "tc_name", ""), lote, contagem_alvo, source_type, file_path
             )
         except Exception:
             pass
-        # Evita dupla inicializacao
-        if service.thread is not None and service.thread.is_alive():
-            return jsonify({"ok": True, "running": True}), 200
+        # Evita dupla inicializacao e STARTs repetidos em curto intervalo
+        now = time.time()
+        with service._start_lock:
+            if service.thread is not None and service.thread.is_alive():
+                return jsonify({"ok": True, "running": True}), 200
+            if service._start_inflight:
+                return jsonify({"ok": True, "running": True, "ignored": "start_inflight"}), 200
+            if (now - service._last_start_ts) < service.start_cooldown_sec:
+                return jsonify({"ok": True, "running": True, "ignored": "debounce"}), 200
+            service._start_inflight = True
+            service._last_start_ts = now
         # Dispara em background para responder rapido
         def _start_async():
             try:
                 service.start_loop(lote=lote, contagem_alvo=contagem_alvo, source_type=source_type, file_path=file_path)
-            except Exception:
-                pass
+                logging.getLogger("agent").info("START disparado em background para tc=%s (%s)", service.tc_id, getattr(service, "tc_name", ""))
+            except Exception as e:
+                logging.getLogger("agent").error("Falha ao iniciar contagem tc=%s (%s): %s", service.tc_id, getattr(service, "tc_name", ""), e, exc_info=True)
+            finally:
+                try:
+                    with service._start_lock:
+                        service._start_inflight = False
+                except Exception:
+                    pass
         threading.Thread(target=_start_async, daemon=True).start()
         return jsonify({"ok": True, "running": True}), 200
 
@@ -540,7 +741,53 @@ def create_agent_app(cfg_path: str | None = None):
     def cmd_stop():
         data = request.get_json(silent=True) or {}
         obs = data.get("observacao")
-        service.stop_loop(observacao=obs)
+        try:
+            logging.getLogger("agent").info("Comando STOP recebido: tc=%s (%s) obs=%s", service.tc_id, getattr(service, "tc_name", ""), bool(obs))
+            service.stop_loop(observacao=obs)
+        except Exception as e:
+            logging.getLogger("agent").error("Falha ao processar STOP tc=%s (%s): %s", service.tc_id, getattr(service, "tc_name", ""), e, exc_info=True)
+        return jsonify({"ok": True})
+
+    @app.route("/api/agent/v1/command/pause", methods=["POST"])
+    def cmd_pause():
+        cp = service.cp
+        try:
+            if cp:
+                cp.pause_session()
+                logging.getLogger("agent").info("Comando PAUSE aplicado: tc=%s (%s)", service.tc_id, getattr(service, "tc_name", ""))
+            else:
+                logging.getLogger("agent").warning("Comando PAUSE ignorado: sem cp/tc ativa (tc=%s)", service.tc_id)
+        except Exception as e:
+            logging.getLogger("agent").error("Falha no PAUSE tc=%s (%s): %s", service.tc_id, getattr(service, "tc_name", ""), e, exc_info=True)
+        return jsonify({"ok": True})
+
+    @app.route("/api/agent/v1/command/resume", methods=["POST"])
+    def cmd_resume():
+        cp = service.cp
+        try:
+            if cp:
+                if getattr(cp, "camera_lost", False):
+                    logging.getLogger("agent").warning("Comando RESUME bloqueado: camera offline tc=%s", service.tc_id)
+                    return jsonify({"ok": False, "error": "camera_offline"}), 409
+                cp.resume_session()
+                logging.getLogger("agent").info("Comando RESUME aplicado: tc=%s (%s)", service.tc_id, getattr(service, "tc_name", ""))
+            else:
+                verify_opt = (service.central_ca or service.central_verify)
+                central = CentralClient(service.central_url, service.token, agent_id=service.agent_id, verify=verify_opt)
+                data = central.get_active_session(service.tc_id) or {}
+                sess = data.get("session") if isinstance(data, dict) else None
+                if sess and sess.get("id") is not None:
+                    service.resume_existing_session(
+                        session_id=int(sess.get("id")),
+                        lote=sess.get("lote") or "",
+                        contagem_alvo=sess.get("contagem_alvo"),
+                        total_atual=sess.get("total_atual"),
+                    )
+                    logging.getLogger("agent").info("Comando RESUME aplicado (reativo): tc=%s (%s)", service.tc_id, getattr(service, "tc_name", ""))
+                else:
+                    logging.getLogger("agent").warning("Comando RESUME ignorado: sem cp/tc ativa (tc=%s)", service.tc_id)
+        except Exception as e:
+            logging.getLogger("agent").error("Falha no RESUME tc=%s (%s): %s", service.tc_id, getattr(service, "tc_name", ""), e, exc_info=True)
         return jsonify({"ok": True})
 
     @app.route("/api/agent/v1/snapshot.jpg")
