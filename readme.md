@@ -79,6 +79,12 @@ Instalação automatizada (Central):
 
 ```
 powershell -ExecutionPolicy Bypass -File scripts\install_nssm_central.ps1 -ServiceName ProjetoSacaria_v1 -Root C:\projeto_sacaria_central -Port 80
+
+powershell -ExecutionPolicy Bypass -File scripts\install_nssm_central.ps1 -ServiceName ProjetoSacariaCentral -Root "C:\Projeto Sacaria\central" -Port 80
+
+cd "C:\Projeto Sacaria\central"
+powershell -ExecutionPolicy Bypass -File .\scripts\install_nssm_central.ps1 -ServiceName ProjetoSacariaCentral -Root "C:\Projeto Sacaria\central" -Port 80
+
 ```
 
 Agente (PC/TC)
@@ -119,9 +125,11 @@ Instalação automatizada (Agente):
 ```
 powershell -ExecutionPolicy Bypass -File scripts\install_nssm_agent.ps1 -ServiceName ProjetoSacaria_Agent -Root C:\projeto_sacaria_agent -Mode waitress -Port 9090
 ```
-powershell -ExecutionPolicy Bypass -File scripts\install_nssm_agent.ps1 -ServiceName ProjetoSacariaAgent_M4-TC2 -Root "C:\Projeto Sacaria\agent_M4-TC2" -Mode waitress -Port 9093
+powershell -ExecutionPolicy Bypass -File scripts\install_nssm_agent.ps1 -ServiceName ProjetoSacariaAgent_M4-TC4 -Root "C:\Projeto Sacaria\agent_M4-TC4" -Mode waitress -Port 9094
 
 
+nssm set ProjetoSacariaAgent_M4-TC4 AppEnvironmentExtra "YOLO_WARMUP_SIZE=128" "YOLO_WARMUP_ENABLE=1"
+nssm restart ProjetoSacariaAgent_M4-TC4
 
 
 ## Preparacao do ambiente (desenvolvimento/homologacao)
