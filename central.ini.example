@@ -7,11 +7,15 @@ connection_limit=200
 channel_timeout=90
 
 [database]
+# type=postgres | sqlite
+type=postgres
 host=localhost
 port=5432
 database=contagem_sacaria
 user=postgres
 password=postgres
+# Para SQLite (quando type=sqlite)
+sqlite_path=data/app.db
 
 [paths]
 # Diretório de logs do serviço (será criado se não existir)

@@ -11,7 +11,7 @@ from services.tc_repository import get_tc, list_tcs
 from services.session_repository import get_active_session_by_ct, pause_session, resume_session, append_observacao, finish_latest_active_by_ct
 from services.auth_repository import list_user_tc_ids, user_can_view_tc, user_can_control_tc
 from services.db import query_one
-from services.agent_repository import get_host_for_tc, get_effective_tc_status
+from services.agent_repository import get_host_for_tc, get_effective_tc_status, is_local_agent_mode
 from services.runtime import tc_runtime, get_or_create_shadow
 from routes.auth import current_user, login_required
 from services.session_repository import get_active_session_by_ct
@@ -872,7 +872,10 @@ def sse_tc(tc_id):
         tc_row = get_tc(tc_id)
         if not tc_row:
             return "TC nÃÂ£o encontrada", 404
-        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
+        if is_local_agent_mode():
+            cp = _ensure_cp(tc_row)
+        else:
+            cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
 
     def stream():
         while True:
@@ -1196,7 +1199,17 @@ def tc_video_proxy(tc_id):
         tc_row = get_tc(tc_id)
         if not tc_row:
             return "TC não encontrada", 404
-        cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
+        if is_local_agent_mode():
+            cp = _ensure_cp(tc_row)
+        else:
+            cp = get_or_create_shadow(tc_id, name=tc_row.get("name"))
+    elif is_local_agent_mode() and getattr(cp, "source_type", "") == "agent-remote":
+        try:
+            tc_row = get_tc(tc_id)
+        except Exception:
+            tc_row = None
+        if tc_row:
+            cp = _ensure_cp(tc_row)
 
     if getattr(cp, "source_type", "") == "agent-remote":
         host = None

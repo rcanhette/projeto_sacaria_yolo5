@@ -2,7 +2,7 @@
 from typing import List, Dict, Optional, Iterable, Union
 from collections.abc import Mapping
 import hashlib
-from services.db import query_all, query_one, execute, execute_returning
+from services.db import query_all, query_one, execute, execute_returning, is_sqlite
 
 # Papéis válidos do sistema
 VALID_ROLES = ("admin", "supervisor", "operator", "viewer")
@@ -107,10 +107,16 @@ def list_user_tc_ids(user_id: int) -> List[int]:
 def set_user_tcs(user_id: int, tc_ids: Iterable[int]) -> None:
     execute("DELETE FROM user_tc WHERE user_id=%s", [user_id])
     for tid in tc_ids:
-        execute(
-            "INSERT INTO user_tc (user_id, tc_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-            [user_id, tid],
-        )
+        if is_sqlite():
+            execute(
+                "INSERT OR IGNORE INTO user_tc (user_id, tc_id) VALUES (%s,%s)",
+                [user_id, tid],
+            )
+        else:
+            execute(
+                "INSERT INTO user_tc (user_id, tc_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+                [user_id, tid],
+            )
 
 def list_users_by_role(roles: Iterable[str]) -> List[Dict]:
     roles = [r for r in roles if r in VALID_ROLES]
@@ -127,10 +133,16 @@ def list_user_ids_for_tc(tc_id: int) -> List[int]:
 def set_tc_users(tc_id: int, user_ids: Iterable[int]) -> None:
     execute("DELETE FROM user_tc WHERE tc_id=%s", [tc_id])
     for uid in user_ids:
-        execute(
-            "INSERT INTO user_tc (tc_id, user_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-            [tc_id, uid],
-        )
+        if is_sqlite():
+            execute(
+                "INSERT OR IGNORE INTO user_tc (tc_id, user_id) VALUES (%s,%s)",
+                [tc_id, uid],
+            )
+        else:
+            execute(
+                "INSERT INTO user_tc (tc_id, user_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+                [tc_id, uid],
+            )
 
 # -----------------------------
 # AUTHZ HELPERS (permissões)

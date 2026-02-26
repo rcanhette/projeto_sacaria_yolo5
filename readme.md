@@ -8,7 +8,7 @@ Aplicacao Flask para contagem de sacarias utilizando um modelo YOLOv5 executado 
 
 - Windows 10/11 ou Windows Server (testado com Python 3.13).
 - Python 3.10+ com `pip`.
-- PostgreSQL acessivel (padrao: `localhost`, database `contagem_sacaria`, usuario `postgres`).
+- PostgreSQL ou SQLite (padrao: PostgreSQL em `localhost`, database `contagem_sacaria`, usuario `postgres`).
 - Camera RTSP ou arquivos de video conforme configuracao das TCs.
 
 As dependencias Python estao listadas em [`requirements.txt`](requirements.txt).

@@ -8,7 +8,7 @@ from routes.auth import login_required, current_user
 from services.auth_repository import user_can_view_tc
 
 # DB helpers
-from services.db import query_all, query_one
+from services.db import query_all, query_one, is_sqlite
 from services.tc_repository import list_tcs
 
 # Excel
@@ -145,13 +145,23 @@ def logs_panel():
         where.append("s.status = %s")
         params.append(status_arg)
     if lote_arg:
-        where.append("s.lote ILIKE %s")
-        params.append(f"%{lote_arg}%")
+        if is_sqlite():
+            where.append("LOWER(s.lote) LIKE %s")
+            params.append(f"%{lote_arg.lower()}%")
+        else:
+            where.append("s.lote ILIKE %s")
+            params.append(f"%{lote_arg}%")
     if ini_de:
-        where.append("s.data_inicio::date >= %s")
+        if is_sqlite():
+            where.append("date(s.data_inicio) >= %s")
+        else:
+            where.append("s.data_inicio::date >= %s")
         params.append(ini_de)
     if ini_ate:
-        where.append("s.data_inicio::date <= %s")
+        if is_sqlite():
+            where.append("date(s.data_inicio) <= %s")
+        else:
+            where.append("s.data_inicio::date <= %s")
         params.append(ini_ate)
     where_sql = " AND ".join(where)
     # total count for pagination
@@ -167,26 +177,48 @@ def logs_panel():
     # page 1 => newest first, standard offset
     offset = (page - 1) * per
 
-    sql = f"""
-        SELECT
-            s.id,
-            s.ct_id,
-            c.name     AS ct_name,
-            s.lote,
-            s.data_inicio,
-            s.data_fim,
-            s.status,
-            s.contagem_alvo,
-            COALESCE(s.total_final, 0) AS total_final,
-            s.observacao
-        FROM session s
-          JOIN tc c ON c.id = s.ct_id
-        WHERE {where_sql}
-        ORDER BY s.data_inicio DESC
-        OFFSET %s
-        LIMIT %s
-    """
-    sessions = query_all(sql, params + [offset, per])
+    if is_sqlite():
+        sql = f"""
+            SELECT
+                s.id,
+                s.ct_id,
+                c.name     AS ct_name,
+                s.lote,
+                s.data_inicio,
+                s.data_fim,
+                s.status,
+                s.contagem_alvo,
+                COALESCE(s.total_final, 0) AS total_final,
+                s.observacao
+            FROM session s
+              JOIN tc c ON c.id = s.ct_id
+            WHERE {where_sql}
+            ORDER BY s.data_inicio DESC
+            LIMIT %s
+            OFFSET %s
+        """
+        sessions = query_all(sql, params + [per, offset])
+    else:
+        sql = f"""
+            SELECT
+                s.id,
+                s.ct_id,
+                c.name     AS ct_name,
+                s.lote,
+                s.data_inicio,
+                s.data_fim,
+                s.status,
+                s.contagem_alvo,
+                COALESCE(s.total_final, 0) AS total_final,
+                s.observacao
+            FROM session s
+              JOIN tc c ON c.id = s.ct_id
+            WHERE {where_sql}
+            ORDER BY s.data_inicio DESC
+            OFFSET %s
+            LIMIT %s
+        """
+        sessions = query_all(sql, params + [offset, per])
 
     total_pages = (total + per - 1) // per if per > 0 else 1
     if total_pages < 1:

@@ -1,13 +1,35 @@
-﻿from typing import Optional, Dict
-from services.db import query_one, execute
+from typing import Optional, Dict
+import os
+from services.db import query_one, execute, is_sqlite
+
+
+def is_local_agent_mode() -> bool:
+    """
+    Indica se o central deve forcar o modo local mesmo com TCs remotas.
+    Controlado via variavel de ambiente (ex.: LOCAL_AGENT_MODE=1).
+    """
+    raw = (os.getenv("LOCAL_AGENT_MODE") or "").strip().lower()
+    if raw in ("1", "true", "yes", "on"):
+        return True
+    if raw in ("0", "false", "no", "off"):
+        return False
+    return False
+
 
 
 def get_agent_by_token(token: str) -> Optional[Dict]:
-    sql = """
-        SELECT id, agent_id, token, tc_id, active
-          FROM agent
-         WHERE token = %s AND active = TRUE
-    """
+    if is_sqlite():
+        sql = """
+            SELECT id, agent_id, token, tc_id, active
+              FROM agent
+             WHERE token = %s AND active = 1
+        """
+    else:
+        sql = """
+            SELECT id, agent_id, token, tc_id, active
+              FROM agent
+             WHERE token = %s AND active = TRUE
+        """
     return query_one(sql, [token])
 
 
@@ -40,36 +62,66 @@ def upsert_tc_status(tc_id: int, hostname: str | None, version: str | None, stat
 
 def get_active_agent_for_tc(tc_id: int) -> Optional[Dict]:
     """Retorna agente ativo vinculado à TC (com hostname/status quando houver)."""
-    sql = """
-        SELECT a.id,
-               a.agent_id,
-               a.token,
-               a.tc_id,
-               a.active,
-               s.hostname,
-               s.version,
-               s.last_seen,
-               s.status as runtime_status,
-               EXTRACT(EPOCH FROM (NOW()::timestamp - s.last_seen)) as age_sec
-          FROM agent a
-          LEFT JOIN agent_status s ON s.agent_id = a.id
-         WHERE a.active = TRUE AND a.tc_id = %s
-         LIMIT 1
-    """
+    if is_sqlite():
+        sql = """
+            SELECT a.id,
+                   a.agent_id,
+                   a.token,
+                   a.tc_id,
+                   a.active,
+                   s.hostname,
+                   s.version,
+                   s.last_seen,
+                   s.status as runtime_status,
+                   (strftime('%s','now') - strftime('%s', s.last_seen)) as age_sec
+              FROM agent a
+              LEFT JOIN agent_status s ON s.agent_id = a.id
+             WHERE a.active = 1 AND a.tc_id = %s
+             LIMIT 1
+        """
+    else:
+        sql = """
+            SELECT a.id,
+                   a.agent_id,
+                   a.token,
+                   a.tc_id,
+                   a.active,
+                   s.hostname,
+                   s.version,
+                   s.last_seen,
+                   s.status as runtime_status,
+                   EXTRACT(EPOCH FROM (NOW()::timestamp - s.last_seen)) as age_sec
+              FROM agent a
+              LEFT JOIN agent_status s ON s.agent_id = a.id
+             WHERE a.active = TRUE AND a.tc_id = %s
+             LIMIT 1
+        """
     return query_one(sql, [tc_id])
 
 
 def get_tc_status(tc_id: int) -> Optional[Dict]:
-    sql = """
-        SELECT tc_id,
-               last_seen,
-               hostname,
-               version,
-               status,
-               EXTRACT(EPOCH FROM (NOW()::timestamp - last_seen)) as age_sec
-          FROM tc_agent_status
-         WHERE tc_id = %s
-    """
+    if is_sqlite():
+        sql = """
+            SELECT tc_id,
+                   last_seen,
+                   hostname,
+                   version,
+                   status,
+                   (strftime('%s','now') - strftime('%s', last_seen)) as age_sec
+              FROM tc_agent_status
+             WHERE tc_id = %s
+        """
+    else:
+        sql = """
+            SELECT tc_id,
+                   last_seen,
+                   hostname,
+                   version,
+                   status,
+                   EXTRACT(EPOCH FROM (NOW()::timestamp - last_seen)) as age_sec
+              FROM tc_agent_status
+             WHERE tc_id = %s
+        """
     return query_one(sql, [tc_id])
 
 
